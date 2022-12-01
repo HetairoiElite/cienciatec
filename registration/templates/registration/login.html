@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% block title %}Iniciar sesión{% endblock title %}
+{% load static %}
+
+
+{% block content %}
+<!--Container card-->
+
+<style>
+    #form-register {
+        margin-bottom: 100px;
+        max-width: 24rem;
+    }
+
+    .errorlist {
+        color: red;
+    }
+
+    label {
+        display: none
+    }
+</style>
+
+<div class="container" id="form-register">
+    {% if 'next' in request.GET %}
+    <div class="alert alert-danger" role="alert">
+        <p>Debes iniciar sesión para acceder a la página</p>
+    </div>
+
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-12 col-md-offset-3">
+            <div class="card">
+                <div class="card-header bg-success text-light">
+                    <h3 class="card-title text-center">Inicio de sesión</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">Iniciar sesión</button>
+                        </div>
+
+
+
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="text-center">
+                        <p>¿No tienes cuenta?<a href="{% url 'signup' %}" class="link-primary"> Regístrate</a></p>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

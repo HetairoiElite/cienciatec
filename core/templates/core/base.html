@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <!-- Fuentes -->
+    <!-- Estilos -->
+    <link rel="stylesheet" href="{% static 'core/bootstrap-5.2.3-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/bootstrap-icons/font/bootstrap-icons.css' %}">
+    <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/x-icon">
+</head>
+
+
+<style>
+    /* footer siempre abajo */
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+
+    /* body centrado */
+
+    footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 2.5rem;
+    }
+
+
+    /* Nav fija */
+    nav {
+        display: flex;
+        /* using flexbox property for parent
+           also known as inline-flex*/
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        overflow: hidden;
+        width: 100%;
+        margin-bottom: 50px;
+    }
+
+    /* Gray body bg */
+    body {}
+</style>
+
+<body>
+
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'core/img/logo1.png' %}" alt="" height="60px">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned"
+                aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="ned">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% if user.is_authenticated and not 'password_reset' in request.path %}
+                        {% if request.path == "/" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">Ingresar &nbsp <i
+                                    class="bi bi-door-open"></i></a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="nav-link" href="{% url 'profile' %}">{{request.user.first_name}}
+                                {{request.user.last_name}} <img src="{{request.user.profile.avatar.url}}" alt="avatar"
+                                    width="40px" height="40px" class="rounded-circle">
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item {% if request.path != '/' %}mt-2{% endif %}">
+                            <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión &nbsp<i
+                                    class="bi bi-box-arrow-left"></i></a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                        </li>
+                        {% endif %}
+
+                        {% if request.path == "/" and not user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </span>
+
+            </div>
+        </div>
+    </nav>
+
+    {% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}
+    <!--Sidebar-->
+    <div class="container-fluid mb-5">
+        <div class="row">
+
+
+            <div class="col-2">
+                <!-- Hover added -->
+                <div class="list-group">
+                    <a href="{% url 'home' %}" class="list-group-item list-group-item-action"><i
+                            class="bi bi-house-fill"></i>Inicio</a>
+                    <a href="{% url 'profile' %}"
+                        class="list-group-item list-group-item-action {% if 'profile in request.path' %}active{% endif %}"><i
+                            class="bi bi-person-fill"></i>Perfil</a>
+                    <a href="#" class="list-group-item list-group-item-action disabled">Disabled item</a>
+                </div>
+
+            </div>
+
+
+
+            <div class="col-10">
+
+                {% endif %}
+
+                <!-- Contenido -->
+                {% block content %}{% endblock %}
+                {% if request.path != "/" and request.path != "/accounts/signup/" %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!--Sidebar-->
+
+    <footer>
+        <!--Pie de página pegado copyright-->
+        <div class="container-fluid bg-dark text-center text-white pt-3">
+
+            <div class="row">
+                <div class="col-6">
+                    <p>Desarrollado por <a class="link-secondary text-light" href="https://github.com/HetairoiElite"
+                            target="_blank">Jonathan Osorio
+                            Sánchez</a></p>
+                </div>
+                <div class="col-6">
+
+                    <div class="row">
+                        <div class="col-6">
+
+                        </div>
+                        <div class="col-6">
+                            <a class="link-light" href="#">Acerca de</a>
+                            &nbsp
+                            <a class="link-light" href="#">Contacto</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <p>© 2021 100CIATEC. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Javascript -->
+    {% comment %} <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'core/js/main.js' %}"></script> {% endcomment %}
+    <script src="{% static 'core/bootstrap-5.2.3-dist/js/bootstrap.js' %}"></script>
+
+
+
+</body>
+
+</html>

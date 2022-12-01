@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!--Success alert email activado-->
+{% if status == "success" %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Se ha activado tu cuenta!</strong> Ya puedes iniciar sesión.
+    <a href="{% url 'login' %}">Iniciar sesión</a>  
+</div>
+{% elif status == "error"  %}
+
+<!--Error alert email no activado-->
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>El link de activación es inválido! porque ya fue utilizado o no existe.</strong>
+</div>
+
+{% elif status == "warning" %}
+<!--Warning alert email no activado-->
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>El link de activación ha expirado!</strong> Por favor solicita otro.
+    <a href="{% url 'resend_link_email'  %}?uidb64={{uidb64}}">Nuevo link</a>
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}Email de confirmación{% endblock title %}
+
+{% block content %}
+<!-- Content Se ha enviado un email de confirmación alert success -->
+{% if status == "success" %}
+<div class="alert alert-success">
+    <h4>¡Gracias por registrarte!</h4>
+    <p>Se ha enviado un email de confirmación a tu dirección de correo electrónico. Por favor, revisa tu bandeja de
+        entrada y sigue las instrucciones para activar tu cuenta.</p>
+</div>
+{% elif status == "warning"%}
+<div class="alert alert-warning">
+    <h4>¡Ya estás registrado!</h4>
+    <p>Ya has confirmado tu cuenta. Puedes iniciar sesión en el sistema.</p>
+</div>
+{% elif status == "error"%}
+
+<div class="alert alert-danger">
+    <h4>¡Error!</h4>
+    <p>Ha ocurrido un error al intentar confirmar tu cuenta. Por favor, inténtalo de nuevo.</p>
+</div>
+
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,121 @@
+{% autoescape off %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+    <title>Verificación de correo</title>
+
+    <style>
+        * {
+            outline: none !important;
+            color: #000
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none !important;
+        }
+
+        a {
+            color: black;
+            font-family: arial;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: black;
+            font-family: arial;
+            text-decoration: none;
+        }
+
+        a:visited {
+            color: black;
+            font-family: arial;
+            text-decoration: none;
+        }
+
+        .format-font {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .my-container {
+            margin: 10px;
+            padding: 10px;
+            padding-top: 0px;
+            justify-content: center;
+            border-radius: 5px;
+            border: 1px solid rgb(204, 203, 203);
+        }
+
+        .my-button {
+            padding: 10px;
+            padding-left: 35px;
+            padding-right: 35px;
+            background-color: #52EB99;
+            color: white;
+            border-radius: 25px;
+            transition-duration: 500ms;
+            text-decoration: none;
+
+        }
+
+        .my-button:hover {
+            color: #52EB99;
+            background-color: white;
+            border-radius: 0px;
+            border: 1px solid #52EB99;
+            transition-duration: 200ms;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="my-container">
+
+        <div style="background-color: #52EB99; border-radius: 15px;">
+            <h1 class="format-font" style="text-align: center; padding: 2px; color:white;">
+                Activación de cuenta
+            </h1>
+        </div>
+
+        <h2 class="format-font" style="text-align: center;">Confirmación de correo</h2>
+        <hr style="background-color:  #52EB99; width:100px">
+
+        <div class="format-font" style="margin-top: 20px; line-height: 1.5;">
+            <p style="text-align: center; font-weight: bold;">¡Saludos!</p>
+            <p style="text-align: center;">Has recibido este email porque intentaste crear una cuenta en nuestra
+                plataforma,
+                Por favor confirma tu correo para activar tu cuenta haciendo click en el siguiente botón.
+            </p>
+        </div>
+
+        <p class="format-font" style="text-align: center; margin-top: 50px;">
+            Verifica tu correo:
+            <hr style="background-color: #52EB99; width:50px">
+            <div class="format-font" style="text-align: center; margin-top: 30px;">
+                <a href="{{protocol}}://{{domain}}{% url 'activate' uidb64=uid token=token %}" class="my-button">Verificar</a>
+            </div>
+
+        </p>
+
+        <p class="format-font" style="margin-top: 50px;">
+            <b>¡Se activará tu cuenta después de la verificación!</b>
+        </p>
+
+        <p class="format-font" style="line-height: 1.5;">
+            <b>¡Gracias por unirte! <br> Este es un correo auto generado. <br>No contestar a este correo </b>
+        </p>
+
+    </div>
+
+</body>
+
+</html>
+{% endautoescape %}
