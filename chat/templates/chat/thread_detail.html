@@ -1,0 +1,388 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+
+<style>
+  .avatar {
+    width: 50px;
+    height: 50px;
+    float: left;
+    margin-right: 10px;
+  }
+
+  .thread {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 0.5em;
+  }
+
+  .mine {
+    padding: 0 0.5em 0.25em;
+    background-color: rgba(230, 242, 245, .5);
+    width: 92%;
+    margin-left: 8%;
+  }
+
+  .other {
+    padding: 0 0.5em 0.25em;
+    background-color: #f2f3f5;
+    width: 92%;
+  }
+</style>
+<main role="main">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-md-9 mx-auto mb-5">
+        <div class="row">
+          <!-- Hilos de conversación -->
+          <div class="col-md-4">
+            <!-- Con una búsqueda inversa user.threads también podemos conseguir los hilos de un usuario -->
+            {% for thread in request.user.threads.all%}
+            <!-- Sólo mostraremos un Thread si tiene como mínimo 1 mensaje -->
+            {% if thread.messages.all|length > 0 %}
+            <div class="mb-3">
+              <!-- Recorremos los miembros del hilo menos el propio request.user -->
+              {% for user in thread.users.all %}
+              {% if user != request.user %}
+              <!-- Mostramos el avatar del miembro -->
+              {% if user.profile.avatar %}
+              <img src="{{user.profile.avatar.url}}" class="avatar">
+              {% else %}
+              <img src="{% static 'registration/img/no-avatar.jpg' %}" class="avatar">
+              {% endif %}
+              <!-- Mostramos la información del miembro -->
+              <div>
+                <a href="{% url 'detail_thread' thread.pk %}">{{user}}</a><br>
+                <small><i>Hace {{thread.messages.first.created|timesince}}</i></small>
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          <!-- Hilo de conversación -->
+          <div class="col-md-8">
+            <!-- Recorremos los miembros del hilo menos el propio request.user -->
+            {% for user in thread.users.all %}
+            {% if user != request.user %}
+            <h4 class="mb-4">Mensajes con <a href=" ">{{user}}</a></h4>
+            {% endif %}
+            {% endfor %}
+            <!-- Mostramos los mensajes en una capa que tiene un overflow vertical de 300 píxeles -->
+            <div class="thread" id="thread">
+              {% for message in object.messages.all reversed%}
+              <!-- Dependiendo del usuario asignamos una clase con un color de fondo u otro en el mensaje -->
+              {% with avatar=message.user.profile.avatar %}
+
+
+              {% if not request.user == message.user %}<img src="{{avatar.url}}" alt=""
+                class="img-fluid rounded-circle float-start mr-4" style="width: 50px; height: 50px;">{% else %}
+              <img src="{{avatar.url}}" alt="" class="img-fluid rounded-circle float-end ml-3"
+                style="width: 50px; height: 50px;">
+              {% endif %}
+              <div {% if request.user == message.user %}class="mine mb-3 text-end" {% else %}class="other mb-3"
+                {% endif %}>
+                <small><i>{{message.created}}</i></small><br>
+                {{message.content}}
+              </div>
+              {% endwith %}
+              {% endfor %}
+              <!-- Translate something-->
+            </div>
+            <!-- Aquí crearemos el formulario -->
+
+            <textarea name="content" id="content" class="form-control" rows="2"
+              placeholder="Escriba un mensaje"></textarea>
+
+            <button id="send" class="btn btn-primary btn-block" disabled>Enviar mensaje</button>
+            {% comment %}
+
+            {{request.user}}
+
+            <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+            <input id="chat-message-input" type="text" size="100"><br>
+            <input id="chat-message-submit" type="button" value="Send">
+            <div id="mensajes">
+
+            </div> {% endcomment %}
+
+            {{ room_name|json_script:"room-name" }}
+            <script>
+              var send = document.getElementById('send');
+
+              const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+              const chatSocket = new WebSocket(
+                'ws://' +
+                window.location.host +
+                '/ws/chat/thread/' +
+                roomName +
+                '/'
+              );
+
+              chatSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                //document.querySelector('#thread').value += (data.message + '\n' + data.username);
+                send.disabled = true;
+                var imagen = document.createElement('img');
+                var message = document.createElement('div');
+
+
+                if (data.username == "{{request.user}}") {
+                  document.querySelector('#thread').innerHTML +=
+                    '<img src="{{request.user.profile.avatar.url}}" alt="" class="img-fluid rounded-circle float-end ml-3" style="width: 50px; height: 50px;">' +
+                    '<div class="mine mb-3 text-end">' +
+                    '<small><i>' + 'Hace un momento' + '</i></small><br>' +
+                    data.message +
+                    '</div>';
+                  scrollBottom()
+                } else {
+                  document.querySelector('#thread').innerHTML +=
+                    '<img src="' + data.avatar +
+                    '" alt="" class="img-fluid rounded-circle float-start mr-4" style="width: 50px; height: 50px;">' +
+                    '<div class="other mb-3">' +
+                    '<small><i>' + 'Hace un momento ' + '</i></small><br>' +
+                    data.message +
+                    '</div>';
+                  scrollBottom()
+                }
+
+
+                scrollBottom();
+              };
+
+              chatSocket.onclose = function (e) {
+                console.error('Chat socket closed unexpectedly');
+              };
+
+              document.querySelector('#content').focus();
+              document.querySelector('#content').onkeyup = function (e) {
+                if (e.keyCode === 13) { // enter, return
+                  document.querySelector('#send').click();
+                }
+              };
+
+              document.querySelector('#send').onclick = function (e) {
+                const messageInputDom = document.querySelector('#content');
+                const message = messageInputDom.value;
+                console.log("mensaje:" + message);
+                const url = "{% url 'add_message' thread.pk %}" + "?content=" + message;
+
+                console.log("url:" + url);
+
+                console.log(message)
+
+                fetch(url).then(response => response.json()).then(function (data) {
+                  console.log(data);
+                  console.log(message.value)
+                  if (data.created) {
+                    chatSocket.send(JSON.stringify({
+                      'message': data.message,
+                      'username': '{{request.user}}',
+                      'created': data.created_at,
+                      'avatar': '{{request.user.profile.avatar.url}}'
+                    }));
+                    messageInputDom.value = '';
+
+                    scrollBottom();
+
+                    if (data.first == true) {
+                      window.location.reload();
+                    }
+                  }
+                });
+
+
+              };
+
+              var content = document.getElementById('content');
+              content.addEventListener('keyup', function () {
+                if (!this.checkValidity() || !this.value) {
+                  send.disabled = true;
+                } else {
+                  send.disabled = false;
+                }
+              })
+
+              // Forzar scroll del chat
+              function scrollBottom() {
+                var thread = document.getElementById('thread');
+                thread.scrollTop = thread.scrollHeight;
+              }
+              scrollBottom();
+            </script>
+
+          </div>
+        </div>
+      </div>
+    </div>
+</main>
+{% endblock content %}
+{% comment %} {% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load l10n %}
+{% block title %}Hilo{% endblock %}
+{% block content %}
+<style>
+  .avatar {
+    width: 50px;
+    height: 50px;
+    float: left;
+    margin-right: 10px;
+  }
+
+  .thread {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 0.5em;
+  }
+
+  .mine {
+    padding: 0 0.5em 0.25em;
+    background-color: rgba(230, 242, 245, .5);
+    width: 92%;
+    margin-left: 8%;
+  }
+
+  .other {
+    padding: 0 0.5em 0.25em;
+    background-color: #f2f3f5;
+    width: 92%;
+  }
+</style>
+<main role="main">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-md-9 mx-auto mb-5">
+        <div class="row">
+          <!-- Hilos de conversación -->
+          <div class="col-md-4">
+            <!-- Con una búsqueda inversa user.threads también podemos conseguir los hilos de un usuario -->
+            {% for thread in request.user.threads.all%}
+            <!-- Sólo mostraremos un Thread si tiene como mínimo 1 mensaje -->
+            {% if thread.messages.all|length > 0 %}
+            <div class="mb-3">
+              <!-- Recorremos los miembros del hilo menos el propio request.user -->
+              {% for user in thread.users.all %}
+              {% if user != request.user %}
+              <!-- Mostramos el avatar del miembro -->
+              {% if user.profile.avatar %}
+              <img src="{{user.profile.avatar.url}}" class="avatar">
+              {% else %}
+              <img src="{% static 'registration/img/no-avatar.jpg' %}" class="avatar">
+              {% endif %}
+              <!-- Mostramos la información del miembro -->
+              <div>
+                <a href="{% url 'detail_thread' thread.pk %}">{{user}}</a><br>
+                <small><i>Hace {{thread.messages.first.created|timesince}}</i></small>
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          <!-- Hilo de conversación -->
+          <div class="col-md-8">
+            <!-- Recorremos los miembros del hilo menos el propio request.user -->
+            {% for user in thread.users.all %}
+            {% if user != request.user %}
+            <h4 class="mb-4">Mensajes con <a href=" ">{{user}}</a></h4>
+            {% endif %}
+            {% endfor %}
+            <!-- Mostramos los mensajes en una capa que tiene un overflow vertical de 300 píxeles -->
+            <div class="thread" id="thread">
+              {% for message in object.messages.all reversed%}
+              <!-- Dependiendo del usuario asignamos una clase con un color de fondo u otro en el mensaje -->
+              {% with avatar=message.user.profile.avatar %}
+
+
+              {% if not request.user == message.user %}<img src="{{avatar.url}}" alt=""
+                class="img-fluid rounded-circle float-start mr-4" style="width: 50px; height: 50px;">{% else %}
+              <img src="{{avatar.url}}" alt="" class="img-fluid rounded-circle float-end ml-3"
+                style="width: 50px; height: 50px;">
+              {% endif %}
+              <div {% if request.user == message.user %}class="mine mb-3 text-right" {% else %}class="other mb-3"
+                {% endif %}>
+                <small><i>{{message.created}}</i></small><br>
+                {{message.content}}
+              </div>
+              {% endwith %}
+              {% endfor %}
+              <!-- Translate something-->
+            </div>
+            <!-- Aquí crearemos el formulario -->
+
+            <textarea name="content" id="content" class="form-control" rows="2"
+              placeholder="Escriba un mensaje"></textarea>
+
+            <button id="send" class="btn btn-primary btn-block" disabled>Enviar mensaje</button>
+
+            <script>
+              var send = document.getElementById('send');
+
+              send.addEventListener('click', function () {
+
+                var content = encodeURIComponent(document.getElementById('content').value);
+
+                if (content.length > 0) {
+                  console.log('click');
+                  const url = "{% url 'add_message' thread.pk %}" + "?content=" + content;
+                  fetch(url).then(response => response.json()).then(function (data) {
+                    if (data.created) {
+                      document.getElementById('content').value =
+                        '{% with avatar=request.user.profile.avatar %}';
+                      send.disabled = true;
+                      var imagen = document.createElement('img');
+                      var message = document.createElement('div');
+
+
+                      imagen.src =
+                        "{% if not avatar %}{% static 'registration/img/no-avatar.jpg' %}{% else %}{{avatar.url}}{% endif %}";
+
+
+                      imagen.alt = "{% endwith %}";
+                      imagen.className = "img-fluid rounded-circle float-end ml-3";
+                      imagen.style = "width: 50px; height: 50px;";
+                      message.className = 'mine mb-3 text-right';
+                      message.innerHTML = '<small><i>Hace un momento</i></small><br>' + decodeURIComponent(
+                        content);
+                      document.getElementById('thread').appendChild(imagen);
+                      document.getElementById('thread').appendChild(message);
+                      scrollBottom();
+
+                      if (data.first) {
+                        window.location.href = "{% url 'detail_thread' thread.pk %}";
+                      }
+                    }
+                  })
+                }
+              })
+
+              var content = document.getElementById('content');
+              content.addEventListener('keyup', function () {
+                if (!this.checkValidity() || !this.value) {
+                  send.disabled = true;
+                } else {
+                  send.disabled = false;
+                }
+              })
+
+              // Forzar scroll del chat
+              function scrollBottom() {
+                var thread = document.getElementById('thread');
+                thread.scrollTop = thread.scrollHeight;
+              }
+              scrollBottom();
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+</main>
+{% endblock %} {% endcomment %}
