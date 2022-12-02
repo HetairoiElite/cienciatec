@@ -1,7 +1,9 @@
 
+import datetime
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from registration.models import Profile
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -25,11 +27,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         created = text_data_json["created"]
         avatar = text_data_json["avatar"]
 
+        # format example 12:00 am.
+
+        hour = datetime.datetime.now().strftime("%I:%M %p")
+
+        if "AM" in hour:
+            hour = hour.replace("AM", "a.m.")
+        else:
+            hour = hour.replace("PM", "p.m.")
+
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat_message", "message": message,
-                                   "username": self.scope["user"].username, 'created': created, 'avatar': avatar}
-        )
+                                   "username": self.scope["user"].username,
+                                   'created': created, 'avatar': avatar, 'hour': hour})
 
     # Receive message from room group
 
@@ -37,5 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event["message"]
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, "username": event["username"], 'created': event['created'], 'avatar': event['avatar']}))
+        await self.send(text_data=json.dumps(
+            {"message": message,
+             "username": event["username"], 'created': event['created'], 'avatar': event['avatar'],
+             'hour': event['hour']}))
         print(event['username'])
