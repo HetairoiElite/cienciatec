@@ -13,10 +13,12 @@
     <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/x-icon">
 
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i" rel="stylesheet">
-    {% comment %} <link href="{% static 'core/css/main.css' %}" rel="stylesheet"> {% endcomment %}
+    {% comment %}
+    <link href="{% static 'core/css/main.css' %}" rel="stylesheet"> {% endcomment %}
     <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i" rel="stylesheet">
-    
-  {% comment %} <link href="{% static 'core/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet"> {% endcomment %}
+
+    {% comment %}
+    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet"> {% endcomment %}
 </head>
 
 
@@ -50,8 +52,16 @@
         margin-bottom: 50px;
     }
 
-    /* Gray body bg */
-    body {}
+    .iconClass {
+        position: relative;
+    }
+
+    .iconClass span {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        display: block;
+    }
 </style>
 
 <body>
@@ -82,8 +92,10 @@
                         </li>
                         {% else %}
                         <li class="nav-item mt-2">
-                            <a class="nav-link" href="{% url 'list_threads' %}">Mensajes &nbsp <i
-                                    class="bi bi-chat-fill"></i></a>
+                            <a class="nav-link iconClass" href="{% url 'list_threads' %}">Mensajes &nbsp <i
+                                    class="bi bi-chat-fill"></i>
+                                <span class="badge rounded-pill badge-notification bg-danger"></span>
+                            </a>
                         </li>
                         <li>
                             <a class="nav-link" href="{% url 'profile' %}">{{request.user.first_name}}
