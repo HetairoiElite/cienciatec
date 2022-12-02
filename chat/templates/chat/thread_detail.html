@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load filters %}
 
 {% block title %}Chat{% endblock %}
 
@@ -121,7 +122,7 @@
               <!-- Mostramos la información del miembro -->
               <div>
                 <a href="{% url 'detail_thread' thread.pk %}">{{user}}</a><br>
-                <small><i>Hace {{thread.messages.first.created|timesince}}</i></small>
+                <small><i>Hace {{thread.messages.first.created|timesince|to_and}}</i></small>
               </div>
               {% endif %}
               {% endfor %}
