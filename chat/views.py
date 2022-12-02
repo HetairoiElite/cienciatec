@@ -18,6 +18,12 @@ def room(request, room_name):
     return render(request, "chat/room.html", {"room_name": room_name})
 
 @method_decorator(login_required, name='dispatch')
+class ThreadListView(TemplateView):
+    model = Thread
+
+    template_name: str = 'chat/thread_list.html'
+
+@method_decorator(login_required, name='dispatch')
 class ThreadDetailView(DetailView):
     model = Thread
 
@@ -26,6 +32,12 @@ class ThreadDetailView(DetailView):
         if self.request.user not in obj.users.all():
             raise Http404()
         return obj
+    
+    def get_context_data(self, **kwargs):
+        obj = super(ThreadDetailView, self).get_object()
+        context = super().get_context_data(**kwargs)
+        context['room_name'] = obj.id
+        return context
 
 
 def add_message(request, pk):
@@ -39,6 +51,8 @@ def add_message(request, pk):
                 user=request.user, content=contenido)
             thread.messages.add(message)
             jsonresponse['created'] = True
+            jsonresponse['message'] = message.content
+            jsonresponse['created_at'] = message.created.strftime("%d %B, %Y")
             if len(thread.messages.all()) is 1:
                 jsonresponse['first'] = True
     else:
@@ -50,4 +64,4 @@ def add_message(request, pk):
 def start_thread(request, username):
     user = get_object_or_404(User, username=username)
     thread = Thread.objects.find_or_create(user, request.user)
-    return redirect(reverse_lazy('messenger:detail', args=[thread.pk]))
+    return redirect(reverse_lazy('detail_thread', args=[thread.pk]))

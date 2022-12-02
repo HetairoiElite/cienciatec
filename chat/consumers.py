@@ -22,15 +22,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        created = text_data_json["created"]
+        avatar = text_data_json["avatar"]
 
         # Send message to room group
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": message}
+            self.room_group_name, {"type": "chat_message", "message": message,
+                                   "username": self.scope["user"].username, 'created': created, 'avatar': avatar}
         )
 
     # Receive message from room group
+
     async def chat_message(self, event):
         message = event["message"]
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"message": message, "username": event["username"], 'created': event['created'], 'avatar': event['avatar']}))
+        print(event['username'])
