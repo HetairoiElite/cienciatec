@@ -19,7 +19,6 @@
     flex-direction: column;
     max-height: 300px;
     overflow-y: scroll;
-
   }
 
   .mine {
@@ -122,7 +121,9 @@
               <!-- Mostramos la información del miembro -->
               <div>
                 <a href="{% url 'detail_thread' thread.pk %}">{{user}}</a><br>
-                <small><i>Hace {{thread.messages.first.created|timesince|to_and}}</i></small>
+                <small><i>Hace
+                    {% if thread.messages.first.created|timesince|minutes > 0 %}{{thread.messages.first.created|timesince|to_and}}{% else %}un
+                    momento{% endif %} </i></small>
               </div>
               {% endif %}
               {% endfor %}
@@ -145,21 +146,21 @@
               {% with avatar=message.user.profile.avatar %}
               <div class="chat-message-{% if request.user == message.user %}right mb-4{% else %}left pb-4{% endif %}">
                 <div class="{% if request.user == message.user %}text-start {% else %}text-end{% endif %}">
-                  <img src="{{avatar.url}}" class="rounded-circle" alt="Chris Wood" width="40" height="40">
+                  <img src="{{avatar.url}}" class="rounded-circle" alt="{{message.user}}" width="40" height="40">
                   <div class="text-muted small text-nowrap mt-2">{{message.created|date:"h:i a"}}</div>
                 </div>
                 <div class="flex-shrink-1 {% if request.user == message.user %}
                 bg-lime
                 {% else %}
-                bg-skyblue
+                bg-skyblue  
                 {% endif %} rounded py-2 px-3 m{% if request.user == message.user  %}r{% else %}l{% endif %}-3">
                   <div class="font-weight-bold mb-1">{% if request.user == message.user %}
-                    Tú
+                    <b>Tú</b>
                     {% else %}
-                    {{message.user}}
+                    <b>{{message.user}}</b>
                     {% endif %}</div>
                   {{message.content}}
-                  <div><small>{{message.created|date}}</small></div>
+                  <div><small style="font-size:12px;">{{message.created|date}}</small></div>
                 </div>
 
               </div>
@@ -211,7 +212,7 @@
                     '<div class="text-muted small text-nowrap mt-2">' + data.hour + '</div>' +
                     '</div>' +
                     '<div class="flex-shrink-1 bg-lime rounded py-2 px-3 mr-3">' +
-                    '<div class="font-weight-bold mb-r">' + 'Tú' + '</div>' +
+                    '<div class="font-weight-bold mb-r"><b>' + 'Tú' + '</b></div>' +
                     data.message +
                     '<div><small>' + 'Hace un momento' + '</small></div>' +
                     '</div>' +
@@ -226,7 +227,7 @@
                     '<div class="text-muted small text-nowrap mt-2">' + data.hour + '</div>' +
                     '</div>' +
                     '<div class="flex-shrink-1 bg-skyblue rounded py-2 px-3 mr-3">' +
-                    '<div class="font-weight-bold mb-1">' + data.username + '</div>' +
+                    '<div class="font-weight-bold mb-1"><b>' + data.username + '</b></div>' +
                     data.message +
                     '<div><small>' + 'Hace un momento' + '</small></div>' +
                     '</div>' +
