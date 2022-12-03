@@ -24,6 +24,7 @@
 
 .dropdown-menu-s {
     max-height: 100px;
+    max-width: 500px;
     overflow-y: scroll;
 }
 
@@ -362,7 +363,7 @@ a[href*="#followme"]::before {
 .hamburger.is-open .hamb-top,
 .hamburger.is-open .hamb-middle,
 .hamburger.is-open .hamb-bottom {
-    background-color: red;
+    background-color: #fff;
 }
 
 .hamburger.is-open .hamb-top,
