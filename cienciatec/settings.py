@@ -53,7 +53,10 @@ INSTALLED_APPS = [
     'core',
     'school',
     'notifications',
+    'dashboard',
 ]
+
+DJANGO_NOTIFICATIONS_CONFIG = { 'USE_JSONFIELD': True}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
