@@ -28,6 +28,9 @@ urlpatterns = [
     path('accounts/', include('registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     
+    
+    path('dashboard/', include('dashboard.urls')),
+    
     re_path(r'^inbox/notifications/', include(notifications_urls, namespace='notifications')),
 ]
 
