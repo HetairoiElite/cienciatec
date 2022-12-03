@@ -22,10 +22,10 @@
     display: block;
 }
 
-.dropdown-menu {
+.dropdown-menu-s {
     max-height: 100px;
     overflow-y: scroll;
-  }
+}
 
 body {
     /* position: relative; */
