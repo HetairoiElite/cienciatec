@@ -1,15 +1,15 @@
 /* Nav fija */
-nav {
+/* nav {
     display: flex;
     /* using flexbox property for parent
-       also known as inline-flex*/
+       also known as inline-flex
     justify-content: center;
     align-items: center;
     position: fixed;
     overflow: hidden;
     width: 100%;
     margin-bottom: 50px;
-}
+} */
 
 .iconClass {
     position: relative;
@@ -21,6 +21,11 @@ nav {
     right: 0px;
     display: block;
 }
+
+.dropdown-menu {
+    max-height: 100px;
+    overflow-y: scroll;
+  }
 
 body {
     /* position: relative; */
@@ -89,6 +94,7 @@ body {
 /*-------------------------------*/
 .navbar {
     padding: 0;
+    margin-bottom: 50px;
 }
 
 .sidebar-nav {
@@ -200,10 +206,6 @@ body {
     border: none;
     background-color: #222;
     box-shadow: none;
-}
-
-.dropdown-menu.show {
-    top: 0;
 }
 
 /*Fontawesome icons*/
