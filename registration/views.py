@@ -156,6 +156,15 @@ def ProfileUpdateView(request):
     form = UserUpdateForm(request.POST or None, instance=request.user)
     form_profile = ProfileForm(request.POST or None,
                                instance=request.user.profile, files=request.FILES or None)
+    
+    print(request.user.profile.first_join)
+
+    if not request.user.profile.first_join and not '?edit' in request.get_full_path():
+        return redirect('dashboard')
+
+    if request.user.profile.first_join:
+        request.user.profile.first_join = False
+        request.user.profile.save()
 
     if request.method == 'POST' and form_profile.is_valid() and form.is_valid():
 
