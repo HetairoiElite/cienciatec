@@ -9,10 +9,11 @@ var consecutive_misfires = 0;
 var registered_functions = [];
 
 function fill_notification_badge(data) {
-    var badges = document.getElementsByClassName(notify_badge_class);
-    if (badges) {
-        for (var i = 0; i < badges.length; i++) {
-            badges[i].innerHTML = data.unread_count;
+    var notify_badges = document.getElementsByClassName(notify_badge_class)
+    console.log(notify_badges);
+    if (notify_badges) {
+        for (var i = 0; i < notify_badges.length; i++) {
+            notify_badges[i].innerHTML = data.unread_count;
         }
     }
 }
@@ -20,6 +21,10 @@ function fill_notification_badge(data) {
 function fill_notification_list(data) {
     var menus = document.getElementsByClassName(notify_menu_class);
     if (menus) {
+        console.log("data", data);
+
+        
+
         var messages = data.unread_list.map(function (item) {
             var message = "";
             if (typeof item.actor !== 'undefined') {
@@ -34,7 +39,20 @@ function fill_notification_list(data) {
             if (typeof item.timestamp !== 'undefined') {
                 message = message + " " + item.timestamp;
             }
-            return '<li><a class="dropdown-item" href="#">' + message + '</a></li>';
+
+
+            if (typeof item.action_object !== 'undefined') {
+                if (item.verb == "message") {
+                    url = '/chat/thread/' + item.action_object;
+                    console.log(url);
+                }
+            }
+
+            if (item.verb == "message") {
+                return '<li><a class="dropdown-item" href="' + url + '">' + message + '</a></li>';
+            } else {
+                return '<li>' + message + '</li>';
+            }
         }).join('')
 
         for (var i = 0; i < menus.length; i++) {
