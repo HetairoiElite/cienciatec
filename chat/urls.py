@@ -9,4 +9,5 @@ urlpatterns = [
     path('thread/<int:pk>/', ThreadDetailView.as_view(), name='detail_thread'),
     path('thread/<int:pk>/add_message/', add_message, name='add_message'),
     path('thread/start/<str:username>/', start_thread, name='start_thread'),
+    path('thread/mark_messages_as_read/<int:pk_thread>/', mark_messages_as_read, name='mark_messages_as_read'),
 ]
