@@ -53,8 +53,13 @@ class ThreadDetailView(DetailView):
         obj = super(ThreadDetailView, self).get_object()
         context = super().get_context_data(**kwargs)
         context['room_name'] = obj.id
+        
+        notifications_unread = Notification.objects.filter(recipient=self.request.user, unread=True, verb='message')
+        context['notifications_unread'] = notifications_unread
+        print(notifications_unread)
+        print("count: ", notifications_unread.count())
+        
         return context
-
 
 def add_message(request, pk):
 
@@ -85,3 +90,15 @@ def start_thread(request, username):
     user = get_object_or_404(User, username=username)
     thread = Thread.objects.find_or_create(user, request.user)
     return redirect(reverse_lazy('detail_thread', args=[thread.pk]))
+
+def mark_messages_as_read(request, pk_thread):
+    if request.user.is_authenticated:
+        other_user =  get_object_or_404(Thread, pk=pk_thread).users.exclude(username=request.user.username)[0]
+        notifications_unread = Notification.objects.filter(recipient=request.user, unread=True, actor_object_id=other_user.id)
+        
+        for notification in notifications_unread:
+            notification.mark_as_read()
+        
+        return JsonResponse({'marked': True})
+    else:
+        raise Http404("Usuario no autenticado")
