@@ -31,6 +31,7 @@ class Profile(models.Model):
         User, on_delete=models.CASCADE, verbose_name='Usuario')
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, verbose_name='Escuela', null=True, blank=True)
+    first_join = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='Creado en')
