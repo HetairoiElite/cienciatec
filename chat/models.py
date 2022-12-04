@@ -38,6 +38,9 @@ class Thread(models.Model):
     
     class Meta:
         ordering = ['-updated']
+        
+    def __str__(self):
+        return str(self.id)
 
 def messages_changed(sender, **kwargs):
     instance = kwargs.pop('instance', None)
