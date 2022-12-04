@@ -40,42 +40,48 @@ function fill_notification_list(data) {
     var menus = document.getElementsByClassName(notify_menu_class);
     if (menus) {
         // console.log("data", data);
-
-
-
-        var messages = data.unread_list.map(function (item) {
-            var message = "";
-            if (typeof item.actor !== 'undefined') {
-                message = item.actor;
+        if (data.unread_count == 0) {
+            for (var i = 0; i < menus.length; i++) {
+                menus[i].innerHTML = '<li><a class="dropdown-item disabled" href="#">Sin notificaciones</a></li>';
             }
-            if (typeof item.verb !== 'undefined') {
-                message = message + " " + item.verb;
-            }
-            if (typeof item.target !== 'undefined') {
-                message = message + " " + item.target;
-            }
-            if (typeof item.timestamp !== 'undefined') {
-                message = message + " " + item.timestamp;
-            }
-
-
-            if (typeof item.action_object !== 'undefined') {
-                if (item.verb == "message") {
-                    url = '/chat/thread/' + item.action_object;
-                    // console.log(url);
+        } else {
+            var messages = data.unread_list.map(function (item) {
+                var message = "";
+                if (typeof item.actor !== 'undefined') {
+                    message = item.actor;
                 }
-            }
+                if (typeof item.verb !== 'undefined') {
+                    message = message + " " + item.verb;
+                }
+                if (typeof item.target !== 'undefined') {
+                    message = message + " " + item.target;
+                }
+                if (typeof item.timestamp !== 'undefined') {
+                    message = message + " " + item.timestamp;
+                }
 
-            if (item.verb == "message") {
-                return '<li><a class="dropdown-item" href="' + url + '">' + message + '</a></li>';
-            } else {
-                return '<li><a class="dropdown-item" href="#">' + message + '</a></li>';
-            }
-        }).join('')
 
-        for (var i = 0; i < menus.length; i++) {
-            menus[i].innerHTML = messages;
+                if (typeof item.action_object !== 'undefined') {
+                    if (item.verb == "message") {
+                        url = '/chat/thread/' + item.action_object;
+                        // console.log(url);
+                    }
+                }
+
+                if (item.verb == "message") {
+                    return '<li><a class="dropdown-item" href="' + url + '">' + message + '</a></li>';
+                } else {
+                    return '<li><a class="dropdown-item" href="#">' + message + '</a></li>';
+                }
+            }).join('')
+
+            for (var i = 0; i < menus.length; i++) {
+                menus[i].innerHTML = messages;
+            }
         }
+
+
+
     }
 }
 
