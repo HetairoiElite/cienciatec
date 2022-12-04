@@ -1,6 +1,7 @@
 from django import template
 from django.utils.html import format_html
 from django.urls import reverse
+from notifications.models import Notification
 
 register = template.Library()
 
@@ -26,6 +27,15 @@ def minutes(value):
     minutes = value.split("\xa0")[0]
 
     return int(minutes)
+
+@register.filter
+def has_notis(value):
+    notis = Notification.objects.filter(actor_object_id=value.id, verb='message', unread=True)  
+    if notis:
+        return True
+    return False
+    
+    
 
 # * Filters for notis
 
