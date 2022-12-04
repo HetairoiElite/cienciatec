@@ -6,24 +6,7 @@
 
 {% block content %}
 
-<style>
-  .item-badge {
-    position:relative;
-    padding-top:12px;
-    display:inline-block;
-}
-.notify-badge-red{
-    position: absolute;
-    right:6px;
-    top:10px;
-    background:red;
-    text-align: center;
-    border-radius: 30px 30px 30px 30px;
-    color:white;
-    padding:10px 10px;
-    font-size:10px;
-}
-</style>
+
 
 
 <main role="main">
@@ -35,30 +18,35 @@
           <div class="col-md-4">
             <!-- Con una búsqueda inversa user.threads también podemos conseguir los hilos de un usuario -->
             {% for thread in request.user.threads.all%}
+
             <!-- Sólo mostraremos un Thread si tiene como mínimo 1 mensaje -->
             {% if thread.messages.all|length > 0 %}
             <div class="mb-3">
               <!-- Recorremos los miembros del hilo menos el propio request.user -->
-              {% for user in thread.users.all %}
+              {% for user in thread.users.all  %}
+
               {% if user != request.user %}
               <!-- Mostramos el avatar del miembro -->
+
               {% if user.profile.avatar %}
 
-              
-              
+
               <div class="item-badge">
                 <a href="#">
 
+                  {% if user|has_notis %}
 
-                  
                   <span class="notify-badge-red"></span>
-                  
-                  <img src="{{user.profile.avatar.url}}" class="avatar rounded-circle">    
+                  {% endif %}
+
+
+                  <img src="{{user.profile.avatar.url}}" class="avatar rounded-circle">
                 </a>
               </div>
-                           <!-- ADD circle red -->
+              <!-- ADD circle red -->
 
               {% else %}
+
               <img src="{% static 'registration/img/no-avatar.jpg' %}" class="avatar">
               {% endif %}
               <!-- Mostramos la información del miembro -->
@@ -78,6 +66,7 @@
           <div class="col-md-8">
             <!-- Recorremos los miembros del hilo menos el propio request.user -->
             {% for user in thread.users.all %}
+
             {% if user != request.user %}
             <h4 class="mb-4">Mensajes con <a href=" ">{{user}}</a></h4>
             {% endif %}
@@ -85,6 +74,7 @@
             <!-- Mostramos los mensajes en una capa que tiene un overflow vertical de 300 píxeles -->
             <div class="thread" id="thread">
               {% for message in object.messages.all reversed%}
+
               <!-- Dependiendo del usuario asignamos una clase con un color de fondo u otro en el mensaje -->
               {% with avatar=message.user.profile.avatar %}
               <div class="chat-message-{% if request.user == message.user %}right mb-4{% else %}left pb-4{% endif %}">
