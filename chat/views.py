@@ -8,7 +8,10 @@ from django.http import Http404
 from django.http import JsonResponse
 from .models import Message
 from django.contrib.auth.models import User
+from notifications.signals import notify
+from notifications.models import Notification
 # Create your views here.
+
 
 def index(request):
     return render(request, "chat/index.html")
@@ -17,11 +20,13 @@ def index(request):
 def room(request, room_name):
     return render(request, "chat/room.html", {"room_name": room_name})
 
+
 @method_decorator(login_required, name='dispatch')
 class ThreadListView(TemplateView):
     model = Thread
 
     template_name: str = 'chat/thread_list.html'
+
 
 @method_decorator(login_required, name='dispatch')
 class ThreadDetailView(DetailView):
@@ -31,8 +36,19 @@ class ThreadDetailView(DetailView):
         obj = super(ThreadDetailView, self).get_object()
         if self.request.user not in obj.users.all():
             raise Http404()
+        
+        other_user = obj.users.exclude(username=self.request.user.username)[0]
+        
+        # mark notifications as read
+        
+        notifications_unread = Notification.objects.filter(recipient=self.request.user, unread=True, actor_object_id=other_user.id)
+        
+        for notification in notifications_unread:
+            notification.mark_as_read()
+
+
         return obj
-    
+
     def get_context_data(self, **kwargs):
         obj = super(ThreadDetailView, self).get_object()
         context = super().get_context_data(**kwargs)
@@ -53,7 +69,11 @@ def add_message(request, pk):
             jsonresponse['created'] = True
             jsonresponse['message'] = message.content
             jsonresponse['created_at'] = message.created.strftime("%d %B, %Y")
-            if len(thread.messages.all()) is 1:
+            other_user = thread.users.exclude(
+                username=request.user.username)[0]
+            notify.send(request.user, recipient=other_user,
+                        verb="message", action_object=thread)
+            if len(thread.messages.all()) == 1:
                 jsonresponse['first'] = True
     else:
         raise Http404("Usuario no autenticado")
