@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,7 +59,7 @@ INSTALLED_APPS = [
     'dashboard',
 ]
 
-DJANGO_NOTIFICATIONS_CONFIG = { 'USE_JSONFIELD': True}
+DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -96,10 +99,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'cienciatec',
-        'USER' : 'postgres',
-        'PASSWORD' : '123',
-        'HOST' : 'localhost',
-        'PORT' : '5432',
+        'USER': 'postgres',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -144,7 +147,7 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = 'media/'
 
-MEDIA_ROOT = BASE_DIR / 'media' 
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # * Email
 
@@ -152,8 +155,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jonathan90090@gmail.com'
-EMAIL_HOST_PASSWORD = 'ltxzxjhazavngcjt'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
 # * Logout
@@ -166,9 +169,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # * Reset Password Email Token Expiration Time
 
-PASSWORD_RESET_TIMEOUT = 3600 # 1 hour
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 # * SESSION DURATION
 
-SESSION_COOKIE_AGE = 3600 # 1 hour
+SESSION_COOKIE_AGE = 3600  # 1 hour
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
