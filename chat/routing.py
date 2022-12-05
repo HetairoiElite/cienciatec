@@ -1,6 +1,9 @@
 # chat/routing.py
-from django.urls import re_path
+if __name__ == '__main__':
+    import django
+    django.setup()
 
+from django.urls import re_path
 from . import consumers
 
 websocket_urlpatterns = [
