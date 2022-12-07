@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-be*^zjk2-qi2mevlgp&#$zuerm950q*6m1f4#mf7vqwm=zxpw5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '3.90.210.225']
 
 # Daphne
 ASGI_APPLICATION = "cienciatec.asgi.application"
@@ -61,6 +61,8 @@ INSTALLED_APPS = [
 ]
 
 DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,6 +150,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = BASE_DIR / 'static'
 
 # * Media
 
