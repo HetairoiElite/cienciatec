@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-be*^zjk2-qi2mevlgp&#$zuerm950q*6m1f4#mf7vqwm=zxpw5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '3.90.210.225']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'articles.het-air-oi.studio']
 
 # Daphne
 ASGI_APPLICATION = "cienciatec.asgi.application"
