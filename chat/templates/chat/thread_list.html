@@ -17,7 +17,7 @@
       <div class="col-md-9 mx-auto mb-5">
         <div class="row">
           <!-- Hilos de conversación -->
-          <div class="col-md-4">
+          <div class="col-md-4 text-center">
             <!-- Recorremos los Threads y sólo mostramos los que tienen como mínimo 1 mensaje -->
             {% for thread in request.user.threads.all %}
             {% if thread.messages.all|length > 0 %}
@@ -45,7 +45,7 @@
               {% endif %}
               <!-- Mostramos la información del miembro -->
               <div>
-                <a href="{% url 'detail_thread' thread.pk %}">{{user}}</a><br>
+                <a href="{% url 'detail_thread' thread.pk %}">{{user.first_name}} {{user.last_name}} </a><br>
 
                 <small><i>Hace
                     {% if thread.messages.first.created|timesince|minutes > 0 %}{{thread.messages.first.created|timesince|to_and}}{% else %}un
