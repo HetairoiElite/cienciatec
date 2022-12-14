@@ -1,9 +1,14 @@
+if __name__ == '__main__':
+    import django
+    django.setup()
+    from registration.models import Profile
+
 
 import datetime
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from registration.models import Profile
+
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

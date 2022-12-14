@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +29,7 @@ SECRET_KEY = 'django-insecure-be*^zjk2-qi2mevlgp&#$zuerm950q*6m1f4#mf7vqwm=zxpw5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'articles.het-air-oi.studio']
 
 # Daphne
 ASGI_APPLICATION = "cienciatec.asgi.application"
@@ -57,9 +58,12 @@ INSTALLED_APPS = [
     'school',
     'notifications',
     'dashboard',
+    'storages',
 ]
 
 DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -95,6 +99,17 @@ WSGI_APPLICATION = 'cienciatec.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'cienciatec',
+#         'USER': 'postgres',
+#         'PASSWORD': '123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -105,7 +120,6 @@ DATABASES = {
         'PORT': os.getenv('PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -138,16 +152,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# * Media
-
-MEDIA_URL = 'media/'
-
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # * Email
 
@@ -175,3 +180,47 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 SESSION_COOKIE_AGE = 3600  # 1 hour
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# * AWS
+
+# * S3
+
+
+AWS_S3_ACCESS_KEY_ID = os.getenv('AWS_S3_ACCESS_KEY_ID')
+
+AWS_S3_SECRET_ACCESS_KEY = os.getenv('AWS_S3_SECRET_ACCESS_KEY')
+
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_DEFAULT_ACL = "public-read"
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_S3_FILE_OVERWRITE = True
+
+AWS_LOCATION = 'static'
+
+AWS_QUERYSTRING_AUTH = False
+
+AWS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+}
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+
+STATICFILES_STORAGE = 'core.storage_backends.StaticStorage'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+
+PUBLIC_MEDIA_LOCATION = 'media'
+
+DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
+
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
