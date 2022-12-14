@@ -217,9 +217,9 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'apellidoP', 'apellidoM', 'last_name']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control mb-2'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Nombre/s'}),
             # 'last_name': forms.TextInput(attrs={'class': 'form-control mb-2'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control mb-2'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Email'}),
             'last_name': forms.HiddenInput(),
         }
         labels = {
@@ -228,14 +228,20 @@ class UserUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['apellidoP'].initial = self.instance.last_name.split(' ')[
-            0]
-        self.fields['apellidoM'].initial = self.instance.last_name.split(' ')[
-            1]
+        try:
+
+            self.fields['apellidoP'].initial = self.instance.last_name.split(' ')[
+                0]
+            self.fields['apellidoM'].initial = self.instance.last_name.split(' ')[
+                1]
+
+        except IndexError:
+            pass
+
         self.fields['apellidoP'].widget.attrs.update(
-            {'class': 'form-control mb-2'})
+            {'class': 'form-control mb-2', 'placeholder': 'Apellido paterno'})
         self.fields['apellidoM'].widget.attrs.update(
-            {'class': 'form-control mb-2'})
+            {'class': 'form-control mb-2', 'placeholder': 'Apellido materno'})
         self.fields['apellidoP'].label = 'Apellido paterno'
         self.fields['apellidoM'].label = 'Apellido materno'
 
