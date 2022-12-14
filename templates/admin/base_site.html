@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+  
+</style>
+{% endblock extrastyle %}
+
+{% block extrahead %}<link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/x-icon">{% endblock %}
+
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'core/img/logo1.png' %}" alt="" width="200px">
+        {% comment %} {{ site_header|default:_('Django Administration') }} {% endcomment %}
+
+    </a>
+</h1>
+
+{% endblock branding %}
+
+{% block nav-global %}{% endblock nav-global %}
