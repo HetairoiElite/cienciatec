@@ -80,7 +80,7 @@ ROOT_URLCONF = 'cienciatec.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -98,17 +98,6 @@ WSGI_APPLICATION = 'cienciatec.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'cienciatec',
-#         'USER': 'postgres',
-#         'PASSWORD': '123',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -152,8 +141,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-
-
 # * Email
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -178,7 +165,7 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 # * SESSION DURATION
 
-SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_COOKIE_AGE = 3600 * 2  # 2 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # * AWS
@@ -223,4 +210,3 @@ PUBLIC_MEDIA_LOCATION = 'media'
 DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
 
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
-
