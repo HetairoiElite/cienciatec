@@ -34,6 +34,11 @@ urlpatterns = [
     re_path(r'^inbox/notifications/', include(notifications_urls, namespace='notifications')),
 ]
 
+# * Custom titles for admin site
+admin.site.site_header = "CienciaTec"
+admin.site.index_title = "Panel de administración de CienciaTec"
+admin.site.site_title = "CienciaTec"
+
 if settings.DEBUG:
     from django.conf.urls.static import static
     
