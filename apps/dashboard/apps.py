@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 
 
-class SchoolConfig(AppConfig):
+class DashboardConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'school'
-    verbose_name = 'Registro de escuelas'
+    name = 'apps.dashboard'

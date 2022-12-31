@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,22 +44,32 @@ CHANNEL_LAYERS = {
 
 # Application definition
 
-INSTALLED_APPS = [
-    'daphne',
-    'chat',
-    'registration',
+DJANGO_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
-    'school',
-    'notifications',
-    'dashboard',
-    'storages',
+
 ]
+
+THIRD_PARTY_APPS = [
+    'daphne',
+    'storages',
+    'notifications',
+]
+
+LOCAL_APPS = [
+    'apps.chat',
+    'apps.registration',
+    'core',
+    'apps.school',
+    'apps.dashboard',
+]
+
+INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
 DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
@@ -168,45 +178,3 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 SESSION_COOKIE_AGE = 3600 * 2  # 2 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-# * AWS
-
-# * S3
-
-
-AWS_S3_ACCESS_KEY_ID = os.getenv('AWS_S3_ACCESS_KEY_ID')
-
-AWS_S3_SECRET_ACCESS_KEY = os.getenv('AWS_S3_SECRET_ACCESS_KEY')
-
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-
-AWS_DEFAULT_ACL = "public-read"
-
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
-
-AWS_S3_FILE_OVERWRITE = True
-
-AWS_LOCATION = 'static'
-
-AWS_QUERYSTRING_AUTH = False
-
-AWS_HEADERS = {
-    "Access-Control-Allow-Origin": "*",
-}
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-
-STATICFILES_STORAGE = 'core.storage_backends.StaticStorage'
-
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-
-PUBLIC_MEDIA_LOCATION = 'media'
-
-DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
-
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'

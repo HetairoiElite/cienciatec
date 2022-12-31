@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import registration.models
+import apps.registration.models
 
 
 class Migration(migrations.Migration):
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Profile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('avatar', models.ImageField(blank=True, null=True, upload_to=registration.models.custom_upload_to)),
+                ('avatar', models.ImageField(blank=True, null=True, upload_to=apps.registration.models.custom_upload_to)),
                 ('type_user', models.CharField(choices=[('0', 'Selecciona el tipo de usuario'), ('1', 'Autor'), ('2', 'Evaluador')], default='0', max_length=1)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

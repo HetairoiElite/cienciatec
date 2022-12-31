@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-from school.models import School
+from apps.school.models import School
 
 # Create your models here.
 

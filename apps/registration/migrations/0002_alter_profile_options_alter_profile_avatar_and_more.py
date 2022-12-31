@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import registration.models
+import apps.registration.models
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='avatar',
-            field=models.ImageField(blank=True, default='avatars/default.jpg', null=True, upload_to=registration.models.custom_upload_to),
+            field=models.ImageField(blank=True, default='avatars/default.jpg', null=True, upload_to=apps.registration.models.custom_upload_to),
         ),
         migrations.AlterField(
             model_name='profile',

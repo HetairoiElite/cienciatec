@@ -21,15 +21,15 @@ from notifications import urls as notifications_urls
 
 
 urlpatterns = [
-    path("chat/", include("chat.urls")),
+    path("chat/", include("apps.chat.urls")),
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     
-    path('accounts/', include('registration.urls')),
+    path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     
     
-    path('dashboard/', include('dashboard.urls')),
+    path('dashboard/', include('apps.dashboard.urls')),
     
     re_path(r'^inbox/notifications/', include(notifications_urls, namespace='notifications')),
 ]

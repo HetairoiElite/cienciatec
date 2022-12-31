@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from notifications.signals import notify
 from django.contrib.auth.models import User
-from chat.models import Thread
+from apps.chat.models import Thread
 # Create your views here.
 
 

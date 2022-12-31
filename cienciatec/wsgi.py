@@ -7,11 +7,14 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/
 """
 
-import os
-
 from django.core.wsgi import get_wsgi_application
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cienciatec.settings')
-print(os.environ,get('DJANGO_SETTINGS_MODULE'))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+                      os.getenv('DJANGO_SETTINGS_MODULE'))
+print(os.getenv('DJANGO_SETTINGS_MODULE'))
 
 application = get_wsgi_application()

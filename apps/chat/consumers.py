@@ -31,6 +31,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         created = text_data_json["created"]
         avatar = text_data_json["avatar"]
+        full_name = text_data_json["full_name"]
 
         # format example 12:00 am.
 
@@ -45,7 +46,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat_message", "message": message,
                                    "username": self.scope["user"].username,
-                                   'created': created, 'avatar': avatar, 'hour': hour})
+                                   'created': created, 'avatar': avatar, 'hour': hour, 'full_name': full_name})
 
     # Receive message from room group
 
@@ -56,5 +57,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(
             {"message": message,
              "username": event["username"], 'created': event['created'], 'avatar': event['avatar'],
-             'hour': event['hour']}))
+             'hour': event['hour'], 'full_name': event['full_name']}))
         print(event['username'])
