@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}{% endblock %} | {{home.title}}</title>
     {% load static %}
     {% load notifications_tags %}
     {% load filters %}
@@ -222,7 +222,7 @@
             <div class="container">
 
                 <a class="navbar-brand" href="" style="margin-left:10%">
-                    <img src="{% static 'core/img/logo1.png' %}" alt="" height="60px">
+                    <img src="{{home.brand_image.url}}" alt="" height="60px">
                 </a>
 
 
