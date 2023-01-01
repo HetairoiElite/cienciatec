@@ -42,3 +42,14 @@ PUBLIC_MEDIA_LOCATION = 'media'
 DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
 
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+# * cors
+
+
+ALLOWED_HOSTS=['*']
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware',)
