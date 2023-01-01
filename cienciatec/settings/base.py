@@ -74,7 +74,6 @@ INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
 DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,6 +84,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'cienciatec.urls'
 
