@@ -17,21 +17,26 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import include
 from django.conf import settings
-from notifications import urls as notifications_urls    
+from notifications import urls as notifications_urls
 
 
 urlpatterns = [
     path("chat/", include("apps.chat.urls")),
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
+
+    path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
+    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     
+    path('', include('core.urls')),
+
     path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    
-    
-    path('dashboard/', include('apps.dashboard.urls')),
-    
-    re_path(r'^inbox/notifications/', include(notifications_urls, namespace='notifications')),
+
+
+    path('dashboard/', include('apps.core_dashboard.urls')),
+
+    re_path(r'^inbox/notifications/',
+            include(notifications_urls, namespace='notifications')),
 ]
 
 # * Custom titles for admin site
@@ -41,8 +46,9 @@ admin.site.site_title = "CienciaTec"
 
 if settings.DEBUG:
     from django.conf.urls.static import static
-    
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
+
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)
+
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
