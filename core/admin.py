@@ -21,13 +21,13 @@ class HomeAdmin(admin.ModelAdmin):
 
     # * image preview
     def image_preview(self, obj):
-        return format_html('<img src="/media/{}" width="200" />'.format(obj.image))
+        return format_html('<img src="{}" width="200" />'.format(obj.image.url))
     image_preview.short_description = 'Imagen principal'
 
     # * brand image preview
 
     def brand_image_preview(self, obj):
-        return format_html('<img src="/media/{}" width="200" />'.format(obj.brand_image))
+        return format_html('<img src="{}" width="200" />'.format(obj.brand_image.url))
 
     brand_image_preview.short_description = 'Imagen de marca'
 
