@@ -45,7 +45,6 @@ CHANNEL_LAYERS = {
 # Application definition
 
 DJANGO_APPS = [
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +55,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'jet.dashboard',
+    'jet',
     'daphne',
     'storages',
     'notifications',
@@ -66,7 +67,7 @@ LOCAL_APPS = [
     'apps.registration',
     'core',
     'apps.school',
-    'apps.dashboard',
+    'apps.core_dashboard',
 ]
 
 INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
@@ -98,6 +99,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.home',
             ],
         },
     },
@@ -177,4 +179,3 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 SESSION_COOKIE_AGE = 3600 * 2  # 2 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
