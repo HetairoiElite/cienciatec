@@ -20,98 +20,135 @@
                 <div class="card-body">
                     <form method="POST" action="">
                         {% csrf_token %}
-                        <div class="form-group mb-3">
-                            {{form.username}}
-                            <small class="form-text"> {{form.username.help_text|safe}}</small>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group mb-3">
+                                    {{form.username.label_tag}}
+                                    {{form.username}}
+                                    <small class="form-text"> {{form.username.help_text|safe}}</small>
 
-                            {% if form.username.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.username.errors}}
+                                    {% if form.username.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.username.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endif %}
+
+                            <div class="col-8">
+                                <div class="form-group mb-3">
+                                    {{form.email.label_tag}}
+                                    {{form.email}}
+                                    <small class="form-text text-muted"> {{form.email.help_text|safe}}</small>
+
+                                    {% if form.email.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.email.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <!--Nombres-->
+                                <div class="form-group mb-3">
+                                    {{form.first_name.label_tag}}
+                                    {{form.first_name}}
+                                    <small class="form-text"> {{form.first_name.help_text|safe}}</small>
+
+                                    {% if form.first_name.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.first_name.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!--Apellidos-->
+
+                            <div class="col-4">
+                                <div class="form-group mb-3">
+                                    {{form.apellidoP.label_tag}}
+                                    {{form.apellidoP}}
+                                    <small class="form-text"> {{form.apellidoP.help_text|safe}}</small>
+
+                                    {% if form.apellidoP.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.apellidoP.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="form-group mb-3">
+                                    {{form.apellidoM.label_tag}}
+                                    {{form.apellidoM}}
+                                    <small class="form-text"> {{form.apellidoM.help_text|safe}}</small>
+
+                                    {% if form.apellidoM.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.apellidoM.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
 
-                        <!--Nombres-->
-                        <div class="form-group mb-3">
-                            {{form.first_name}}
-                            <small class="form-text"> {{form.first_name.help_text|safe}}</small>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    {{form.password1.label_tag}}
+                                    {{form.password1}}
+                                    <small class="form-text"> {{form.password1.help_text|safe}}</small>
 
-                            {% if form.first_name.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.first_name.errors}}
+                                    {% if form.password1.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.password1.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% endif %}
+
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    {{form.password2.label_tag}}
+                                    {{form.password2}}
+                                    <small class="form-text"> {{form.password2.help_text|safe}}</small>
+
+                                    {% if form.password2.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{form.password2.errors}}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            {{form.type_user.label_tag}}
+                            {% for type in form.type_user %}
+                            <div class="form-check m-3">
+
+                                {{type.label_tag}}
+                                {{type}}
+                                {% if type.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{type.errors}}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            <small class="form-text"> {{form.type_user.help_text|safe}}</small>
                         </div>
 
-                        <!--Apellidos-->
-                        <div class="form-group mb-3">
-                            {{form.apellidoP}}
-                            <small class="form-text"> {{form.apellidoP.help_text|safe}}</small>
-
-                            {% if form.apellidoP.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.apellidoP.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group mb-3">
-                            {{form.apellidoM}}
-                            <small class="form-text"> {{form.apellidoM.help_text|safe}}</small>
-
-                            {% if form.apellidoM.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.apellidoM.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group mb-3">
-                            {{form.email}}
-                            <small class="form-text text-muted"> {{form.email.help_text|safe}}</small>
-
-                            {% if form.email.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.email.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group mb-3">
-                            {{form.password1}}
-                            <small class="form-text"> {{form.password1.help_text|safe}}</small>
-
-                            {% if form.password1.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.password1.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group mb-3">
-                            {{form.password2}}
-                            <small class="form-text"> {{form.password2.help_text|safe}}</small>
-
-                            {% if form.password2.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form.password2.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group mb-3">
-                            {{form_profile.type_user}}
-                            <small class="form-text"> {{form_profile.type_user.help_text|safe}}</small>
-
-                            {% if form_profile.type_user.errors %}
-                            <div class="alert alert-danger" role="alert">
-                                {{form_profile.type_user.errors}}
-                            </div>
-                            {% endif %}
-                        </div>
 
                         <button type="submit" class="btn btn-primary">Registrar</button>
                     </form>
+                    <!--Iterate type user choices-->
+
+
+
+
                 </div>
             </div>
         </div>
