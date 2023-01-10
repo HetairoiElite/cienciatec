@@ -12,12 +12,8 @@ from model_utils.models import TimeStampedModel
 
 def custom_upload_to(instance, filename):
     old_instance = Home.objects.get(pk=instance.pk)
-    if not old_instance.image == 'home/itssmt.png':
-        old_instance.image.delete()
-    if not old_instance.brand_image == 'home/logo1.png':
-        old_instance.brand_image.delete()
-
-    return 'home/' + filename
+    old_instance.image.delete()
+    return 'home/'+filename
 
 
 # * home model
@@ -26,11 +22,16 @@ def custom_upload_to(instance, filename):
 class Home(TimeStampedModel):
     title = models.CharField(max_length=100, verbose_name='Título')
     subtitle = models.CharField(max_length=100, verbose_name='Subtítulo')
-    description = models.TextField(verbose_name='Descripción')
+    
     image = models.ImageField(
-        verbose_name='Imagen Principal', upload_to=custom_upload_to, default='home/itssmt.png')
+        verbose_name='Imagen Principal', upload_to=custom_upload_to, null=True, blank=True)
     brand_image = models.ImageField(
-        verbose_name='Imagen de marca', upload_to=custom_upload_to, default='home/logo1.png')
+        verbose_name='Imagen de marca', upload_to=custom_upload_to, null=True, blank=True)
+    
+    favicon = models.ImageField(
+        verbose_name='Favicon', upload_to=custom_upload_to, null=True, blank=True)
+    
+    description = models.TextField(verbose_name='Descripción')
 
     def __str__(self):
         return self.title
@@ -48,5 +49,6 @@ class Home(TimeStampedModel):
 def submission_delete(sender, instance, **kwargs):
     instance.image.delete(False)
     instance.brand_image.delete(False)
+    instance.favicon.delete(False)
 
     
