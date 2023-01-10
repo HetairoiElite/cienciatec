@@ -7,4 +7,4 @@ from apps.chat.models import Thread
 
 def dashboard(request):
     
-    return render(request, 'dashboard/index.html')
+    return render(request, 'core_dashboard/index.html')
