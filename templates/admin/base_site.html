@@ -15,6 +15,10 @@
 <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/x-icon">
 {% endblock %}
 
+{% block welcome-msg %}
+Bienvenido
+<strong>{% firstof user.get_short_name user.get_username %} </strong>
+{% endblock %}
 
 {% block branding %}
 <h1 id="site-name">
