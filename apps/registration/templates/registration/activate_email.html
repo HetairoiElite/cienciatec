@@ -20,7 +20,7 @@
 <!--Warning alert email no activado-->
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>El link de activación ha expirado!</strong> Por favor solicita otro.
-    <a href="{% url 'resend_link_email'  %}?uidb64={{uidb64}}">Nuevo link</a>
+    <a href="{% url 'registration:resend_link_email'  %}?uidb64={{uidb64}}">Nuevo link</a>
 </div>
 
 {% endif %}
