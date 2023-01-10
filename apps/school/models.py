@@ -1,6 +1,6 @@
 from django.db import models
 from core import validators
-
+from .managers import SchoolManager
 # Create your models here.
 
 
@@ -30,6 +30,8 @@ class School(models.Model):
         auto_now_add=True, verbose_name='Creado en')
     updated_at = models.DateTimeField(
         auto_now=True, verbose_name='Actualizado en')
+    
+    objects = SchoolManager()
 
     def __str__(self):
         return self.name
