@@ -12,7 +12,7 @@ class HomeAdmin(admin.ModelAdmin):
     
     # * deactive add button
     def has_add_permission(self, request):
-        return False
+        return True
     
     # * deactive delete button
     def has_delete_permission(self, request, obj=None):
@@ -30,13 +30,21 @@ class HomeAdmin(admin.ModelAdmin):
         return format_html('<img src="{}" width="200" />'.format(obj.brand_image.url))
 
     brand_image_preview.short_description = 'Imagen de marca'
+    
+    # * favicon preview
+    
+    def favicon_preview(self, obj):
+        return format_html('<img src="{}" width="20" />'.format(obj.favicon.url))
+    
+    favicon_preview.short_description = 'Favicon'
+    
 
     # * list display
-    list_display = ('title', 'image_preview', 'brand_image_preview')
+    list_display = ('title', 'image_preview', 'brand_image_preview', 'favicon_preview')
 
     fieldsets = (
         ('Página principal', {
-         'fields': ('title', 'subtitle', 'description', 'image', 'brand_image')}),
+         'fields': ('title', 'subtitle', 'description', 'image', 'brand_image', 'favicon')}),
     )
 
 
