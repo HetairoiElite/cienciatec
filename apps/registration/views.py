@@ -1,14 +1,14 @@
+
+# * django
+
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
-from django.views.generic import CreateView, TemplateView, UpdateView
-from .forms import *
+from django.views.generic import FormView
 from django.urls import reverse_lazy
-from .models import Profile
 from django.contrib.auth.views import LoginView
 from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from .tokens import account_activation_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
@@ -16,35 +16,80 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+
+# * locals
+
+from .forms import *
+from .models import Profile
+from .tokens import account_activation_token
+
 
 # Create your views here.
-
-
-def SignUpView(request):
-    form = UserCreationFromEmail(request.POST or None)
-    form_profile = UserCreationFormType(request.POST or None)
-
-    if request.method == 'POST' and form.is_valid() and form_profile.is_valid():
+class SignUp(FormView):
+    template_name = 'registration/signup.html'
+    form_class = SignUpForm
+    
+    # * enviar email de confirmación de registro cuando el formulario es válido
+    
+    def form_valid(self, form):
         user = form.save()
-        profile = Profile.objects.get(user=user)
-        profile.type_user = form_profile.cleaned_data['type_user']
-        profile.save()
+        activateEmailSendLink(self.request, user, user.email)
+        return super().form_valid(form)
+    
+    # * redireccionar al usuario a la página de inicio si ya está autenticado
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    # * success url
+    
+    def get_success_url(self):
+        return reverse('registration:sent_email') + '?status=success'
+    
 
-        # * send confirmation email
-
-        if activateEmailSendLink(request, user, user.email):
-
-            context = {
-                'status': 'success',
-            }
-
-            return redirect(reverse('sent_email')+f"?status={context['status']}")
-
-    return render(request, 'registration/signup.html', {'form': form, 'form_profile': form_profile})
-
-
+# * UpdateProfile
+@method_decorator(login_required, name='dispatch')
+class UpdateProfile(FormView):
+    template_name = 'registration/profile_form.html'
+    form_class = ProfileUpdateForm
+    
+    # * pasar el usuario al form
+    
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(user=self.request.user, **self.get_form_kwargs())
+    
+    # * si es la primera vez que se actualiza first_time = false
+    # * si no es la primera vez redireccionar a la página de inicio
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.profile.first_join:
+            request.user.profile.first_join = False
+            request.user.profile.save()
+            return super().dispatch(request, *args, **kwargs)
+        elif 'edit' in request.GET:
+            return super().dispatch(request, *args, **kwargs)
+        
+        return redirect('dashboard')
+    
+    def get_success_url(self):
+        # * agregar mensaje de éxito
+        messages.add_message(self.request, messages.SUCCESS, 'Perfil actualizado correctamente')
+        
+        # * en la misma vista
+        return reverse('registration:profile') + '?edit'
+    
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    
+    
 def SentEmailView(request):
     if not request.GET.get('status'):
         return redirect('home')
@@ -131,7 +176,7 @@ def new_link_active_email(request):
                 context = {
                     'status': 'success',
                 }
-                return redirect(reverse('sent_email')+f"?status={context['status']}")
+                return redirect(reverse('registration:sent_email')+f"?status={context['status']}")
             else:
                 context = {
                     'status': 'error',
@@ -149,29 +194,3 @@ def new_link_active_email(request):
         'status': 'error',
     }
     return redirect(reverse('sent_email')+f'?status={context["status"]}')
-
-
-@login_required(login_url='login')
-def ProfileUpdateView(request):
-    form = UserUpdateForm(request.POST or None, instance=request.user)
-    form_profile = ProfileForm(request.POST or None,
-                               instance=request.user.profile, files=request.FILES or None)
-    
-    print(request.user.profile.first_join)
-
-    if not request.user.profile.first_join and not '?edit' in request.get_full_path():
-        return redirect('dashboard')
-
-    if request.user.profile.first_join:
-        request.user.profile.first_join = False
-        request.user.profile.save()
-
-    if request.method == 'POST' and form_profile.is_valid() and form.is_valid():
-
-        form.save()
-        form_profile.save()
-        messages.success(request, 'Perfil actualizado correctamente')
-    elif request.method == 'POST':
-        messages.error(request, 'Error al actualizar el perfil')
-
-    return render(request, 'registration/profile_form.html', {'form_profile': form_profile, 'form': form})
