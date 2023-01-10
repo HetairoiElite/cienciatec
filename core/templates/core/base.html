@@ -242,7 +242,7 @@
                             {% if user.is_authenticated and not 'password_reset' in request.path %}
                             {% if request.path == "/" %}
                             <li class="nav-item dropdown">
-                                <a class="nav-link" href="{% url 'profile' %}">Ingresar &nbsp <i
+                                <a class="nav-link" href="{% url 'registration:profile' %}">Ingresar &nbsp <i
                                         class="fa fa-door-open"></i></a>
                             </li>
                             {% else %}
@@ -284,7 +284,7 @@
                                     </a>
 
                                     <ul class="dropdown-menu-dark session dropdown-menu">
-                                        <li><a class="dropdown-item" href="{% url 'profile' %}?edit">Perfil &nbsp <i
+                                        <li><a class="dropdown-item" href="{% url 'registration:profile' %}?edit">Perfil &nbsp <i
                                                     class="fas fa-user"></i> </a></li>
                                         <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión &nbsp<i
                                                     class="fa-solid fa-right-from-bracket"></i></a></li>
@@ -308,7 +308,7 @@
 
                             {% if request.path == "/" and not user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
+                                <a class="nav-link" href="{% url 'registration:signup' %}">Registrarse</a>
                             </li>
                             {% endif %}
                         </ul>
