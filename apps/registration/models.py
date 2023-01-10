@@ -16,7 +16,6 @@ def custom_upload_to(instance, filename):
 
 # * Choices type user
 TYPE_USER = (
-    ('0', 'Selecciona el tipo de usuario'),
     ('1', 'Autor'),
     ('2', 'Evaluador'),
 )
@@ -26,7 +25,7 @@ class Profile(models.Model):
     avatar = models.ImageField(
         upload_to=custom_upload_to, blank=True, null=True, default='avatars/default.jpg')
     type_user = models.CharField(
-        max_length=1, choices=TYPE_USER, default='0', verbose_name='Tipo de usuario')
+        max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario')
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name='Usuario')
     school = models.ForeignKey(
