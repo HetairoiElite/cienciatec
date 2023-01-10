@@ -19,6 +19,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+
 # * locals
 
 from .forms import *
@@ -194,3 +196,14 @@ def new_link_active_email(request):
         'status': 'error',
     }
     return redirect(reverse('sent_email')+f'?status={context["status"]}')
+
+
+# * override de la vista de reset password
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'registration/change_password.html'
+    
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, 'Contraseña actualizada correctamente')
+        return reverse('registration:profile')+ '?edit'
+    

@@ -12,4 +12,5 @@ urlpatterns = [
     path('email/resend_link/',
          new_link_active_email, name='resend_link_email'),
     path('profile/', UpdateProfile.as_view(), name='profile'),
+    path('change_password/', CustomPasswordChangeView.as_view(), name='change_password'),
 ]
