@@ -5,8 +5,7 @@ from .models import School
 
 
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'city', 'state', 'zip_code', 'country',
-                    'phone', 'email', 'website', 'is_external', 'created_at', 'updated_at')
+    list_display = ('name',  'is_external')
     search_fields = ('name', 'address', 'city', 'state', 'zip_code',
                      'country', 'phone', 'email', 'website', 'created_at', 'updated_at')
     list_filter = ('city', 'state', 'country',
