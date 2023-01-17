@@ -9,6 +9,9 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import django
+from django.utils.encoding import smart_str
+django.utils.encoding.smart_text = smart_str
 
 from pathlib import Path
 import os
@@ -68,6 +71,8 @@ LOCAL_APPS = [
     'core',
     'apps.school',
     'apps.core_dashboard',
+    'apps.events',
+    'apps.proposal_reception',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS +  DJANGO_APPS
