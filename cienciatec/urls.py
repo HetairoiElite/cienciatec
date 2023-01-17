@@ -31,6 +31,8 @@ urlpatterns = [
 
     path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    
+    path('events/', include('apps.events.urls')),
 
 
     path('dashboard/', include('apps.core_dashboard.urls')),
