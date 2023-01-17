@@ -8,6 +8,7 @@
     {% load static %}
     {% load notifications_tags %}
     {% load filters %}
+    {% block styles %}{% endblock styles %}
 
     <!-- Fuentes -->
     <script src="https://kit.fontawesome.com/7cc488ca30.js" crossorigin="anonymous"></script>
@@ -166,7 +167,7 @@
         position: relative;
     }
 
-    .iconClass span {   
+    .iconClass span {
         position: absolute;
         top: 0px;
         right: 0px;
@@ -188,7 +189,7 @@
                 </div>
                 <li><a href="{% url 'dashboard' %}"><i class="fas fa-tachometer"></i> Tablero</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#events">Events</a></li>
+                <li><a href="{% url 'events:calendar' %}"><i class="fas fa-calendar"></i> Calendario</a></li>
                 <li><a href="#team">Team</a></li>
                 <li class="dropdown">
                     <a href="#works" class="dropdown-toggle" data-toggle="dropdown">Works <span
@@ -248,8 +249,8 @@
                             {% else %}
                             <li class="nav-item dropdown mt-3">
                                 <div class="dropdown ">
-                                    <a class="nav-link dropdown-toggle iconClass" href="#" role="button" id="dropdownMenuLink"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle iconClass" href="#" role="button"
+                                        id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
 
                                         <i class="fas fa-bell"></i>
                                         {% live_notify_badge_notis badge_class='badge rounded-pill badge-notification bg-danger notis' %}
@@ -284,8 +285,8 @@
                                     </a>
 
                                     <ul class="dropdown-menu-dark session dropdown-menu">
-                                        <li><a class="dropdown-item" href="{% url 'registration:profile' %}?edit">Perfil &nbsp <i
-                                                    class="fas fa-user"></i> </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'registration:profile' %}?edit">Perfil
+                                                &nbsp <i class="fas fa-user"></i> </a></li>
                                         <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión &nbsp<i
                                                     class="fa-solid fa-right-from-bracket"></i></a></li>
                                     </ul>
