@@ -27,7 +27,7 @@ class Profile(models.Model):
     type_user = models.CharField(
         max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario')
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, verbose_name='Usuario')
+        User, on_delete=models.CASCADE, verbose_name='Usuario', related_name='profile')
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, verbose_name='Escuela', null=True, blank=True)
     first_join = models.BooleanField(default=True)
