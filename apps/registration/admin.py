@@ -3,12 +3,14 @@ from .models import Profile
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-from django.contrib.admin.widgets import AdminFileWidget
-from django.db import models
 
+from jet.filters import RelatedFieldAjaxListFilter
+from django.contrib.admin import SimpleListFilter
+
+# * import filters
 
 # Register your models here.
+
 
 class CustomProfileAdmin(admin.ModelAdmin):
     # model = Profile
@@ -20,7 +22,6 @@ class CustomProfileAdmin(admin.ModelAdmin):
 
     list_display = ('user', 'image_tag', 'type_user',
                     'school', 'created_at', 'updated_at')
-    list_filter = ('type_user',)
 
 
 class InlineProfile(admin.StackedInline):
@@ -30,23 +31,44 @@ class InlineProfile(admin.StackedInline):
     verbose_name_plural = 'Profile'
     fk_name = 'user'
     fields = ('avatar', 'type_user', 'school', 'first_join')
+
     readonly_fields = ('first_join',)
+
+    radio_fields = {'type_user': admin.HORIZONTAL}
 
 
 class CustomUserAdmin(UserAdmin):
-    
+
+    change_list_template = 'admin/users/change_list.html'
+
     def image_tag(self, obj):
         return format_html('<img src="{}" width="100" height="100" />'.format(obj.profile.avatar.url))
 
     image_tag.short_description = 'Avatar'
-    
+
+    def get_type_user(self, obj):
+        return obj.profile.type_user
+
+    get_type_user.short_description = 'Tipo de usuario'
+
     actions = None
     inlines = (InlineProfile,)
     model = User
     list_display = ('username', 'image_tag', 'email', 'first_name',
-                    'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined')
+                    'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+                    'get_type_user')
+
+    search_fields = ('username', 'email', 'first_name',
+                     'last_name', 'profile__type_user')
+
     list_filter = (
-        'is_staff', 'is_active', 'is_superuser', 'date_joined', 'profile__type_user')
+        ('is_staff'),
+        ('groups', RelatedFieldAjaxListFilter),
+        ('username'),
+    )
+
+    # list_filter = (
+    #     'is_staff', 'is_active', 'is_superuser', 'date_joined', 'profile__type_user')
     fieldsets = (
         ('Cuenta', {'fields': ('username', 'email', 'password')}),
         ('Información personal', {'fields': ('first_name', 'last_name', )}),
