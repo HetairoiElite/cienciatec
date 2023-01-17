@@ -307,8 +307,12 @@ class ProfileUpdateForm(forms.Form):
         
         profile = Profile.objects.get(user=user)
         self.fields['first_name'].initial = user.first_name
-        self.fields['apellidoP'].initial = user.last_name.split()[0]
-        self.fields['apellidoM'].initial = user.last_name.split()[1]
+        try:
+            self.fields['apellidoP'].initial = user.last_name.split()[0]
+            self.fields['apellidoM'].initial = user.last_name.split()[1]
+        except:
+            pass
+        
         try:
             self.fields['school'].initial = profile.school.id     
         except:
