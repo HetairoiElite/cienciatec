@@ -8,15 +8,15 @@ class School(models.Model):
     name = models.CharField(
         max_length=100, verbose_name='Nombre', validators=[validators.name])
     address = models.CharField(
-        max_length=100, verbose_name='Dirección')
+        max_length=100, verbose_name='Dirección', null=True, blank=True)
     city = models.CharField(
         max_length=100, verbose_name='Ciudad', validators=[validators.name], null=True, blank=True)
     state = models.CharField(
-        max_length=100, verbose_name='Estado', validators=[validators.name])
+        max_length=100, verbose_name='Estado', validators=[validators.name], null=True, blank=True)
     zip_code = models.CharField(
-        max_length=100, verbose_name='Código postal', validators=[validators.zip_code])
+        max_length=100, verbose_name='Código postal', validators=[validators.zip_code], null=True, blank=True)
     country = models.CharField(
-        max_length=100, verbose_name='País', validators=[validators.name])
+        max_length=100, verbose_name='País', validators=[validators.name], null=True, blank=True)
     phone = models.CharField(
         max_length=100, verbose_name='Teléfono', validators=[validators.phone], null=True, blank=True)
     email = models.EmailField(
