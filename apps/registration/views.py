@@ -77,7 +77,7 @@ class UpdateProfile(FormView):
         elif 'edit' in request.GET:
             return super().dispatch(request, *args, **kwargs)
         
-        return redirect('dashboard')
+        return redirect('index')
     
     def get_success_url(self):
         # * agregar mensaje de éxito
