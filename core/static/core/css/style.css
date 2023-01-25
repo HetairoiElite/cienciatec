@@ -139,19 +139,9 @@ body {
 .sidebar-nav li:hover {
     background: skyblue !important;
     border-radius: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
-.sidebar-nav li:hover:before,
-.sidebar-nav li.open:hover:before {
-    width: 100%;
-    -webkit-transition: width .2s ease-in;
-    -moz-transition: width .2s ease-in;
-    -ms-transition: width .2s ease-in;
-    transition: width .2s ease-in;
 
-}
 
 .sidebar-nav li a {
     display: block;
