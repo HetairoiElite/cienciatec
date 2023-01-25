@@ -14,16 +14,15 @@ from django.urls import reverse
 from django.utils import timezone
 
 # * receiver for signals
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 # * apps
 from core.models import Home
 from apps.proposal_reception.models import ProposalReception
 from .events import Event, EventDay
-
+from .managers import PublicationManager
 # * abstract class event
-
 
 
 # * publicacion está compuesta por los siguientes eventos one to one
@@ -46,12 +45,14 @@ class Publication(Event):
     )
     # try:
     home = models.ForeignKey(Home, on_delete=models.CASCADE, null=True, blank=True, related_name='publications',
-                             default=Home.objects.first().id)
+                             default='1')
     # except:
     #     pass
 
     current = models.BooleanField(
         verbose_name='Publicación actual', help_text='Publicación actual', default=False)
+
+    objects = PublicationManager()
 
     class Meta:
         verbose_name = 'Publicación'
@@ -63,13 +64,18 @@ class Publication(Event):
     def check_overlap(self, start_date, end_date):
 
         try:
-            if self.start_date <= start_date <= self.end_date:
+            # if self.start_date <= start_date <= self.end_date:
+            if self.start_date <= start_date:
+
                 return True
-            if self.start_date <= end_date <= self.end_date:
+            # if self.start_date <= end_date <= self.end_date:
+            if self.start_date <= end_date:
                 return True
-            if start_date <= self.start_date <= end_date:
+            # if start_date <= self.start_date <= end_date:
+            if start_date <= self.start_date:
                 return True
-            if start_date <= self.end_date <= end_date:
+            # if start_date <= self.end_date <= end_date:
+            if start_date <= self.end_date:
                 return True
             return False
         except:
@@ -109,12 +115,11 @@ class Publication(Event):
                     'Ya existe una publicación actual: (' + str(other.first()) + ')')
 
         # * no puede durar menos de 36 dias
-        if (self.end_date - self.start_date).days < 36:
-            raise ValidationError('La publicación debe durar al menos 36 días')
+        # if (self.end_date - self.start_date).days < 36:
+        #     raise ValidationError('La publicación debe durar al menos 36 días')
 
 
 # * 1. Recepción de propuestas
-
 
 
 # * 2. Asignación de revisores
@@ -242,9 +247,9 @@ class FinalReportSending(EventDay):
         return exists
 
     def clean(self):
-        if not self.check_overlap(self.day):
-            raise ValidationError(
-                'La fecha de entrega de dictamen final debe estar dentro del rango de la publicación')
+        # if not self.check_overlap(self.day):
+        #     raise ValidationError(
+        #         'La fecha de entrega de dictamen final debe estar dentro del rango de la publicación')
 
         super().clean()
 
@@ -274,9 +279,9 @@ class ArticlePublication(EventDay):
         return exists
 
     def clean(self):
-        if not self.check_overlap(self.day):
-            raise ValidationError(
-                'La fecha de publicación de articulos debe estar dentro del rango de la publicación')
+        #     if not self.check_overlap(self.day):
+        #         raise ValidationError(
+        #             'La fecha de publicación de articulos debe estar dentro del rango de la publicación')
 
         super().clean()
 
@@ -333,5 +338,44 @@ def create_events(sender, instance, created, **kwargs):
             publication=instance, day=instance.final_report_sending.day +
             timedelta(days=9)
         )
+    else:
+        if instance.end_date != instance.article_publication.day:
+            instance.proposal_reception.start_date = instance.start_date
+            instance.proposal_reception.end_date = instance.start_date + \
+                timedelta(days=9)
+            instance.proposal_reception.save()
+
+            instance.reviewer_assignment.start_date = instance.proposal_reception.end_date
+            instance.reviewer_assignment.end_date = instance.proposal_reception.end_date + \
+                timedelta(days=3)
+            instance.reviewer_assignment.save()
+
+            instance.article_review.start_date = instance.reviewer_assignment.end_date
+            instance.article_review.end_date = instance.reviewer_assignment.end_date + \
+                timedelta(days=6)
+            instance.article_review.save()
+
+            instance.corrections_sending.start_date = instance.article_review.end_date + \
+                timedelta(days=1)
+            instance.corrections_sending.end_date = instance.article_review.end_date + \
+                timedelta(days=3)
+            instance.corrections_sending.save()
+
+            instance.corrections_reception.start_date = instance.corrections_sending.end_date
+            instance.corrections_reception.end_date = instance.corrections_sending.end_date + \
+                timedelta(days=2)
+            instance.corrections_reception.save()
+
+            instance.final_report_sending.day = instance.corrections_reception.end_date + \
+                timedelta(days=4)
+            instance.final_report_sending.save()
+
+            instance.article_publication.day = instance.final_report_sending.day + \
+                timedelta(days=9)
+            instance.article_publication.save()
+
+            instance.end_date = instance.article_publication.day
+            instance.save()
+
 
 # * cuando se actualiza un evento de la publicación se actualizan los eventos de la publicación
