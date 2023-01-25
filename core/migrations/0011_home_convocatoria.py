@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='home',
             name='convocatoria',
-            field=models.FileField(blank=True, null=True, upload_to=core.models.custom_upload_to, verbose_name='Convocatoria'),
+            field=models.FileField(blank=True, null=True, upload_to=core.models.custom_upload_to_convocatoria, verbose_name='Convocatoria'),
         ),
     ]

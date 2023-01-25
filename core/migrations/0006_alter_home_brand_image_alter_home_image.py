@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='home',
             name='brand_image',
-            field=models.ImageField(default='home/logo1.png', upload_to=core.models.custom_upload_to, verbose_name='Imagen de marca'),
+            field=models.ImageField(default='home/logo1.png', upload_to=core.models.custom_upload_to_brand, verbose_name='Imagen de marca'),
         ),
         migrations.AlterField(
             model_name='home',
             name='image',
-            field=models.ImageField(default='home/itssmt.png', upload_to=core.models.custom_upload_to, verbose_name='Imagen Principal'),
+            field=models.ImageField(default='home/itssmt.png', upload_to=core.models.custom_upload_to_image, verbose_name='Imagen Principal'),
         ),
     ]

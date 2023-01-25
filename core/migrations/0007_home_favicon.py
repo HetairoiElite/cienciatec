@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='home',
             name='favicon',
-            field=models.ImageField(default='home/favicon.png', upload_to=core.models.custom_upload_to, verbose_name='Favicon'),
+            field=models.ImageField(default='home/favicon.png', upload_to=core.models.custom_upload_to_favicon, verbose_name='Favicon'),
         ),
     ]

@@ -14,16 +14,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='home',
             name='brand_image',
-            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to, verbose_name='Imagen de marca'),
+            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to_brand, verbose_name='Imagen de marca'),
         ),
         migrations.AlterField(
             model_name='home',
             name='favicon',
-            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to, verbose_name='Favicon'),
+            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to_favicon, verbose_name='Favicon'),
         ),
         migrations.AlterField(
             model_name='home',
             name='image',
-            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to, verbose_name='Imagen Principal'),
+            field=models.ImageField(blank=True, null=True, upload_to=core.models.custom_upload_to_image, verbose_name='Imagen Principal'),
         ),
     ]
