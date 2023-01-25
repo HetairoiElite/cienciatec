@@ -1,0 +1,212 @@
+{% extends "core/base.html" %}
+
+{% block title %}Propuesta de articulo{% endblock title %}
+
+
+{% block content %}
+
+
+<main role="main">
+    <div class="container">
+
+
+        <div class="row mt-3">
+            <div class="col-md-10 mx-auto mb-5">
+                <div class="card">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="card-title">Propuesta de articulo</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
+                            role="alert">
+                            {{ message }}
+                        </div>
+
+                        {% endfor %}
+                        {% endif %}
+
+
+                        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <div id="form-general">
+                                {{ article_proposal_form.as_p}}
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <!--coautores-->
+                            <h5>Coautores</h5>
+
+                            <div id="formset-coauthor">
+                                {{ coauthor_formset.management_form }}
+                                {% for coautor_form in coauthor_formset %}
+                                <div class="row">
+                                    <div class="col-4">
+
+                                        <!--Error-->
+                                        {% if coautor_form.nombre.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {% for error in coautor_form.nombre.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        {{ coautor_form.nombre.label_tag }}
+                                        {{ coautor_form.nombre }}
+                                    </div>
+                                    <div class="col-4">
+                                        <!--Error-->
+                                        {% if coautor_form.apellido_paterno.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {% for error in coautor_form.apellido_paterno.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %} 
+
+                                        {{ coautor_form.apellido_paterno.label_tag }}
+                                        {{ coautor_form.apellido_paterno }}
+                                    </div>
+                                    <div class="col-4">
+                                        <!--Error-->
+                                        {% if coautor_form.apellido_materno.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {% for error in coautor_form.apellido_materno.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+
+                                        {{ coautor_form.apellido_materno.label_tag }}
+                                        {{ coautor_form.apellido_materno }}
+                                    </div>
+                                    <div class="col-12">
+                                        <!--Error-->
+                                        {% if coautor_form.email.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {% for error in coautor_form.email.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        {{ coautor_form.email.label_tag }}
+                                        {{ coautor_form.email }}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <!--Transparent add button-->
+                                <button style="text-decoration:none" class="btn btn-link text-success"
+                                    id="add-form_coautor" type="button">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Agregar otro coautor</button>
+                                <hr class="border border-success border-2 opacity-75">
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <!--imagenes-->
+                            <h5>Imágenes</h5>
+
+                            <!--Help text warning-->
+                            <div class="alert alert-info" role="alert">
+                                <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar futuras
+                                    correciones.</h6>
+                            </div>
+
+                            <div id="formset-image">
+                                {{ article_image_formset.management_form }}
+                                {% for imagen_form in article_image_formset %}
+                                {{ imagen_form.as_p }}
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <!--Transparent add button-->
+                                <button style="text-decoration:none" class="btn btn-link text-success"
+                                    id="add-form_image" type="button">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Agregar otra imagen</button>
+                                <hr class="border border-success border-2 opacity-75">
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+
+
+                        </form>
+
+                    </div>
+                    <div class="card-footer">
+                        {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
+                        {% endcomment %}
+                        <div id="empty_form_coauthor" style="display:none">
+                            <div class="row">
+                                <div class="col-4">
+
+                                    {{ coauthor_formset.empty_form.nombre.label_tag }}
+                                    {{ coauthor_formset.empty_form.nombre }}
+
+                                </div>
+                                <div class="col-4">
+                                    {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
+                                    {{ coauthor_formset.empty_form.apellido_paterno }}
+                                </div>
+                                <div class="col-4">
+                                    {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
+                                    {{ coauthor_formset.empty_form.apellido_materno }}
+                                </div>
+                                <div class="col-12">
+                                    {{ coauthor_formset.empty_form.email.label_tag }}
+                                    {{ coauthor_formset.empty_form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div id="empty_form_image" style="display:none">
+                            {{ article_image_formset.empty_form.as_p }}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+{% endblock content %}
+
+
+{% block scripts %}
+<script>
+    // * Agregar formularios dinamicamente
+    // * coauthor_formset
+
+    $('#add-form_coautor').click(function () {
+        console.log($('#id_coauthors-TOTAL_FORMS'))
+        var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
+        console.log(form_idx);
+        // add hr
+        $('#formset-coauthor').append('<hr class="border border-success border-2 opacity-75">');
+        $('#formset-coauthor').append($('#empty_form_coauthor').html().replace(/__prefix__/g, form_idx));
+        $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log($('#id_coauthors-TOTAL_FORMS').val());
+    });
+
+    // * article_image_formset
+
+    $('#add-form_image').click(function () {
+        var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
+        // add hr 
+        $('#formset-image').append('<hr class="border border-success border-2 opacity-75">');
+        $('#formset-image').append($('#empty_form_image').html().replace(/__prefix__/g, form_idx));
+        $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log($('#id_proposal_images-TOTAL_FORMS').val());
+    });
+</script>
+{% endblock scripts %}
