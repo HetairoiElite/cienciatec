@@ -1,14 +1,14 @@
 {% extends "admin/base.html" %}
 
 {% load static %}
-{% load i18n static jet_tags %}
+{% comment %} {% load i18n static jet_tags %} {% endcomment %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrastyle %}
 <style>
 .today{
-    background-color: #ee1;
+    background-color: #F9F0B8;
 }
 
 .noday{
@@ -49,9 +49,9 @@ Bienvenido
 
 {% block blockbots %}{{ block.super }}
 
-<script src="{% static 'admin/js/vendor/jquery/jquery.js' as url %}{{ url|jet_append_version }}" type="text/javascript">
-</script>
-<script src="{% static 'admin/js/jquery.init.js' as url %}{{ url|jet_append_version }}"></script>
+{% comment %} <script src="{% static 'admin/js/vendor/jquery/jquery.js' as url %}{{ url|jet_append_version }}" type="text/javascript">
+</script> {% endcomment %}
+{% comment %} <script src="{% static 'admin/js/jquery.init.js' as url %}{{ url|jet_append_version }}"></script> {% endcomment %}
 {% endblock %}
 
 {% block nav-global %}{% endblock nav-global %}
