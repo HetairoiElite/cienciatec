@@ -10,7 +10,6 @@ class PublicationCalendar(HTMLCalendar):
     def __init__(self, events=None):
         super(PublicationCalendar, self).__init__()
         self.events = events
-        
 
     def formatday(self, day, weekday, events):
         """
@@ -37,23 +36,23 @@ class PublicationCalendar(HTMLCalendar):
                 events_html += f'<li> Inicio {rp} </li>'
             elif rp.end_date.day == day and rp.end_date.month == self.month and rp.end_date.year == self.year:
                 events_html += f'<li> Final {rp} </li>'
-                
+
             # * asignacion de articulos
             aa = events[0].reviewer_assignment
-            
+
             if aa.start_date.day == day and aa.start_date.month == self.month and aa.start_date.year == self.year:
                 events_html += f'<li> Inicio {aa} </li>'
             elif aa.end_date.day == day and aa.end_date.month == self.month and aa.end_date.year == self.year:
                 events_html += f'<li> Final {aa} </li>'
-                
+
             # * revision de articulos
             ra = events[0].article_review
-             
+
             if ra.start_date.day == day and ra.start_date.month == self.month and ra.start_date.year == self.year:
                 events_html += f'<li> Inicio {ra} </li>'
             elif ra.end_date.day == day and ra.end_date.month == self.month and ra.end_date.year == self.year:
                 events_html += f'<li> Final {ra} </li>'
-            
+
             # * envio de correcciones
             cs = events[0].corrections_sending
 
@@ -61,33 +60,31 @@ class PublicationCalendar(HTMLCalendar):
                 events_html += f'<li> Inicio {cs} </li>'
             elif cs.end_date.day == day and cs.end_date.month == self.month and cs.end_date.year == self.year:
                 events_html += f'<li> Final {cs} </li>'
-                 
+
             # * recepcion de correcciones
             cr = events[0].corrections_reception
-             
+
             if cr.start_date.day == day and cr.start_date.month == self.month and cr.start_date.year == self.year:
                 events_html += f'<li> Inicio {cr} </li>'
             elif cr.end_date.day == day and cr.end_date.month == self.month and cr.end_date.year == self.year:
                 events_html += f'<li> Final {cr} </li>'
-                
+
             # * envio de dictamen final
             fs = events[0].final_report_sending
-            
+
             try:
-            
+
                 if fs.day == date(self.year, self.month, day):
                     events_html += f'<li>{fs} </li>'
-                    
+
                 # * publicacion de articulos
                 pa = events[0].article_publication
-                
+
                 if pa.day == date(self.year, self.month, day):
                     events_html += f'<li>{pa} </li>'
             except:
                 pass
-                
-                 
-            
+
         if day == 0:
             return '<td class="noday">&nbsp;</td>'  # day outside month
         else:
@@ -117,7 +114,10 @@ class PublicationCalendar(HTMLCalendar):
         self.month = themonth
 
         events = Publication.objects.filter(
-            Q(end_date__month=themonth) | Q(start_date__month=themonth))
+            Q(end_date__month=themonth) | Q(start_date__month=themonth) | Q(start_date__month=themonth-1) | Q(end_date__month=themonth+1))
+
+        # * si el mes es mayor a febrero restar 1 al mes
+
         v = []
         a = v.append
         a('<table border="0" cellpadding="0" cellspacing="0" class="calendar">')
