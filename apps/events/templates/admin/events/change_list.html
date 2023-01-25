@@ -45,11 +45,7 @@
           {% block object-tools-items %}
             {% change_list_object_tools %}
           {% endblock %}
-        </ul>
-    {% endblock %}
-    
-    <ul class="object-tools">
-        <li>
+          <li>
             <a href={{ previous_month }}>
                 Mes anterior
             </a>
@@ -59,8 +55,9 @@
                 Siguiente mes
             </a>
         </li>
-    </ul>
-
+        </ul>
+    {% endblock %}
+    
     {{ calendar }}
     {% if cl.formset and cl.formset.errors %}
         <p class="errornote">
