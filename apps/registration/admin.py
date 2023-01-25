@@ -64,7 +64,8 @@ class CustomUserAdmin(UserAdmin):
     list_filter = (
         ('is_staff'),
         ('groups', RelatedFieldAjaxListFilter),
-        ('username'),
+        ('is_active'),
+        ('date_joined'),
     )
 
     # list_filter = (
