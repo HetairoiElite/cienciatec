@@ -12,7 +12,6 @@
 
     .calendar tr,
     .calendar td {
-        border: 1px solid black;
     }
 
     .calendar th {
@@ -27,8 +26,9 @@
         padding: 20px 0px 0px 5px;
     }
 
-    .today {
-        background-color: yellow;
+    .table .today {
+        background-color: #F9F0B8;
+
     }
 
     .left {
@@ -50,8 +50,8 @@
         margin: 15px;
     }
 
-    .noday{
-        background-color: #ddd;
+    .table .noday {
+        background-color: #F9F7F7;
     }
 </style>
 {% endblock styles %}
@@ -62,5 +62,10 @@
     <a class="btn btn-info left" href={{ previous_month }}><i class="fa-solid fa-arrow-left"></i> Mes anterior </a>
     <a class="btn btn-info right" href={{ next_month }}><i class="fa-solid fa-arrow-right"></i> Mes siguiente </a>
 </div>
-{{calendar}}
+
+<div class="container" >
+    {{calendar}}
+
+</div>
+
 {% endblock content %}
