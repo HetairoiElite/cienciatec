@@ -22,10 +22,11 @@ from notifications import urls as notifications_urls
 
 urlpatterns = [
     path("chat/", include("apps.chat.urls")),
-    path('admin/', admin.site.urls),
-
+    
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
+    path('admin/', admin.site.urls),
+
     
     path('', include('core.urls')),
 
@@ -36,6 +37,9 @@ urlpatterns = [
 
 
     path('dashboard/', include('apps.core_dashboard.urls')),
+    
+    # * proposal reception
+    path('proposal_reception/', include('apps.proposal_reception.urls')),
 
     re_path(r'^inbox/notifications/',
             include(notifications_urls, namespace='notifications')),
