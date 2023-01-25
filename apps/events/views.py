@@ -9,6 +9,7 @@ from .utils import PublicationCalendar
 import calendar
 import datetime
 
+
 class CalendarView(ListView):
     model = Publication
     template_name = 'events/calendario.html'
@@ -49,11 +50,11 @@ class CalendarView(ListView):
             'events:calendar') + '?start_date__gte=' + str(next_month)
 
         cal = PublicationCalendar()
-        
+
         html_calendar = cal.formatmonth(d.year, d.month, withyear=True)
-        
+
         # * traducir meses
-        
+
         html_calendar = html_calendar.replace(
             'January', 'Enero'
         ).replace(
@@ -79,9 +80,9 @@ class CalendarView(ListView):
         ).replace(
             'December', 'Diciembre'
         )
-        
+
         # * traducir dias de la semana
-        
+
         html_calendar = html_calendar.replace(
             'Mon', 'Lun'
         ).replace(
@@ -97,14 +98,15 @@ class CalendarView(ListView):
         ).replace(
             'Sun', 'Dom'
         )
-        
-        
-    
-        
-        
+
         html_calendar = html_calendar.replace(
             '<td ', '<td  width="200" height="50"')
+
+        html_calendar = html_calendar.replace(
+            'class="calendar"', 'class="calendar table table-bordered border-primary"')
+
         context['calendar'] = mark_safe(html_calendar)
+
         print(html_calendar)
-        
+
         return context
