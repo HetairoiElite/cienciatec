@@ -5,7 +5,76 @@
 
 {% block content %}
 <!-- Imagen cnetrada -->
-<div class="container text-center">
+<div class="container text-center mb-3">
     <img src="{{home.image.url}}" class="img-fluid" alt="Responsive image">
 </div>
+
+
+
+{% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}
+
+<!-- Prpopuesta de articulo -->
+
+<h4 class="text-center">Recursos</h4>
+
+<!-- Convocatoria -->
+
+<div class="container text-center mb-3">
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-danger btn-lg btn-block" href="{{home.convocatoria.url}}"><i
+                    class="fas fa-file-pdf"></i>&nbsp;
+                Convocatoria</a>
+        </div>
+    </div>
+</div>
+
+<!-- Plantillas -->
+<div class="container text-center mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Plantillas</h4>
+            {% for plantilla in home.article_templates.all %}
+            <p><a class="btn btn-primary btn-lg btn-block" href="{{plantilla.template.url}}"><i
+                        class="fas fa-file-word"></i>&nbsp;
+                    {{plantilla.name}}</a></p>
+
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+{% if not user.is_staff and not user.profile.type_user == "2    " %}
+
+<div class="container text-center mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            {% comment "" %}if message {% endcomment %}
+            {% if messages %}
+            {% for message in messages %}
+            <div id="over" class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+
+            {% endfor %}
+            {% endif %}
+            <h4>Inicia tu propuesta</h4>
+            <a class="btn btn-primary btn-lg btn-block" href="{% url 'proposal_reception:article_proposal_form' %}"><i
+                    class="fas fa-file-pdf"></i>&nbsp;
+                Comenzar propuesta de articulo</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<br>
+<br>
+
+
+
+{% endif %}
+
+
 {% endblock content %}
