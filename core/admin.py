@@ -4,22 +4,49 @@ from django import forms
 from django.urls import reverse
 
 # * models
-from core.models import Home
+from core.models import Home, ArticleTemplate
 from .forms import HomeChangeForm
 # Register your models here.
+
+
+# * article template admin inline
+
+class ArticleTemplateInline(admin.TabularInline):
+    model = ArticleTemplate
+    extra = 0
 
 # * home admin
 
 
 class HomeAdmin(admin.ModelAdmin):
+    
+    # * inline
+    inlines = [ArticleTemplateInline]
 
     # * deactive add button
     def has_add_permission(self, request):
-        return False
+        # * if no super user
+        if not request.user.is_superuser:
+            return False
+        
+        # * if super user
+        if Home.objects.count() >= 1:
+            return False
+        
+        return True
 
     # * deactive delete button
     def has_delete_permission(self, request, obj=None):
-        return False
+        
+        # * if no super user
+        if not request.user.is_superuser:
+            return False
+        
+        # * if super user
+        if Home.objects.count() >= 1:
+            return False
+        
+        return True
 
     # * image preview
 
@@ -93,7 +120,7 @@ class HomeAdmin(admin.ModelAdmin):
 
     # * list display
     list_display = ('title', 'image_preview',
-                    'brand_image_preview', 'favicon_preview', 'current_publication')
+                    'brand_image_preview', 'favicon_preview', )
 
     fieldsets = (
         ('Información general', {
@@ -107,7 +134,8 @@ class HomeAdmin(admin.ModelAdmin):
         ('Archivos adjuntos', {
             'fields': (
                 'convocatoria',
-
+                'acept_template',
+                'reject_template',
             )
         }),
         # ('Periodo de publicación', {'fields': ('publication',)})
