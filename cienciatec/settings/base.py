@@ -66,7 +66,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.chat',
+    # 'apps.chat',
     'apps.registration',
     'core',
     'apps.school',

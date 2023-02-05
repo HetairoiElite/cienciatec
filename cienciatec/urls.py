@@ -21,7 +21,7 @@ from notifications import urls as notifications_urls
 
 
 urlpatterns = [
-    path("chat/", include("apps.chat.urls")),
+    # path("chat/", include("apps.chat.urls")),
     
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
