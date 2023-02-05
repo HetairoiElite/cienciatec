@@ -40,8 +40,6 @@ class Publication(Event):
         verbose_name='Numero de publicación',
         help_text='Numero de publicación',
         unique=True,
-        blank=True,
-        null=True
     )
     # try:
     home = models.ForeignKey(Home, on_delete=models.CASCADE, null=True, blank=True, related_name='publications',
@@ -96,28 +94,41 @@ class Publication(Event):
         return u'<a href="%s">%s</a>' % (url, self)
 
     def clean(self):
-        if self.end_date <= self.start_date:
-            raise ValidationError(
-                'La fecha de finalizacion debe ser mayor a la fecha de inicio')
-
-        events = Publication.objects.filter(
-            start_date__lte=self.end_date, end_date__gte=self.start_date).exclude(id=self.id)
-
-        if events.exists():
-            raise ValidationError('El evento se cruza con otros eventos')
-
-        # * revisar que no exista otra publicación actual
-        if self.current:
-            other = Publication.objects.filter(
-                current=True).exclude(id=self.id)
-            if other.exists():
+        if self.end_date is not None and self.start_date is not None:
+            if self.end_date <= self.start_date:
                 raise ValidationError(
-                    'Ya existe una publicación actual: (' + str(other.first()) + ')')
+                    'La fecha de finalizacion debe ser mayor a la fecha de inicio')
+
+            events = Publication.objects.filter(
+                start_date__lte=self.end_date, end_date__gte=self.start_date).exclude(id=self.id)
+
+            if events.exists():
+                raise ValidationError('El evento se cruza con otros eventos')
+
+        if self.current is False:
+            raise ValidationError(
+                'Debe rellenar la casilla de publicación actual')
+
+        # # * revisar que no exista otra publicación actual
+        # if self.current:
+        #     other = Publication.objects.filter(
+        #         current=True).exclude(id=self.id)
+        #     if other.exists():
+        #         raise ValidationError(
+        #             'Ya existe una publicación actual: (' + str(other.first()) + ')')
 
         # * no puede durar menos de 36 dias
         # if (self.end_date - self.start_date).days < 36:
         #     raise ValidationError('La publicación debe durar al menos 36 días')
 
+    def save(self):
+        current_pub = Publication.objects.get_current()
+        self.current = True
+        current_pub.current = False
+        
+        super().save()
+
+        
 
 # * 1. Recepción de propuestas
 
