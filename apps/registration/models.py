@@ -28,9 +28,9 @@ class Profile(models.Model):
         max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario')
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name='Usuario', related_name='profile')
-    school = models.ForeignKey(
-        School, on_delete=models.CASCADE, verbose_name='Escuela', null=True, blank=True)
-    first_join = models.BooleanField(default=True)
+    # school = models.ForeignKey(
+    #     School, on_delete=models.CASCADE, verbose_name='Escuela', null=True, blank=True)
+    # first_join = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='Creado en')
