@@ -6,7 +6,8 @@ from django.urls import reverse
 from calendar import HTMLCalendar
 from .utils import PublicationCalendar
 from django.utils.safestring import mark_safe
-
+from django.contrib import messages
+from django.utils.html import format_html
 # Register your models here.
 
 # * inline for publication
@@ -54,7 +55,7 @@ class ArticlePublicationInline(admin.StackedInline):
 
 
 class PublicationAdmin(admin.ModelAdmin):
-    list_display = ['numero_publicacion', 'start_date', 'end_date', 'notes']
+    list_display = ['numero_publicacion', 'start_date', 'end_date']
     change_list_template = 'admin/events/change_list.html'
 
     readonly_fields = ['home']
@@ -156,6 +157,14 @@ class PublicationAdmin(admin.ModelAdmin):
         )
         extra_context['calendar'] = mark_safe(html_calendar)
         return super(PublicationAdmin, self).changelist_view(request, extra_context)
-
+    
+    def message_user(self, *args, **kwargs):
+        pass 
+    
+    def save_model(self, request, obj, form, change):
+        if change:
+            messages.add_message(request, messages.SUCCESS,
+                                 format_html('La <a href="{}">{}</a> ha sido actualizada correctamente.', reverse('admin:events_publication_change', args=[obj.id]), obj))
+        super().save_model(request, obj, form, change)
 
 admin.site.register(Publication, PublicationAdmin)
