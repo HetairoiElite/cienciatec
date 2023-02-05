@@ -70,11 +70,7 @@ class UpdateProfile(FormView):
     # * si no es la primera vez redireccionar a la página de inicio
     
     def dispatch(self, request, *args, **kwargs):
-        if request.user.profile.first_join:
-            request.user.profile.first_join = False
-            request.user.profile.save()
-            return super().dispatch(request, *args, **kwargs)
-        elif 'edit' in request.GET:
+        if 'edit' in request.GET:
             return super().dispatch(request, *args, **kwargs)
         
         return redirect('index')
