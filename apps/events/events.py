@@ -9,8 +9,8 @@ class Event(models.Model):
         verbose_name='Fecha de Inicio', help_text='Fecha de Inicio')
     end_date = models.DateTimeField(
         verbose_name='Fecha de Finalizacion', help_text='Fecha de Finalizacion')
-    notes = models.TextField(verbose_name='Notas',
-                             help_text='Notas', blank=True, null=True)
+    # notes = models.TextField(verbose_name='Notas',
+    #                          help_text='Notas', blank=True, null=True)
 
     class Meta:
         abstract = True
