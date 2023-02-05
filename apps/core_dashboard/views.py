@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # * apps
-from apps.chat.models import Thread
+# from apps.chat.models import Thread
 
 
 # Create your views here.
