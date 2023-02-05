@@ -15,27 +15,50 @@ class ArticleProposalForm(forms.ModelForm):
             'title',
             'modality',
             'school',
+            'new_school',
             'template',
         ]
 
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Título del artículo', 'required': 'true'}),
+            'modality': forms.Select(attrs={'class': 'form-control mb-2 ', 'required': 'true'}),
+            # 'placeholder': 'Escuela
+            'school': forms.Select(attrs={
+                'class': 'form-control mb-2 ',
+            }
+            ),
+            'new_school': forms.TextInput(attrs={
+                'class': 'form-control mb-2 ', 'placeholder': 'Nombre de la escuela',
+                'disabled': 'true',
+            }),
+            'template': forms.ClearableFileInput(attrs={
+                'class': 'form-control mb-2 ',
+                'accept': '.docx',
+            })
+
+        }
+
+        help_texts = {
+            'new_school': 'Si la escuela no se encuentra, seleccione "Otra" y escriba el nombre de la escuela en el campo de texto',
+        }
+
+        labels = {
+            'title': 'Título',
+            'modality': 'Modalidad',
+            'school': 'Escuela',
+            'new_school': '',
+            'template': 'Plantilla',
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].required = True
-        self.fields['title'].label = 'Título'
-        self.fields['title'].widget.attrs['class'] = 'form-control'
-        self.fields['title'].widget.attrs['placeholder'] = 'Título del artículo'
 
-        self.fields['modality'].required = True
-        self.fields['modality'].label = 'Modalidad'
-        self.fields['modality'].widget.attrs['class'] = 'form-control'
+        # * concat queryset with option "Otra" with value "new"
+        self.fields['school'].choices = [('', '---------')] + \
+            [(school.id, school.name)
+             for school in School.objects.all()] + [(None, 'Otra')]
 
-        self.fields['school'].required = True
-        self.fields['school'].label = 'Escuela'
-        self.fields['school'].widget.attrs['class'] = 'form-control'
-
-        self.fields['template'].required = True
-        self.fields['template'].label = 'Plantilla'
-        self.fields['template'].widget.attrs['class'] = 'form-control'
+        self.fields['new_school'].required = False
 
     def clean_template(self):
         template = self.cleaned_data['template']
@@ -52,7 +75,14 @@ class ArticleProposalForm(forms.ModelForm):
                 'El título no puede tener más de 100 caracteres')
         return title
 
-        
+
+class ArticleProposalUpdateForm(ArticleProposalForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # * if not school exclude school field
+        self.fields['template'].required = False
+
 
 class CoauthorForm(forms.ModelForm):
 
@@ -65,27 +95,19 @@ class CoauthorForm(forms.ModelForm):
             'email',
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].required = True
-        self.fields['nombre'].label = 'Nombre(s)'
-        self.fields['nombre'].widget.attrs['class'] = 'form-control'
-        self.fields['nombre'].widget.attrs['placeholder'] = 'Nombre'
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Nombre(s)', 'required': 'true'}),
+            'apellido_paterno': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Apellido paterno', 'required': 'true'}),
+            'apellido_materno': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Apellido materno', 'required': 'true'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Correo electrónico', 'required': 'true'}),
+        }
 
-        self.fields['apellido_paterno'].required = True
-        self.fields['apellido_paterno'].label = 'Apellido paterno'
-        self.fields['apellido_paterno'].widget.attrs['class'] = 'form-control'
-        self.fields['apellido_paterno'].widget.attrs['placeholder'] = 'Apellido paterno'
-
-        self.fields['apellido_materno'].required = True
-        self.fields['apellido_materno'].label = 'Apellido materno'
-        self.fields['apellido_materno'].widget.attrs['class'] = 'form-control'
-        self.fields['apellido_materno'].widget.attrs['placeholder'] = 'Apellido materno'
-
-        self.fields['email'].required = True
-        self.fields['email'].label = 'Correo electrónico'
-        self.fields['email'].widget.attrs['class'] = 'form-control'
-        self.fields['email'].widget.attrs['placeholder'] = 'Correo electrónico'
+        labels = {
+            'nombre': 'Nombre(s)',
+            'apellido_paterno': 'Apellido paterno',
+            'apellido_materno': 'Apellido materno',
+            'email': 'Correo electrónico',
+        }
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
@@ -93,7 +115,7 @@ class CoauthorForm(forms.ModelForm):
         # *max 2 names
         if len(nombre.split(' ')) > 2:
             raise forms.ValidationError(
-                'El nombre no puede tener más de dos palabras')
+                'El nombre no puede tener más de dos nombres')
 
         # * if 2 names check if they are valid
         if len(nombre.split(' ')) == 2:
@@ -124,7 +146,6 @@ class CoauthorForm(forms.ModelForm):
         return apellido_materno
 
 
-
 class ArticleImageForm(forms.ModelForm):
 
     class Meta:
@@ -133,8 +154,13 @@ class ArticleImageForm(forms.ModelForm):
             'image',
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['image'].required = False
-        self.fields['image'].label = 'Imagen'
-        self.fields['image'].widget.attrs['class'] = 'form-control'
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control mb-2 ',
+                'accept': '.jpg, .jpeg, .png',
+            }),
+        }
+
+        labels = {
+            'image': 'Imagen',
+        }

@@ -5,14 +5,18 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils import timezone
+# * slugify
+from django.utils.text import slugify
 
 # * docxtpl
-from docxtpl import DocxTemplate
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Cm
 
 # * django models utils
 from model_utils.models import TimeStampedModel
 
 from apps.events.events import Event
+from core.models import Home
 
 # Create your models here.
 
@@ -60,11 +64,24 @@ def custom_upload_to_user_dictamen(instance, filename):
         return f'dictamen/{instance.author.user.username}/{filename}'
 
 
+def custom_upload_to_reception_letter(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.reception_letter.delete()
+        return f'letters/{instance.author.user.username}/{filename}'
+    except ArticleProposal.DoesNotExist:
+        return f'letters/{instance.author.user.username}/{filename}'
+
+
 class ArticleProposal(TimeStampedModel):
     proposal_reception = models.ForeignKey(
         ProposalReception, on_delete=models.CASCADE, related_name='article_proposals', verbose_name='Recepción de propuestas')
     title = models.CharField(
-        max_length=100, verbose_name='Titulo', help_text='Debe ser un titulo no muy largo')
+        max_length=100, verbose_name='Titulo', unique=True)
+
+    slug = models.SlugField(
+        max_length=200, verbose_name='Slug', unique=True, null=True, blank=True)
+
     author = models.ForeignKey(verbose_name='Autor', to='registration.Profile',
                                on_delete=models.CASCADE, related_name='article_proposal')
 
@@ -78,20 +95,35 @@ class ArticleProposal(TimeStampedModel):
     )
 
     modality = models.CharField(
-        max_length=1, choices=MODALIDADES, verbose_name='Modalidad', help_text='Seleccione la modalidad de su artículo', db_index=True)
+        max_length=1, choices=MODALIDADES, verbose_name='Modalidad', db_index=True)
 
     school = models.ForeignKey('school.School', on_delete=models.CASCADE,
-                               related_name='article_proposals', verbose_name='Institución de adscripción')
+                               related_name='article_proposals', verbose_name='Institución de adscripción', null=True, blank=True)
+
+    new_school = models.CharField(
+        max_length=100, verbose_name='Institución NO normalizada', null=True, blank=True)
+
     template = models.FileField(
         verbose_name='Plantilla', upload_to=custom_upload_to_user_template)
 
    # * Keep icons in approved field
 
-    is_approved = models.BooleanField(
-        null=True, verbose_name='Aprobado')
+    # is_approved = models.BooleanField(
+    #     null=True, verbose_name='Aprobado')
 
-    dictamen = models.FileField(
-        verbose_name='Dictamen', upload_to=custom_upload_to_user_dictamen, null=True, blank=True)
+    # dictamen = models.FileField(
+    #     verbose_name='Dictamen', upload_to=custom_upload_to_user_dictamen, null=True, blank=True)
+
+    STATUS_CHOICES = (
+        ('1', 'En espera'),
+        ('2', 'Recibido'),
+    )
+
+    status = models.CharField(
+        max_length=1, choices=STATUS_CHOICES, verbose_name='Estatus', db_index=True, default='1')
+
+    reception_letter = models.FileField(
+        verbose_name='Carta de recepción', upload_to=custom_upload_to_reception_letter, null=True, blank=True, max_length=255)
 
     class Meta:
         verbose_name = 'Propuesta de artículo'
@@ -100,53 +132,143 @@ class ArticleProposal(TimeStampedModel):
     def __str__(self):
         return self.title
 
-    def send_arbitration_report(self):
-        print('send_arbitration_report')
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
-        print(settings.MEDIA_ROOT + '/templates/arbitration_report.docx')
+    def send_reception_letter(self):
 
-        if self.is_approved:
-            doc = DocxTemplate(settings.MEDIA_ROOT +
-                               '/home/DICTAMEN-APROBADO_edit.docx')
-        else:
-            doc = DocxTemplate(settings.MEDIA_ROOT +
-                               '/home/DICTAMEN-NO-APROBADO_edit.docx')
+        reception_letter = Home.objects.first().reception_letters
+
+        # * str basedir
+        template_paths = (settings.BASE_DIR /
+                          'downloads/Recepcion_de_articulo_EDIT.docx').__str__()
+
+        print(template_paths)
+        print(template_paths.__str__())
+
+        doc = DocxTemplate(template_paths)
+
+        seal = (settings.BASE_DIR / 'downloads/sello.jpg').__str__()
+
+        firma_presidente = (settings.BASE_DIR /
+                            'downloads/firma_presidente.png').__str__()
+        firma_secretario = (settings.BASE_DIR /
+                            'downloads/firma_secretary.png').__str__()
+
+        sello = InlineImage(doc, image_descriptor=seal,
+                            width=Cm(5.7), height=Cm(6.3))
+
+        firma_presidente = InlineImage(
+            doc, image_descriptor=firma_presidente, width=Cm(1.58), height=Cm(2.97)
+        )
+
+        firma_secretario = InlineImage(
+            doc, image_descriptor=firma_secretario, width=Cm(3.63), height=Cm(2.58))
 
         context = {
-            'titulo': self.title,
+            'fecha': timezone.now().strftime('%d de %B de %Y').replace(
+                'January', 'Enero').replace(
+                'February', 'Febrero').replace(
+                'March', 'Marzo').replace(
+                'April', 'Abril').replace(
+                'May', 'Mayo').replace(
+                'June', 'Junio').replace(
+                'July', 'Julio').replace(
+                'August', 'Agosto').replace(
+                'September', 'Septiembre').replace(
+                'October', 'Octubre').replace(
+                'November', 'Noviembre').replace(
+                'December', 'Diciembre'),
+            'numero_oficio': reception_letter.current_number,
+            'anio': timezone.now().year,
             'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
-            'numero': self.proposal_reception.publication.numero_publicacion,
-            # * now formato ejemplo: 6 de junio de 2021
-            'fecha': timezone.now().strftime('%d de %B de %Y'),
+            'titulo': self.title,
+            'email': self.author.user.email,
+            'coautores': self.coauthors.all(),
+            'numero': Home.objects.first().publications.get_current().numero_publicacion,
+            'firma_presidente': firma_presidente,
+            'firma_secretary': firma_secretario,
+            'PRESIDENT': reception_letter.president,
+            'SECRETARY': reception_letter.secretary,
+            'SEAL': sello,
         }
 
-        print(context)
-
         doc.render(context)
-        doc.save(settings.MEDIA_ROOT + '/home/dictamen.docx')
+        template_save = settings.BASE_DIR / f'letters/Carta_de_recepcion.docx'
+        doc.save(template_save)
 
-        # * docx2pdf
         from docx2pdf import convert
-
         import pythoncom
 
         pythoncom.CoInitialize()
 
-        convert(settings.MEDIA_ROOT + '/home/dictamen.docx',
-                settings.MEDIA_ROOT + '/home/dictamen.pdf')
+        convert(settings.BASE_DIR / f'letters/Carta_de_recepcion.docx',
+                settings.BASE_DIR / f'letters/Carta_de_recepcion.pdf')
 
-        # * upload dictamen to dictamen field
-
-        # * binary file
-        with open(settings.MEDIA_ROOT + '/home/dictamen.pdf', 'rb') as f:
+        with open(settings.BASE_DIR / 'letters/Carta_de_recepcion.pdf', 'rb') as file:
 
             from django.core.files import File
 
-            file = File(f)
-
-            self.dictamen.save('dictamen.pdf', file, save=True)
+            file = File(file)
+            self.reception_letter.save(
+                f'Carta_de_recepcion_{self.title}.pdf', file)
 
         self.save()
+
+        reception_letter.current_number += 1
+        reception_letter.save()
+
+    # def send_reception_letter(self):
+
+    # def send_arbitration_report(self):
+    #     print('send_arbitration_report')
+
+    #     print(settings.MEDIA_ROOT + '/templates/arbitration_report.docx')
+
+    #     if self.is_approved:
+    #         doc = DocxTemplate(settings.MEDIA_ROOT +
+    #                            '/home/DICTAMEN-APROBADO_edit.docx')
+    #     else:
+    #         doc = DocxTemplate(settings.MEDIA_ROOT +
+    #                            '/home/DICTAMEN-NO-APROBADO_edit.docx')
+
+    #     context = {
+    #         'titulo': self.title,
+    #         'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
+    #         'numero': self.proposal_reception.publication.numero_publicacion,
+    #         # * now formato ejemplo: 6 de junio de 2021
+    #         'fecha': timezone.now().strftime('%d de %B de %Y'),
+    #     }
+
+    #     print(context)
+
+    #     doc.render(context)
+    #     doc.save(settings.MEDIA_ROOT + '/home/dictamen.docx')
+
+    #     # * docx2pdf
+    #     from docx2pdf import convert
+
+    #     import pythoncom
+
+    #     pythoncom.CoInitialize()
+
+    #     convert(settings.MEDIA_ROOT + '/home/dictamen.docx',
+    #             settings.MEDIA_ROOT + '/home/dictamen.pdf')
+
+    #     # * upload dictamen to dictamen field
+
+    #     # * binary file
+    #     with open(settings.MEDIA_ROOT + '/home/dictamen.pdf', 'rb') as f:
+
+    #         from django.core.files import File
+
+    #         file = File(f)
+
+    #         self.dictamen.save('dictamen.pdf', file, save=True)
+
+        # self.save()
 
 
 # * Imagenes de la propuesta
@@ -157,6 +279,7 @@ def custom_upload_to_user_images(instance, filename):
         return f'images/{instance.article_proposal.author.user.username}/{filename}'
     except ArticleImage.DoesNotExist:
         return f'images/{instance.article_proposal.author.user.username}/{filename}'
+
 
 class ArticleImage(TimeStampedModel):
 

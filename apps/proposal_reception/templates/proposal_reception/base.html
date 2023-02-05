@@ -1,0 +1,207 @@
+{% extends "core/base.html" %}
+
+
+
+{% block content %}
+
+
+<main role="main">
+    <div class="container">
+
+
+        <div class="row mt-3">
+            <div class="col-md-10 mx-auto mb-5">
+                <div class="card">
+                    <div class="card-header bg-dark text-light">
+                        <h3 class="card-title">Propuesta de articulo</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
+                            role="alert">
+                            {{ message }}
+                        </div>
+
+                        {% endfor %}
+                        {% endif %}
+
+
+                        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <div id="form-general">
+                                {% block general %}
+
+                                {% endblock general %}
+                            </div>
+
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <!--coautores-->
+                            <h5>Coautores</h5>
+
+                            <div id="formset-coauthor">
+                                {% block formset_coauthor %}{% endblock formset_coauthor %}
+
+                            </div>
+                            <div class="mb-3">
+                                <!--Transparent add button-->
+                                <button style="text-decoration:none" class="btn btn-link text-success"
+                                    id="add-form_coautor" type="button">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Agregar coautor</button>
+                                <hr class="border border-success border-2 opacity-75">
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <!--imagenes-->
+                            <h5>Imágenes</h5>
+
+                            <!--Help text warning-->
+                            <div class="alert alert-info" role="alert">
+                                <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
+                                    futuras
+                                    correciones.</h6>
+                            </div>
+
+                            <div id="formset-image">
+                                {{ article_image_formset.management_form }}
+                                {% for imagen_form in article_image_formset %}
+                                {{ imagen_form.as_p }}
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <!--Transparent add button-->
+                                <button style="text-decoration:none" class="btn btn-link text-success"
+                                    id="add-form_image" type="button">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Agregar imagen</button>
+                                <hr class="border border-success border-2 opacity-75">
+                            </div>
+
+                            <hr class="border border-primary border-3 opacity-75">
+
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+
+
+                        </form>
+
+                    </div>
+                    <div class="card-footer">
+                        {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
+                        {% endcomment %}
+                        <div id="empty_form_coauthor" style="display:none">
+                            <div class="row">
+                                <div class="col-4">
+
+                                    {{ coauthor_formset.empty_form.nombre.label_tag }}
+                                    {{ coauthor_formset.empty_form.nombre }}
+
+                                </div>
+                                <div class="col-4">
+                                    {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
+                                    {{ coauthor_formset.empty_form.apellido_paterno }}
+                                </div>
+                                <div class="col-4">
+                                    {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
+                                    {{ coauthor_formset.empty_form.apellido_materno }}
+                                </div>
+                                <div class="col-12">
+                                    {{ coauthor_formset.empty_form.email.label_tag }}
+                                    {{ coauthor_formset.empty_form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div id="empty_form_image" style="display:none">
+                            {{ article_image_formset.empty_form.as_p }}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+{% endblock content %}
+
+
+{% block scripts %}
+{% block extra %}{% endblock extra %}
+
+<script>
+    // * Agregar formularios dinamicamente
+    // * coauthor_formset
+
+    $('#add-form_coautor').click(function () {
+        console.log($('#id_coauthors-TOTAL_FORMS'))
+        var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
+        console.log(form_idx);
+        // add hr
+        $('#formset-coauthor').append('<hr class="border border-success border-2 opacity-75">');
+        $('#formset-coauthor').append($('#empty_form_coauthor').html().replace(/__prefix__/g, form_idx));
+        $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log($('#id_coauthors-TOTAL_FORMS').val());
+    });
+
+    // * article_image_formset
+
+    $('#add-form_image').click(function () {
+        var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
+        // add hr 
+        $('#formset-image').append('<hr class="border border-success border-2 opacity-75">');
+        $('#formset-image').append($('#empty_form_image').html().replace(/__prefix__/g, form_idx));
+        $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log($('#id_proposal_images-TOTAL_FORMS').val());
+    });
+
+    // * when select "otra" con valor new activar new school field 
+
+    $('#id_school').change(function () {
+        if ($("#id_school option:selected").text() == 'Otra') {
+            $('#id_new_school').prop('disabled', false);
+            $('#id_new_school').focus();
+            // required
+            $('#id_new_school').prop('required', true);
+            // school no required
+            $('#id_school').prop('required', false);
+        } else {
+            $('#id_new_school').prop('disabled', true);
+            $('#id_new_school').val('');
+            // no required
+            $('#id_new_school').prop('required', false);
+            // school required
+            $('#id_school').prop('required', true);
+        }
+    });
+
+    // * when load page check if select "otra escuela" con valor new activar new school field
+    $(document).ready(function () {
+
+
+        if ($("#id_school option:selected").text() == 'Otra') {
+            $('#id_new_school').prop('disabled', false);
+            $('#id_new_school').focus();
+            // required
+            $('#id_new_school').prop('required', true);
+            // school no required
+            $('#id_school').prop('required', false);
+        } else {
+            $('#id_new_school').prop('disabled', true);
+            $('#id_new_school').val('');
+            // no required
+            $('#id_new_school').prop('required', false);
+            // school required
+            $('#id_school').prop('required', true);
+        }
+    });
+</script>
+
+
+{% endblock scripts %}
+

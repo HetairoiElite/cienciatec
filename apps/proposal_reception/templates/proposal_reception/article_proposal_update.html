@@ -1,16 +1,14 @@
 {% extends "proposal_reception/base.html" %}
 
-{% block title %}Propuesta de articulo{% endblock title %}
-
+{% block title %}Editar articulo {{article_proposal.title}}{% endblock title %}
 
 {% block general %}
-{% with  article_proposal_form as form  %}
 <div class="row mb-2">
     <div class="col-12">
         {{ form.title.label_tag }}
         {{ form.title }}
         {% if form.title.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in form.title.errors %}
             {{ error }}
             {% endfor %}
@@ -23,7 +21,7 @@
         {{ form.modality.label_tag }}
         {{ form.modality }}
         {% if form.modality.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in form.modality.errors %}
             {{ error }}
             {% endfor %}
@@ -31,29 +29,26 @@
         {% endif %}
     </div>
 </div>
-
-<div class="row mb 2">
+<div class="row mb-2">
     <div class="col-6">
-        {{form.school.label_tag}}
-        {{form.school}}
+        {{ form.school.label_tag }}
+        {{ form.school }}
         {% if form.school.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in form.school.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-
     <div class="col-6">
-        {{form.new_school.label_tag}}
-        {{form.new_school}}
-        {% comment "help text" %}{% endcomment %}
+        {{ form.new_school.label_tag }}
+        {{ form.new_school }}
         <div class="form-text">
             {{form.new_school.help_text}}
         </div>
         {% if form.new_school.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in form.new_school.errors %}
             {{ error }}
             {% endfor %}
@@ -61,76 +56,104 @@
         {% endif %}
     </div>
 </div>
-
-{% comment "template" %}{% endcomment %}
 <div class="row mb-2">
     <div class="col-12">
         {{ form.template.label_tag }}
         {{ form.template }}
         {% if form.template.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in form.template.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-
 </div>
-{% endwith %}
-
 {% endblock general %}
-
-
 
 {% block formset_coauthor %}
 {{ coauthor_formset.management_form }}
+
 {% for coautor_form in coauthor_formset %}
+
+{% for hidden in coautor_form.hidden_fields %}
+{{ hidden }}
+{% endfor %}
+
 <div class="row">
-    <div class="col-4">
+    <div class="col-4 mb-2">
+
+
         {{ coautor_form.nombre.label_tag }}
         {{ coautor_form.nombre }}
+        <!--Error-->
         {% if coautor_form.nombre.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in coautor_form.nombre.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-4">
+    <div class="col-4 mb-2">
         {{ coautor_form.apellido_paterno.label_tag }}
         {{ coautor_form.apellido_paterno }}
         {% if coautor_form.apellido_paterno.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in coautor_form.apellido_paterno.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-4">
+    <div class="col-4 mb-2">
         {{ coautor_form.apellido_materno.label_tag }}
         {{ coautor_form.apellido_materno }}
         {% if coautor_form.apellido_materno.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in coautor_form.apellido_materno.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-12">
+    <div class="col-12 mb-2">
         {{ coautor_form.email.label_tag }}
         {{ coautor_form.email }}
         {% if coautor_form.email.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger mt-2" role="alert">
             {% for error in coautor_form.email.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
+
 </div>
+{% if coauthor_formset.can_delete %}
+{{coautor_form.DELETE.label_tag}}
+{{coautor_form.DELETE}}
+{% endif %}
+{% if not forloop.last %}
+<hr class="border border-success border-2 opacity-75">
+{% endif %}
+
 {% endfor %}
+
 {% endblock formset_coauthor %}
+
+
+{% block extra %}
+<script>
+    $(document).ready(function () {
+        console.log($('#id_new_school').val());
+        console.log("Hola")
+
+        if ($('#id_new_school').val() != '') {
+            // set school with text Otra 
+            $("#id_school option[value='']").attr("selected", true);
+        }
+    });
+</script>
+
+{% endblock extra %}
