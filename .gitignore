@@ -10,3 +10,9 @@ __pycache__/
 # * .vscode folder
 
 /.vscode
+
+/downloads
+
+/apps/chat
+
+/letters
