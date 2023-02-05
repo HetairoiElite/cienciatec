@@ -84,7 +84,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group mb-2">
+                                    {% comment %} <div class="form-group mb-2">
                                         {{form.school.label}}
                                         {{form.school}}
                                         {% if form.school.errors %}
@@ -93,7 +93,7 @@
                                         </div>
                                         {% endif %}
                                         <small class="form-text"> {{form.school.help_text}} </small>
-                                    </div>
+                                    </div> {% endcomment %}
 
                                     <div class="form-group mt-3">
                                         <label for="email">Email: <i class="bi bi-check"
