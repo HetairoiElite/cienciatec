@@ -43,7 +43,8 @@ def custom_upload_to_favicon(instance, filename):
         return 'home/'+filename
     except Home.DoesNotExist:
         return 'home/'+filename
-    
+
+
 def custom_upload_to_convocatoria(instance, filename):
     try:
         old_instance = Home.objects.get(pk=instance.pk)
@@ -51,7 +52,8 @@ def custom_upload_to_convocatoria(instance, filename):
         return 'home/'+filename
     except Home.DoesNotExist:
         return 'home/'+filename
-    
+
+
 def custom_upload_to_acept_template(instance, filename):
     try:
         old_instance = Home.objects.get(pk=instance.pk)
@@ -59,7 +61,8 @@ def custom_upload_to_acept_template(instance, filename):
         return 'home/'+filename
     except Home.DoesNotExist:
         return 'home/'+filename
-    
+
+
 def custom_upload_to_reject_template(instance, filename):
     try:
         old_instance = Home.objects.get(pk=instance.pk)
@@ -153,3 +156,91 @@ class ArticleTemplate(TimeStampedModel):
         ordering = ['name']
         verbose_name = 'Plantilla de artículo'
         verbose_name_plural = 'Plantillas de artículos'
+
+
+def custom_upload_to_reception_letter(instance, filename):
+    try:
+        old_instance = ReceptionLetter.objects.get(pk=instance.pk)
+        old_instance.template.delete()
+        return 'home/'+filename
+    except ReceptionLetter.DoesNotExist:
+        return 'home/'+filename
+
+
+def custom_upload_firm_pre(instance, filename):
+    try:
+        old_instance = ReceptionLetter.objects.get(pk=instance.pk)
+        old_instance.president_firm.delete()
+        return 'home/'+filename
+    except ReceptionLetter.DoesNotExist:
+        return 'home/'+filename
+
+
+def custom_upload_firm_sec(instance, filename):
+    try:
+        old_instance = ReceptionLetter.objects.get(pk=instance.pk)
+        old_instance.secretary_firm.delete()
+        return 'home/'+filename
+    except ReceptionLetter.DoesNotExist:
+        return 'home/'+filename
+
+
+def custom_upload_seal(instance, filename):
+    try:
+        old_instance = ReceptionLetter.objects.get(pk=instance.pk)
+        old_instance.seal.delete()
+        return 'home/'+filename
+    except ReceptionLetter.DoesNotExist:
+        return 'home/'+filename
+    
+def custom_upload_template_reception_letter(instance, filename):
+    try:
+        old_instance = ReceptionLetter.objects.get(pk=instance.pk)
+        old_instance.template.delete()
+        return 'home/'+filename
+    except ReceptionLetter.DoesNotExist:
+        return 'home/'+filename
+
+
+class ReceptionLetter(TimeStampedModel):
+    home = models.OneToOneField(Home, on_delete=models.CASCADE,
+                                verbose_name='Página principal', default=1, related_name='reception_letters')
+    # name = models.CharField(max_length=100, verbose_name='Nombre')
+    template = models.FileField(
+        verbose_name='Plantilla', upload_to= custom_upload_template_reception_letter, null=True, blank=True)
+
+    # * número de oficio actual
+
+    current_number = models.PositiveIntegerField(
+        verbose_name='Número de oficio actual', default=1)
+
+    # * presidente del comité de arbitraje
+
+    president = models.CharField(
+        max_length=100, verbose_name='Presidente del comité de arbitraje')
+
+    president_firm = models.ImageField(
+        verbose_name='Firma del presidente', upload_to=custom_upload_firm_pre,
+        null=True, blank=True)
+
+    # * secretario del comité de arbitraje
+
+    secretary = models.CharField(
+        max_length=100, verbose_name='Secretario del comité de arbitraje')
+
+    secretary_firm = models.ImageField(
+        verbose_name='Firma del secretario', upload_to=custom_upload_firm_sec,
+        null=True, blank=True)
+
+    # * sello del departamento de investigación
+
+    seal = models.ImageField(
+        verbose_name='Sello del departamento de investigación', upload_to=custom_upload_seal,
+        null=True, blank=True)
+
+    def __str__(self):
+        return self.home.title
+
+    class Meta:
+        verbose_name = 'Carta de recepción'
+        verbose_name_plural = 'Cartas de recepción'
