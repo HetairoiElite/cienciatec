@@ -35,9 +35,12 @@
         <div class="col-md-12">
             <h4>Plantillas</h4>
             {% for plantilla in home.article_templates.all %}
+            {% if plantilla.template.url is not none %}
+
             <p><a class="btn btn-primary btn-lg btn-block" href="{{plantilla.template.url}}"><i
                         class="fas fa-file-word"></i>&nbsp;
                     {{plantilla.name}}</a></p>
+            {% endif %}
 
             {% endfor %}
 
@@ -53,7 +56,8 @@
             {% comment "" %}if message {% endcomment %}
             {% if messages %}
             {% for message in messages %}
-            <div id="over" class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
+            <div id="over"
+                class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
                 role="alert">
                 {{ message }}
             </div>
