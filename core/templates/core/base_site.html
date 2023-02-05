@@ -269,12 +269,12 @@
                             </li>
 
 
-                            <li class="nav-item dropdown mt-3">
+                            {% comment %} <li class="nav-item dropdown mt-3">
                                 <a class="nav-link iconClass" href="{% url 'list_threads' %}"> &nbsp <i
                                         class="fas fa-message"></i>
                                     {% live_notify_badge_notis badge_class='badge rounded-pill badge-notification bg-danger message' %}
                                 </a>
-                            </li>
+                            </li> {% endcomment %}
                             {% comment %} <li>
                                 <a class="nav-link" href="{% url 'profile' %}">{{request.user.first_name}}
                                     {{request.user.last_name}} <img src="{{request.user.profile.avatar.url}}"
