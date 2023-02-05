@@ -1,6 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+# *authenticate
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 
 from .models import Profile, TYPE_USER
 from apps.school.models import School
@@ -17,36 +21,37 @@ class CustomLoginForm(AuthenticationForm):
         self.fields['username'].label = ''
         self.fields['password'].label = ''
 
-    def clean_username(self):
-        email_or_username = self.cleaned_data.get('username')
-        if User.objects.filter(email=email_or_username).exists():
-            email_or_username = User.objects.get(
-                email=email_or_username).username
-            if not User.objects.get(username=email_or_username).is_active:
-                raise forms.ValidationError(
-                    'El usuario no está activo, revisa tu correo.')
-        else:
-            if not User.objects.filter(username=email_or_username).exists():
-                raise forms.ValidationError(
-                    'El usuario no existe.')
+    def username(self):
+        # * username or email
+        username = self.cleaned_data.get('username')
+        if '@' in username:
+            try:
+                user = User.objects.get(email=username)
+                username = user.username
+            except User.DoesNotExist:
+                pass
+        return username
 
+    def clean(self):
+        username = self.cleaned_data.get("username")
+        password = self.cleaned_data.get("password")
+
+        if username is not None and password:
+            self.user_cache = authenticate(
+                self.request, username=username, password=password
+            )
+            if self.user_cache is None:
+                try:
+                    user = User.objects.get(username=username, password=make_password(password))
+                    if not user.is_active:
+                        raise forms.ValidationError(
+                            "Esta cuenta no está activa, revisa tu correo electrónico para activarla o contacta al administrador.")
+                except User.DoesNotExist:
+                    raise self.get_invalid_login_error()
             else:
-                if not User.objects.get(username=email_or_username).is_active:
-                    raise forms.ValidationError(
-                        'El usuario no está activo, revisa tu correo.')
+                self.confirm_login_allowed(self.user_cache)
 
-        return email_or_username
-
-    def clean_password(self):
-        try:
-            password = self.cleaned_data.get('password')
-            user = User.objects.get(username=self.cleaned_data.get('username'))
-            if not user.check_password(password):
-                raise forms.ValidationError(
-                    'La contraseña es incorrecta.')
-        except User.DoesNotExist:
-            pass
-        return password
+        return self.cleaned_data
 
 
 class SignUpForm(forms.Form):
@@ -259,31 +264,32 @@ class ProfileUpdateForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     apellidoP = forms.CharField(max_length=30)
     apellidoM = forms.CharField(max_length=30)
-    school = forms.ChoiceField(choices=[(0, 'Selecciona una escuela')])
+    # school = forms.ChoiceField(choices=[(0, 'Selecciona una escuela')])
 
-    def __init__(self, user = None, *args, **kwargs):
+    def __init__(self, user=None, *args, **kwargs):
         super(ProfileUpdateForm, self).__init__(*args, **kwargs)
-        
+
         # * choices for school
-        
-        choices = [(0, 'Selecciona una escuela')]
-        choices.extend([(school.id, school.name) for school in School.objects.all()])
-        
-        self.fields['school'].choices = choices
+
+        # choices = [(0, 'Selecciona una escuela')]
+        # choices.extend([(school.id, school.name)
+        #                for school in School.objects.all()])
+
+        # self.fields['school'].choices = choices
 
         # * labels
         self.fields['avatar'].label = 'Imagen de perfil'
         self.fields['first_name'].label = 'Nombre(s)'
         self.fields['apellidoP'].label = 'Apellido paterno'
         self.fields['apellidoM'].label = 'Apellido materno'
-        self.fields['school'].label = 'Escuela'
+        # self.fields['school'].label = 'Escuela'
 
         # * attrs
         self.fields['avatar'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['first_name'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoP'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoM'].widget.attrs['class'] = 'form-control mb-2'
-        self.fields['school'].widget.attrs['class'] = 'form-control mb-2'
+        # self.fields['school'].widget.attrs['class'] = 'form-control mb-2'
 
         # * placeholders
         self.fields['first_name'].widget.attrs['placeholder'] = 'Nombre(s)'
@@ -293,18 +299,17 @@ class ProfileUpdateForm(forms.Form):
         self.fields['first_name'].help_text = '30 caracteres o menos. Máximo 2 nombres.'
         self.fields['apellidoP'].help_text = '30 caracteres o menos.'
         self.fields['apellidoM'].help_text = '30 caracteres o menos.'
-        
-        # * help text 
-        
-        self.fields['school'].help_text = 'Escuela a la que perteneces. Si no aparece tu escuela, contacta a un administrador para agregarla.'
+
+        # * help text
+
+        # self.fields['school'].help_text = 'Escuela a la que perteneces. Si no aparece tu escuela, contacta a un administrador para agregarla.'
 
         # * initial values
-        
+
         # * get user from kwargs
-        
-        
+
         self.user = user
-        
+
         profile = Profile.objects.get(user=user)
         self.fields['first_name'].initial = user.first_name
         try:
@@ -312,11 +317,11 @@ class ProfileUpdateForm(forms.Form):
             self.fields['apellidoM'].initial = user.last_name.split()[1]
         except:
             pass
-        
-        try:
-            self.fields['school'].initial = profile.school.id     
-        except:
-            self.fields['school'].initial = 0
+
+        # try:
+        #     self.fields['school'].initial = profile.school.id
+        # except:
+        #     self.fields['school'].initial = 0
         # self.fields['avatar'].initial = profile.avatar
 
     def clean_first_name(self):
@@ -391,7 +396,7 @@ class ProfileUpdateForm(forms.Form):
         apellidoM = self.cleaned_data.get('apellidoM')
         school = self.cleaned_data.get('school')
         avatar = self.cleaned_data.get('avatar')
-        
+
         user = self.user
 
         user.first_name = first_name
@@ -400,15 +405,15 @@ class ProfileUpdateForm(forms.Form):
         user.save()
 
         profile = Profile.objects.get(user=user)
-        
-        try:
-            school = School.objects.get(id=school)
-            profile.school = school
-        except:
-            pass
-        
+
+        # try:
+        #     # school = School.objects.get(id=school)
+        #     profile.school = school
+        # except:
+        #     pass
+
         if avatar != None:
-            profile.avatar = avatar 
+            profile.avatar = avatar
 
         profile.save()
 
