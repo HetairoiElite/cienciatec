@@ -21,7 +21,7 @@ class CustomProfileAdmin(admin.ModelAdmin):
     image_tag.short_description = 'Avatar'
 
     list_display = ('user', 'image_tag', 'type_user',
-                    'school', 'created_at', 'updated_at')
+                    'created_at', 'updated_at')
 
 
 class InlineProfile(admin.StackedInline):
@@ -30,10 +30,7 @@ class InlineProfile(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
-    fields = ('avatar', 'type_user', 'school', 'first_join')
-
-    readonly_fields = ('first_join',)
-
+    fields = ('avatar', 'type_user')
     radio_fields = {'type_user': admin.HORIZONTAL}
 
 
