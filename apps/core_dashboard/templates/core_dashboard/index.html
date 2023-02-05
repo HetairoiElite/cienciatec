@@ -9,17 +9,6 @@
 
 <main role="main">
     <!--Mensajes-->
-    {% if messages %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {% for message in messages %}
-        <strong>{{ message }}</strong>
-        {% endfor %}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endif %}
-
     {% if not request.user.profile.type_user == "2" %}
 
     <div class="container">
@@ -44,8 +33,9 @@
                         <table class="table">
                             <thead>
                                 <th>Titulo</th>
-                                <th>Aprobado</th>
-                                <th>Dictamen</th>
+                                <th>Estado</th>
+                                <th>Carta de recepción</th>
+                                <th>Acciones</th>
                             </thead>
 
 
@@ -57,24 +47,26 @@
                                 <tr>
                                     <td>{{ article.title }}</td>
                                     <td>
-                                        {% if article.is_approved == False %}
-                                        <i class="fa-solid fa-xmark" style="color:red"></i>
-                                        {% elif article.is_approved %}
-                                        <i class="fa-solid fa-check" style="color:green"></i>
+                                        {% if article.status == "2" %}
+                                        <i class="fa-solid fa-check" style="color:green"></i> &nbsp; Recibido
                                         {% else %}
-                                        Sin revisar
+                                        Sin recibir
                                         {% endif %}
 
                                     </td>
                                     <td>
                                         <!--Ver dictamen-->
-                                        {% if article.dictamen.url %}
-                                        <a href="{{ article.dictamen.url }}" class="btn btn-link text-primary"
+                                        {% if article.reception_letter.url is not null %}
+                                        <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
                                             style="text-decoration: none;" target="_blank">
                                             <i class="fa-solid fa-file-pdf" style="color:red"></i>
-                                            Ver dictamen</a>
+                                            Ver</a>
 
                                         {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"><i
+                                                class="fa-solid fa-edit"></i></a>
                                     </td>
                                 </tr>
                             </tbody>
