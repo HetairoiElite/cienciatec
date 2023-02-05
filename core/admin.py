@@ -2,10 +2,13 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django import forms
 from django.urls import reverse
+# ¨messages
+
+from django.contrib import messages
 
 # * models
-from core.models import Home, ArticleTemplate
-from .forms import HomeChangeForm
+from core.models import Home, ArticleTemplate, ReceptionLetter
+from .forms import HomeChangeForm, ReceptionLetterForm
 # Register your models here.
 
 
@@ -15,37 +18,88 @@ class ArticleTemplateInline(admin.TabularInline):
     model = ArticleTemplate
     extra = 0
 
+# * ReceptionLetterAdmin
+
+
+class ReceptionLetterAdmin(admin.StackedInline):
+    model = ReceptionLetter
+    can_delete = False
+
+    form = ReceptionLetterForm
+
+    def secretary_firm_preview(self, obj):
+
+        return format_html(
+            '<img src="{}" width="50" />'.format(obj.secretary_firm.url)
+        )
+
+    secretary_firm_preview.short_description = 'Firma del secretario'
+
+    def president_firm_preview(self, obj):
+        return format_html(
+            '<img src="{}" width="50" />'.format(obj.president_firm.url)
+        )
+
+    president_firm_preview.short_description = 'Firma del presidente'
+
+    def seal_preview(self, obj):
+
+        return format_html(
+            '<img src="{}" width="150" />'.format(obj.seal.url)
+        )
+
+    seal_preview.short_description = 'Sello del departamento de investigacion'
+
+    fieldsets = (
+        (None, {
+            'fields': ('template', 'current_number', 'seal_preview', 'seal')
+        }),
+        ('Secretario del comite arbitraje', {
+            'fields': ('secretary', 'secretary_firm_preview', 'secretary_firm')
+        }),
+        ('Presidente del comite arbitraje', {
+            'fields': ('president', 'president_firm_preview', 'president_firm')
+        }),
+    )
+
+    readonly_fields = (
+        'seal_preview', 'secretary_firm_preview', 'president_firm_preview')
+
+
 # * home admin
 
 
 class HomeAdmin(admin.ModelAdmin):
-    
+
     # * inline
-    inlines = [ArticleTemplateInline]
+    inlines = [
+        ArticleTemplateInline,
+        ReceptionLetterAdmin
+    ]
 
     # * deactive add button
     def has_add_permission(self, request):
         # * if no super user
         if not request.user.is_superuser:
             return False
-        
+
         # * if super user
         if Home.objects.count() >= 1:
             return False
-        
+
         return True
 
     # * deactive delete button
     def has_delete_permission(self, request, obj=None):
-        
+
         # * if no super user
         if not request.user.is_superuser:
             return False
-        
+
         # * if super user
         if Home.objects.count() >= 1:
             return False
-        
+
         return True
 
     # * image preview
@@ -129,7 +183,9 @@ class HomeAdmin(admin.ModelAdmin):
                 'image_previewc', 'image',
                 'brand_image_previewc', 'brand_image',
                 'favicon_previewc', 'favicon',
-                'current_publication', 'publication')
+                'current_publication',
+                # 'publication'
+            )
         }),
         ('Archivos adjuntos', {
             'fields': (
@@ -147,6 +203,16 @@ class HomeAdmin(admin.ModelAdmin):
     # radio_fields = {
     #     'publication': admin.VERTICAL,
     # }
+
+    def message_user(self, *args, **kwargs):
+        pass
+
+    def save_model(self, request, obj, form, change):
+        if change:
+            messages.add_message(
+                request, messages.SUCCESS, 'Se ha actualizado la información de la página principal.')
+
+        super().save_model(request, obj, form, change)
 
 
 # * admin
