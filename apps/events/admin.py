@@ -19,7 +19,7 @@ class PorposalReceptionInline(admin.StackedInline):
     can_delete = False
     
 class ReviewerAssignmentInline(admin.StackedInline):
-    model = ReviewerAssignment
+    model = RefereeAssignment
     fk_name = 'publication'
     can_delete = False
 

@@ -1,6 +1,7 @@
 
 # * imports python
 
+from apps.proposal_reception.models import ArticleProposal
 from datetime import datetime, timedelta, date
 
 # * time
@@ -20,6 +21,7 @@ from django.dispatch import receiver
 # * apps
 from core.models import Home
 from apps.proposal_reception.models import ProposalReception
+from apps.reviewer_assignment.models import RefereeAssignment, Assignment, ArticleProfile
 from .events import Event, EventDay
 from .managers import PublicationManager
 # * abstract class event
@@ -125,37 +127,15 @@ class Publication(Event):
         current_pub = Publication.objects.get_current()
         self.current = True
         current_pub.current = False
-        
+
         super().save()
 
-        
 
 # * 1. Recepción de propuestas
 
 
 # * 2. Asignación de revisores
 
-
-class ReviewerAssignment(Event):
-    publication = models.OneToOneField(
-        Publication, on_delete=models.CASCADE, related_name='reviewer_assignment')
-
-    class Meta:
-        verbose_name = 'Asignación de revisores'
-        verbose_name_plural = 'Asignación de revisores'
-
-    # * comprobar que la fecha de inicio de la asignación de revisores este
-    # * dentro del rango de la publicación
-
-    def clean(self):
-        if not self.publication.check_overlap(self.start_date, self.end_date):
-            raise ValidationError(
-                'La fecha de inicio de la asignación de revisores debe estar dentro del rango de la publicación')
-
-        super().clean()
-
-    def __str__(self):
-        return 'Asignación de revisores de la publicación #' + str(self.publication.numero_publicacion)
 
 # * 3. Revisión de articulos
 
@@ -315,8 +295,8 @@ def create_events(sender, instance, created, **kwargs):
         # * colocar la fecha de inicio de la asignación de revisores en la fecha de fin de la asignación de revisores
         # * y la fecha de fin de la asignación de revisores 3 días después de la fecha de fin de la recepción de propuestas
 
-        ReviewerAssignment.objects.create(publication=instance, start_date=instance.proposal_reception.end_date,
-                                          end_date=instance.proposal_reception.end_date + timedelta(days=3))
+        RefereeAssignment.objects.create(publication=instance, start_date=instance.proposal_reception.end_date,
+                                         end_date=instance.proposal_reception.end_date + timedelta(days=3))
 
         # * colocar la fecha de inicio de la revisión de articulos en la fecha de fin de la asignación de revisores
         # * y la fecha de fin de la revisión de articulos 6 días después de la fecha de fin de la asignación de revisores
@@ -349,44 +329,14 @@ def create_events(sender, instance, created, **kwargs):
             publication=instance, day=instance.final_report_sending.day +
             timedelta(days=9)
         )
-    else:
-        if instance.end_date != instance.article_publication.day:
-            instance.proposal_reception.start_date = instance.start_date
-            instance.proposal_reception.end_date = instance.start_date + \
-                timedelta(days=9)
-            instance.proposal_reception.save()
-
-            instance.reviewer_assignment.start_date = instance.proposal_reception.end_date
-            instance.reviewer_assignment.end_date = instance.proposal_reception.end_date + \
-                timedelta(days=3)
-            instance.reviewer_assignment.save()
-
-            instance.article_review.start_date = instance.reviewer_assignment.end_date
-            instance.article_review.end_date = instance.reviewer_assignment.end_date + \
-                timedelta(days=6)
-            instance.article_review.save()
-
-            instance.corrections_sending.start_date = instance.article_review.end_date + \
-                timedelta(days=1)
-            instance.corrections_sending.end_date = instance.article_review.end_date + \
-                timedelta(days=3)
-            instance.corrections_sending.save()
-
-            instance.corrections_reception.start_date = instance.corrections_sending.end_date
-            instance.corrections_reception.end_date = instance.corrections_sending.end_date + \
-                timedelta(days=2)
-            instance.corrections_reception.save()
-
-            instance.final_report_sending.day = instance.corrections_reception.end_date + \
-                timedelta(days=4)
-            instance.final_report_sending.save()
-
-            instance.article_publication.day = instance.final_report_sending.day + \
-                timedelta(days=9)
-            instance.article_publication.save()
-
-            instance.end_date = instance.article_publication.day
-            instance.save()
 
 
 # * cuando se actualiza un evento de la publicación se actualizan los eventos de la publicación
+
+
+@receiver(post_save, sender=ArticleProposal)
+def ensure_assigment(sender, instance, created, **kwargs):
+    Assignment.objects.get_or_create(
+        article=instance, referee_assignment=Publication.objects.get_current().reviewer_assignment)
+    ArticleProfile.objects.get_or_create(
+        article=instance, referee_assignment=Publication.objects.get_current().reviewer_assignment)
