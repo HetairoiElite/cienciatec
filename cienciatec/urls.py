@@ -33,16 +33,21 @@ urlpatterns = [
     path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     
-    path('events/', include('apps.events.urls')),
+    path('eventos/', include('apps.events.urls')),
 
 
-    path('dashboard/', include('apps.core_dashboard.urls')),
+    path('tablero/', include('apps.core_dashboard.urls')),
+    
+    # * celery_progress
+    # path('celery-progress/', include('celery_progress.urls')),
     
     # * proposal reception
-    path('proposal_reception/', include('apps.proposal_reception.urls')),
+    path('recepcion-propuestas/', include('apps.proposal_reception.urls')),
 
     re_path(r'^inbox/notifications/',
             include(notifications_urls, namespace='notifications')),
+    
+    
 ]
 
 # * Custom titles for admin site
