@@ -2,6 +2,7 @@ from django import template
 from django.utils.html import format_html
 from django.urls import reverse
 from notifications.models import Notification
+from django.contrib.auth.models import Group 
 
 register = template.Library()
 
@@ -123,3 +124,8 @@ def user_context(context):
     if user_is_anonymous:
         return None
     return user
+
+@register.filter(name='has_group')
+def has_group(user, group_name):
+    group = Group.objects.get(name=group_name)
+    return True if group in user.groups.all() else False
