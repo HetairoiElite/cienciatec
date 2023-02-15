@@ -17,7 +17,7 @@ from jet.filters import RelatedFieldAjaxListFilter
 class ArticleImageInline(admin.TabularInline):
     model = ArticleImage
     extra = 1
-    max_num = 5
+    max_num = 3
 
     fields = ('image', )
 
@@ -82,6 +82,12 @@ def send_reception_letter(modeladmin, request, queryset):
 
 @admin.action(description='Marcar como recibido')
 def mark_as_received(modeladmin, request, queryset):
+    # from .tasks import go_to_sleep
+     
+    # go_to_sleep.delay(10)
+    
+    # * add context to view
+    
     queryset.update(status='2')
     messages.success(request, 'Se han marcado como recibidos')
 
@@ -158,6 +164,8 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                                  format_html(f'La propuesta de artículo <a href="/admin/proposal_reception/articleproposal/{obj.id}">{obj.title}</a> ha sido actualizada correctamente.'))
 
         super().save_model(request, obj, form, change)
+        
+    # * change_list_context
 
 
 admin.site.register(ArticleProposal, ArticleProposalAdmin)
