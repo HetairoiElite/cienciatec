@@ -18,8 +18,9 @@ class CustomLoginForm(AuthenticationForm):
             attrs={'class': 'form-control mb-2', 'placeholder': 'Nombre de usuario o email'})
         self.fields['password'].widget.attrs.update(
             {'class': 'form-control mb-2', 'placeholder': 'Contraseña'})
-        self.fields['username'].label = ''
-        self.fields['password'].label = ''
+        self.fields['username'].label = 'Usuario o email'
+        self.fields['password'].label = 'Contraseña'
+
 
     def username(self):
         # * username or email
@@ -42,7 +43,8 @@ class CustomLoginForm(AuthenticationForm):
             )
             if self.user_cache is None:
                 try:
-                    user = User.objects.get(username=username, password=make_password(password))
+                    user = User.objects.get(
+                        username=username, password=make_password(password))
                     if not user.is_active:
                         raise forms.ValidationError(
                             "Esta cuenta no está activa, revisa tu correo electrónico para activarla o contacta al administrador.")
@@ -285,7 +287,7 @@ class ProfileUpdateForm(forms.Form):
         # self.fields['school'].label = 'Escuela'
 
         # * attrs
-        self.fields['avatar'].widget.attrs['class'] = 'form-control mb-2'
+        self.fields['avatar'].widget.attrs['class'] = 'help-text'
         self.fields['first_name'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoP'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoM'].widget.attrs['class'] = 'form-control mb-2'
