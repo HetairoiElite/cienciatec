@@ -4,25 +4,35 @@
 
 {% block content %}
 <!--Success alert email activado-->
-{% if status == "success" %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>Se ha activado tu cuenta!</strong> Ya puedes iniciar sesión.
-    <a href="{% url 'login' %}">Iniciar sesión</a>  
-</div>
-{% elif status == "error"  %}
+<div class="grid-x grid-margin-x align-center">
+    <div class="cell medium-6 large-8" style="margin-top: 2em;">
+        {% if status == "success" %}
 
-<!--Error alert email no activado-->
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>El link de activación es inválido! porque ya fue utilizado o no existe.</strong>
-</div>
+        <div class="callout success">
+            <h3>¡Felicidades!</h5>
+                <p>¡Tu cuenta ha sido activada! Ya puedes iniciar sesión.</p>
+                <a href="{% url 'login' %}">Iniciar sesión</a>
+        </div>
+        {% elif status == "error"  %}
 
-{% elif status == "warning" %}
-<!--Warning alert email no activado-->
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>El link de activación ha expirado!</strong> Por favor solicita otro.
-    <a href="{% url 'registration:resend_link_email'  %}?uidb64={{uidb64}}">Nuevo link</a>
-</div>
+        <!--Error alert email no activado-->
 
-{% endif %}
+        <div class="callout alert">
+            <h3>¡Error!</h5>
+                <p>¡El link de activación es inválido! porque ya fue utilizado o no existe.</p>
+        </div>
+
+
+        {% elif status == "warning" %}
+        <!--Warning alert email no activado-->
+        <div class="callout warning">
+            <h3>El link de activación ha expirado!</h5>
+                <p>Por favor solicita otro.
+                    <a href="{% url 'registration:resend_link_email'  %}?uidb64={{uidb64}}">Nuevo link</a>
+                </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

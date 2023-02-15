@@ -1,419 +1,195 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html class="no-js" lang="en">
+{% load static %}
+{% load filters %}
+<style>
+    .rounded-circle {
+        border-radius: 50%;
+    }
+
+    /* FILE INPUT STYLE Foundatipn 6.5.3 */
+
+
+    ::-webkit-file-upload-button {
+        background: #d7ecfa;
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #d7ecfa;
+        cursor: pointer;
+    }
+
+    ::-webkit-file-upload-button:hover {
+        background: #a7ecfa;
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #a7ecfa;
+        cursor: pointer;
+    }
+
+    ::-webkit-file-upload-button:active {
+        background: #a7ecfa;
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #a7ecfa;
+        cursor: pointer;
+    }
+</style>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} | {{home.title}}</title>
-    {% load static %}
-    {% load notifications_tags %}
-    {% load filters %}
-    {% block styles %}{% endblock styles %}
+    <link rel="stylesheet" href="{% static 'core/node_modules/foundation-sites/dist/css/foundation.min.css' %}" />
+    <link rel="shortcut icon" href="{{home.favicon.url}}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'core/foundation-icons/foundation-icons.css' %}">
 
-    <!-- Fuentes -->
-    <script src="https://kit.fontawesome.com/7cc488ca30.js" crossorigin="anonymous"></script>
+    <style>
+        .help-text {
+            color: gray;
+        }
 
-    <!-- Estilos -->
-    <link rel="stylesheet" href="{% static 'core/bootstrap-5.2.3-dist/css/bootstrap.min.css' %}">
-    {% comment %}
-    <link rel="stylesheet" href="{% static 'core/bootstrap-icons/font/bootstrap-icons.css' %}"> {% endcomment %}
-    {% comment %}
-    <link rel="stylesheet" href="{% static 'core/vendor/font-awesome/css/font-awesome.css' %}"> {% endcomment %}
-    <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/x-icon">
+        .card-divider {
+            background-color: #212531;
+        }
 
-    {% comment %}
-    <link href="{% static 'core/css/main.css' %}" rel="stylesheet"> {% endcomment %}
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
-
-    {% comment %}
-    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet"> {% endcomment %}
+        .title-white {
+            color: white;
+        }
+    </style>
 </head>
-
-
-<style>
-    html {
-        min-height: 100%;
-        position: relative;
-    }
-
-    body {
-        margin: 0;
-        margin-bottom: 40px;
-    }
-
-    footer {
-        background-color: black;
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 40px;
-        color: white;
-    }
-
-    /* sidebard bootstrap */
-</style>
-<style>
-    .avatar {
-        width: 50px;
-        height: 50px;
-        float: left;
-        margin-right: 10px;
-    }
-
-    .thread {
-        display: flex;
-        flex-direction: column;
-        max-height: 300px;
-        overflow-y: scroll;
-    }
-
-    .mine {
-        padding: 0 0.5em 0.25em;
-        background-color: rgba(230, 242, 245, .5);
-        width: 92%;
-        margin-left: 8%;
-    }
-
-
-    .other {
-        padding: 0 0.5em 0.25em;
-        background-color: #f2f3f5;
-        width: 92%;
-    }
-
-    .you {
-        background-color: lime;
-    }
-
-    .chat-online {
-        color: #34ce57
-    }
-
-    .chat-offline {
-        color: #e4606d
-    }
-
-    .chat-messages {
-        display: flex;
-        flex-direction: column;
-        max-height: 800px;
-        overflow-y: scroll;
-    }
-
-    .chat-message-left,
-    .chat-message-right {
-        display: flex;
-        flex-shrink: 0;
-        /* break links or words */
-        overflow-wrap: break-word;
-    }
-
-    .chat-message-left {
-        margin-right: auto
-    }
-
-    .chat-message-right {
-        flex-direction: row-reverse;
-        margin-left: auto;
-
-    }
-
-    .py-3 {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-
-    .px-4 {
-        padding-right: 1.5rem !important;
-        padding-left: 1.5rem !important;
-    }
-
-    .flex-grow-0 {
-        flex-grow: 0 !important;
-    }
-
-    .border-top {
-        border-top: 1px solid #dee2e6 !important;
-    }
-
-    .bg-lime {
-        background-color: #DAFFE1;
-    }
-
-    .bg-skyblue {
-        background-color: #E6F2F5;
-    }
-</style>
-<style>
-    .item-badge {
-        position: relative;
-        padding-top: 12px;
-        display: inline-block;
-    }
-
-    .notify-badge-red {
-        position: absolute;
-        right: 6px;
-        top: 10px;
-        background: red;
-        text-align: center;
-        border-radius: 30px 30px 30px 30px;
-        color: white;
-        padding: 10px 10px;
-        font-size: 10px;
-    }
-
-    .iconClass {
-        position: relative;
-    }
-
-    .iconClass span {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        display: block;
-    }
-</style>
 
 <body>
 
-    <div id="wrapper">
-        <div class="overlay"></div>
 
-        <!-- Sidebar -->
-        <nav class="navbar navbar-inverse fixed-top" id="sidebar-wrapper" role="navigation">
-            <ul class="nav sidebar-nav">
-                <div class="sidebar-header">
-                    <div class="sidebar-brand">
-                    </div>
-                </div>
-                <li><a href="{% url 'index' %}"><i class="fas fa-house"></i> Inicio</a></li>
-                {% if not user.is_staff %}
-                <li><a href="{% url 'core_dashboard:dashboard' %}"><i class="fas fa-tachometer"></i> Tablero</a></li>
-                {% else %}
-                <li><a href="{% url 'admin:index' %}"><i class="fas fa-dashboard"></i> Administrar</a></li>
-                {% endif %}
-                <li><a href="{% url 'events:calendar' %}"><i class="fas fa-calendar"></i> Calendario</a></li>
-                <li><a href="#team">Team</a></li>
-                <li class="dropdown">
-                    <a href="#works" class="dropdown-toggle" data-toggle="dropdown">Works <span
-                            class="caret"></span></a>
-                    <ul class="dropdown-menu animated fadeInLeft" role="menu">
-                        <div class="dropdown-header">Dropdown heading</div>
-                        <li><a href="#pictures">Pictures</a></li>
-                        <li><a href="#videos">Videeos</a></li>
-                        <li><a href="#books">Books</a></li>
-                        <li><a href="#art">Art</a></li>
-                        <li><a href="#awards">Awards</a></li>
-                    </ul>
-                </li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a></li>
-            </ul>
-        </nav>
-        <!-- Page Content -->
-
-        <!-- Navegación -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top"">
-            {% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}
-            <button type=" button" id="clickButton" class="hamburger animated fadeInLeft is-closed"
-            data-toggle="offcanvas">
-            <span class="hamb-top"></span>
-            <span class="hamb-middle"></span>
-            <span class="hamb-bottom"></span>
+    <!-- FIN del primer bloque home -->
+    <div class="off-canvas-wrapper">
+        <div class="off-canvas position-left" style="background-color: #212531;" id="offCanvasLeft" data-off-canvas>
+            <button class="close-button" style="color:white;" aria-label="Close menu" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
             </button>
-            {% endif %}
-            <div class="container">
 
-                <a class="navbar-brand" href="" style="margin-left:10%">
-                    <img src="{{home.brand_image.url}}" alt="" height="60px">
-                </a>
-
-
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned"
-                    aria-controls="ned" aria-expanded="false">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="ned">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            {% comment %} <a class="nav-link" href="{% url 'home' %}">Inicio</a> {% endcomment %}
+            <ul class="vertical menu">
+                <br>
+                <br>
+                <div class="grid-x grid-maring-x align-center">
+                    <div class="cell small-12 medium-12 large-11">
+                        <li><a style="color:white;" href="{% url 'home' %}">
+                                <i class="fi-home"></i>
+                                Inicio</a>
                         </li>
-                    </ul>
-                    <span class="navbar-text">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            {% if user.is_authenticated and not 'password_reset' in request.path %}
-
-                            {% if request.path == "/" %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link" href="{% url 'registration:profile' %}">Ingresar &nbsp <i
-                                        class="fa fa-door-open"></i></a>
-                            </li>
-                            {% else %}
-                            <li class="nav-item dropdown mt-3">
-                                <div class="dropdown ">
-                                    <a class="nav-link dropdown-toggle iconClass" href="#" role="button"
-                                        id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-
-                                        <i class="fas fa-bell"></i>
-                                        {% live_notify_badge_notis badge_class='badge rounded-pill badge-notification bg-danger notis' %}
-                                    </a>
-
-                                    {% live_notify_list_notis list_class='dropdown-menu dropdown-menu-dark dropdown-menu-s' %}
-
-
-
-                                </div>
-                            </li>
-
-{% comment %} 
-                            <li class="nav-item dropdown mt-3">
-                                <a class="nav-link iconClass" href="{% url 'list_threads' %}"> &nbsp <i
-                                        class="fas fa-message"></i>
-                                    {% live_notify_badge_notis badge_class='badge rounded-pill badge-notification bg-danger message' %}
-                                </a>
-                            </li> {% endcomment %}
-                            {% comment %} <li>
-                                <a class="nav-link" href="{% url 'profile' %}">{{request.user.first_name}}
-                                    {{request.user.last_name}} <img src="{{request.user.profile.avatar.url}}"
-                                        alt="avatar" width="40px" height="40px" class="rounded-circle">
-                                </a>
-                            </li> {% endcomment %}
-                            <!--Administracion-->
-
-                            <li class="nav-item dropdown mt-2">
-                                <div class="dropdown iconClass">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                        data-bs-toggle="dropdown" aria-expanded="false">{{request.user.first_name}}
-                                        {{request.user.last_name}} <img src="{{request.user.profile.avatar.url}}"
-                                            alt="avatar" width="40px" height="40px" class="rounded-circle">
-                                    </a>
-
-                                    <ul class="dropdown-menu-dark session dropdown-menu">
-                                        <li><a class="dropdown-item" href="{% url 'registration:profile' %}?edit">Perfil
-                                                &nbsp <i class="fas fa-user"></i> </a></li>
-                                        <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión &nbsp<i
-                                                    class="fa-solid fa-right-from-bracket"></i></a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            {% endif %}
-
-                            {% if request.path == '/' %}
-                            <li class="nav-item {% if request.path != '/' %}mt-2{% endif %}">
-                                <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión &nbsp<i
-                                        class="fa-solid fa-right-from-bracket"></i></a>
-                            </li>
-                            {% endif %}
-
-                            {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
-                            </li>
-                            {% endif %}
-
-                            {% if request.path == "/" and not user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'registration:signup' %}">Registrarse</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </span>
-
-                </div>
-            </div>
-        </nav>
-
-        {% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}
-        <!--Sidebar-->
-        <div class="container-fluid mb-5">
-
-
-            {% endif %}
-
-            <!-- Contenido -->
-            {% block content %}{% endblock %}
-            {% if request.path != "/" and request.path != "/accounts/signup/" %}
-
-
-        </div>
-        {% endif %}
-
-        <footer class="mt-5">
-            <!--Pie de página pegado copyright-->
-            <div class="container-fluid bg-dark text-center text-white pt-3">
-                <div class="row">
-                    <div class="col-12">
-                        <p>© 2021 100CIATEC. Todos los derechos reservados.</p>
                     </div>
-                </div>
+                    {% if request.user.is_authenticated %}
+                    {% if not request.user|has_group:"Administrador" and not request.user.is_superuser %}
+
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'core_dashboard:dashboard' %}">
+                                <i class="fi-graph-bar"></i>
+                                Tablero
+                            </a>
+                        </li>
+                    </div>
+                    {% endif %}
+
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'events:calendar' %}">
+                                <i class="fi-calendar"></i>
+                                Calendario</a>
+                        </li>
+                        {% if request.user.is_staff %}
+                        <div class="cell large-11">
+                            <li><a style="color:white;" href="{% url 'admin:index' %}">
+                                    <i class="fi-widget"></i>
+                                    Administración</a>
+                            </li>
+                        </div>
+                        {% endif %}
+                        <div class="cell large-11">
+                            <li><a style="color:white;" href="{% url 'logout' %}">
+                                    <i class="fi-power"></i>
+                                    Salir</a></li>
+                        </div>
+
+
+                        {% else %}
+                        <div class="cell large-11">
+                            <li><a style="color:white;" href="{% url 'login' %}">
+                                    <i class="fi-lock"></i>
+                                    Iniciar sesión</a></li>
+                        </div>
+                        <div class="cell large-11">
+                            <li><a style="color:white;" href="{% url 'registration:signup' %}">
+                                    <i class="fi-torso"></i>
+                                    Registrarse</a></li>
+                        </div>
+
+
+                        {% endif %}
+            </ul>
+        </div>
+        <div class="off-canvas-content" data-off-canvas-content>
+            {% include 'core/includes/header.html' %}
+
+            <div class="grid-container">
+
+                {% block content %}
+
+                {% endblock content %}
+
             </div>
-        </footer>
+        </div>
+    </div>
 
-        <!-- Javascript -->
-        <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
-        <script src="{% static 'core/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-        {% comment %} <script src="{% static 'core/bootstrap-5.2.3-dist/js/bootstrap.js' %}"></script> {% endcomment %}
-        <script>
-            $(document).ready(function () {
-                var trigger = $('.hamburger'),
-                    overlay = $('.overlay'),
-                    isClosed = false;
 
-                trigger.click(function () {
-                    hamburger_cross();
-                });
 
-                function hamburger_cross() {
+    {% include "core/includes/footer.html" %}
 
-                    if (isClosed == true) {
-                        overlay.hide();
-                        trigger.removeClass('is-open');
-                        trigger.addClass('is-closed');
-                        isClosed = false;
-                    } else {
-                        overlay.show();
-                        trigger.removeClass('is-closed');
-                        trigger.addClass('is-open');
-                        isClosed = true;
-                    }
-                }
 
-                $('[data-toggle="offcanvas"]').click(function () {
-                    $('#wrapper').toggleClass('toggled');
+    <script src="{% static 'core/node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'core/node_modules/what-input/dist/what-input.js' %}"></script>
+    <script src="{% static 'core/node_modules/foundation-sites/dist/js/foundation.min.js' %}"></script>
+    <script>
+        $(document).foundation();
+    </script>
 
-                    // * save state 
+    <script>
+        // * on resizing
 
-                    if (isClosed == true) {
-                        localStorage.setItem('sidebar', 'open');
-                    } else {
-                        localStorage.setItem('sidebar', 'close');
-                    }
-                });
+        $(window).resize(function () {
+            var width = $(window).width();
+            if (width < 640) {
+                // display css none
 
-                // * load state
+                $('#inicio').hide();
 
-                // {% if request.path != "/" and not "accounts" in request.path or "profile" in request.path %}
-                if (localStorage.getItem('sidebar') == 'open') {
-                    $('#wrapper').toggleClass('toggled');
-                    hamburger_cross();
-                }
+                // * image width to 50px
+            } else {
+                $('#inicio').show();
+                // * image width to 160px
+            }
+        });
 
-                // {% endif %}
+        // * on loading
 
-            });
-        </script>
+        $(document).ready(function () {
+            var width = $(window).width();
+            if (width < 640) {
+                // display css none
+                $('#inicio').hide();
+                // * image width to 50px
+            } else {
+                $('#inicio').show();
+                // * image width to 160px
+            }
+        });
+    </script>
 
-        <script src="{% static 'core/notify.js' %}" type="text/javascript"></script>
-        {% comment %} <script src="{% static 'core/live-test.js' %}" type="text/javascript"></script> {% endcomment %}
-        {% register_notify_callbacks_notis notis_badge_class='badge rounded-pill badge-notification bg-danger notis' message_badge_class='badge rounded-pill badge-notification bg-danger message' menu_class='dropdown-menu dropdown-menu-dark dropdown-menu-s' callbacks='fill_notification_list,fill_notification_badge' fetch=20 refresh_period=5 %}
+    {% block scripts %}
+    {% endblock scripts %}
 
-        {% block scripts %}
-
-        {% endblock scripts %}
 </body>
 
 </html>

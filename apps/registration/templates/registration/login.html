@@ -21,44 +21,75 @@
     }
 </style>
 
-<div class="container" id="form-register">
-    {% if 'next' in request.GET %}
-    <div class="alert alert-danger" role="alert">
-        <p>Debes iniciar sesión para acceder a la página</p>
-    </div>
 
-    {% endif %}
-    
-    <div class="row">
-        <div class="col-md-12 col-md-offset-3">
-            <div class="card">
-                <div class="card-header bg-success text-light">
-                    <h3 class="card-title text-center">Inicio de sesión</h3>
+
+
+<div class="grid-x grid-margin-x align-center">
+
+    <div class="cell medium-6 large-4" style="margin-top: 2em;">
+        {% if 'next' in request.GET %}
+        <div class="callout alert" data-closable>
+            <h4>Sin sesión activa</h4>
+            <p>Debes iniciar sesión para acceder a la página</p>
+            <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        {% endif %}
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white"> Acceso de usuario</p>
+                </h4>
+
+            </div>
+            <div class="card-section">
+                {% if form.errors %}
+                <div class="callout alert" data-closable>
+                    <h5>¡Datos incorrectos!</h5>
+                    <p>{{form.non_field_errors}}</p>
+
+                    <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success">Iniciar sesión</button>
+                {% endif %}
+                <form class="grid-x grid-margin-x" enctype="multipart/form-data" method="POST" data-abide novalidate>
+                    {% csrf_token %}
+                    <div class="cell medium-12">
+                        <div data-abide-error class="alert callout" style="display: none;">
+                            <p><i class="fi-alert"></i> Hay algunos errores en el formulario.
+                            </p>
                         </div>
-
-
-
-                    </form>
-                </div>
-                <div class="card-footer">
-                    <div class="text-center">
-                        <p>¿No tienes cuenta?<a href="{% url 'registration:signup' %}" class="link-primary"> Regístrate</a></p>
                     </div>
-                    <div class="text-center">
-                        <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+                    <div class="cell medium-12">
+                        {{form.username}}
+                        <span class="form-error">
+                            Este campo es obligatorio
+                        </span>
                     </div>
-                </div>
+
+                    <div class="cell medium-12">
+                        {{form.password}}
+                        <span class="form-error">
+                            Este campo es obligatorio
+                        </span>
+                    </div>
+                    <button type="submit" class="cell button primary">Acceder</button>
+                    {% comment %} <a class="cell hollow button alert"
+                        href="{% url 'registration:signup' %}">Registrar</a> {% endcomment %}
+                    <div class="cell medium-12">
+                        <p class="text-center">¿No tienes cuenta?<a href="{% url 'registration:signup' %}"
+                                class="link-primary">
+                                Regístrate</a></p>
+                    </div>
+                    <div class="cell medium-12">
+                        <p class="text-center"><a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a></p>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

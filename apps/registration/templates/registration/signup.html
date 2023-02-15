@@ -4,152 +4,64 @@
 {% block content %}
 <!--Container card-->
 
-<style>
-    #form-register {
-        margin-bottom: 100px;
-    }
-</style>
 
-<div class="container" id="form-register" style="max-width: 50rem;">
-    <div class="row">
-        <div class="col-md-12 col-md-offset-3">
-            <div class="card">
-                <div class="card-header bg-dark text-light">
-                    <h3 class="card-title text-center">Registro</h3>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="form-group mb-3">
-                                    {{form.username.label_tag}}
-                                    {{form.username}}
-                                    <small class="form-text"> {{form.username.help_text|safe}}</small>
+<div class="grid-x grid-margin-x align-center">
+    <div class="cell medium-9 large-9" style="margin-top: 2em;">
 
-                                    {% if form.username.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.username.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white">Registro</p>
+                </h4>
 
-                            <div class="col-8">
-                                <div class="form-group mb-3">
-                                    {{form.email.label_tag}}
-                                    {{form.email}}
-                                    <small class="form-text text-muted"> {{form.email.help_text|safe}}</small>
+            </div>
+            <div class="card-section">
 
-                                    {% if form.email.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.email.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <!--Nombres-->
-                                <div class="form-group mb-3">
-                                    {{form.first_name.label_tag}}
-                                    {{form.first_name}}
-                                    <small class="form-text"> {{form.first_name.help_text|safe}}</small>
+                <form method="POST" data-abide novalidate>
+                    {% if form.errors %}
+                    <div class="callout alert">
+                        <h6><i class="fi-alert"></i> Por favor, corrija los siguientes errores:</h6>
+                        {% comment %}
+                        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                            <span aria-hidden="true">&times;</span>
+                        </button> {% endcomment %}
+                    </div>
+                    {% endif %}
+                    {% csrf_token %}
 
-                                    {% if form.first_name.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.first_name.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <!--Apellidos-->
-
-                            <div class="col-4">
-                                <div class="form-group mb-3">
-                                    {{form.apellidoP.label_tag}}
-                                    {{form.apellidoP}}
-                                    <small class="form-text"> {{form.apellidoP.help_text|safe}}</small>
-
-                                    {% if form.apellidoP.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.apellidoP.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="col-4">
-                                <div class="form-group mb-3">
-                                    {{form.apellidoM.label_tag}}
-                                    {{form.apellidoM}}
-                                    <small class="form-text"> {{form.apellidoM.help_text|safe}}</small>
-
-                                    {% if form.apellidoM.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.apellidoM.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group mb-3">
-                                    {{form.password1.label_tag}}
-                                    {{form.password1}}
-                                    <small class="form-text"> {{form.password1.help_text|safe}}</small>
-
-                                    {% if form.password1.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.password1.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-group mb-3">
-                                    {{form.password2.label_tag}}
-                                    {{form.password2}}
-                                    <small class="form-text"> {{form.password2.help_text|safe}}</small>
-
-                                    {% if form.password2.errors %}
-                                    <div class="alert alert-danger" role="alert">
-                                        {{form.password2.errors}}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            {{form.type_user.label_tag}}
-                            {% for type in form.type_user %}
-                            <div class="form-check m-3">
-
-                                {{type.label_tag}}
-                                {{type}}
-                                {% if type.errors %}
-                                <div class="alert alert-danger" role="alert">
-                                    {{type.errors}}
-                                </div>
+                    {% for field in form %}
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-12">
+                            <label>
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                <span class="required">*</span>
                                 {% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                            <h5 class="help-text">{{ field.help_text|safe }}</h5>
+                            {% endif %}
+                            {% if field.errors %}
+                            <div class="callout alert">
+                                <p>
+                                    {% for error in field.errors %}
+                                    <strong>{{ field.label }}</strong>: {{ error }}<br>
+                                    {% endfor %}
+                                </p>
+                                {% comment %} <button class="close-button" aria-label="Dismiss alert" type="button"
+                                    data-close>
+                                    <span aria-hidden="true">&times;</span>
+                                </button> {% endcomment %}
                             </div>
-                            {% endfor %}
-                            <small class="form-text"> {{form.type_user.help_text|safe}}</small>
+                            {% endif %}
                         </div>
+                    </div>
+                    {% endfor %}
 
-
-                        <button type="submit" class="btn btn-primary">Registrar</button>
-                    </form>
-                    <!--Iterate type user choices-->
-
-
-
-
-                </div>
+                    <button type="submit" class="button cell primary">Registrar</button>
+                </form>
+                <!--Iterate type user choices-->
             </div>
         </div>
     </div>

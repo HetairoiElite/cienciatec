@@ -2,126 +2,106 @@
 {% load static %}
 {% block title %}Perfil{% endblock %}
 {% block content %}
-<style>
-    .errorlist {
-        color: red;
-    }
-</style>
-<main role="main">
-    <div class="container">
-        <div class="row mt-3">
-            <div class="col-md-12 mx-auto mb-5">
-                <div class="card">
-                    <div class="card-header bg-dark text-light">
-                        <h3 class="card-title">Perfil</h3>
-                    </div>
-                    <div class="card-body">
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
-                            role="alert">
-                            {{ message }}
+
+
+
+
+<div class="grid-x grid-margin-x align-center">
+    <div class="cell medium-10 large-10" style="margin-top: 2em;">
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white">Perfil</p>
+                </h4>
+
+            </div>
+            <div class="card-section ">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}"
+                    data-closable>
+                    <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="grid-x grid-container">
+                        <div class="cell grid-x medium-12 large-2 align-center">
+                            <div class="row align-center">
+                                <img src="{{request.user.profile.avatar.url}}"
+                                    class="rounded-circle column align-center " width="75px" height="75pd">
+                            </div>
+                        </div>
+                        <div class="cell grid-x grid-padding-x medium-12 large-10 align-center">
+                            <div class="grid-x cell medium-12 large-12">
+                                <div class="cell large-6">
+                                    {{form.avatar.label_tag}}
+                                    {{form.avatar}}
+                                </div>
+                              
+                            </div>
+                            <div class="cell medium-12 large-4">
+                                <label for="">
+                                    {{form.first_name.label_tag}}
+                                    {{form.first_name}}
+                                </label>
+                                {% if form.first_name.errors %}
+                                <div class="callout alert" data-closable>
+
+                                    {{form.first_name.errors}}
+                                </div>
+                                {% endif %}
+
+                                <small class="help-text"> {{form.first_name.help_text}} </small>
+                            </div>
+                            <div class="cell medium-12 large-4">
+                                <label for="">
+
+                                    {{form.apellidoP.label_tag}}
+                                    {{form.apellidoP}}
+                                </label>
+
+                                {% if form.apellidoP.errors %}
+                                <div class="callout alert" data-closable>
+                                    {{form.apellidoP.errors}}
+                                </div>
+                                {% endif %}
+                                <small class="help-text"> {{form.apellidoP.help_text}} </small>
+                            </div>
+                            <div class="cell medium-12 large-4">
+                                {{form.apellidoM.label_tag}}
+                                {{form.apellidoM}}
+                                {% if form.apellidoM.errors %}
+                                <div class="callout alert" data-closable>
+                                    {{form.apellidoM.errors}}
+                                </div>
+                                {% endif %}
+                                <small class="help-text"> {{form.apellidoM.help_text}} </small>
+                            </div>
+                            <div class="cell medium-12">
+                                <label for="email">Email: <i class="fi-check" style="color: green; width: 50px;"></i>
+                                </label>
+                                <input type="email" class="form-control mb-3" value="{{request.user.email}}"
+                                    aria-label="Disabled input example" disabled>
+                            </div>
+
+                            <div class="cell medium 12">
+                                <a href="{% url 'registration:change_password' %}">Cambiar contraseña</a>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="cell medium-12">
+                                <button type="submit" class="button success" style="color:white;">Guardar</button>
+                            </div>
                         </div>
 
-                        {% endfor %}
-                        {% endif %}
-                        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-                            <div class="row">
-                                <!-- Previa del avatar -->
-                                <div class="col-md-2 mx-auto text-center">
-                                    <img src="{{request.user.profile.avatar.url}}" class="rounded-circle" width="100px"
-                                        height="100px">
-                                </div>
-
-                                <!-- Formulario -->
-                                <div class="col-md-10">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-group">
-                                                {{form.avatar.label_tag}}
-                                                {{form.avatar}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="form-group mb-2">
-                                                {{form.first_name.label_tag}}
-                                                {{form.first_name}}
-                                                {% if form.first_name.errors %}
-                                                <div class="alert alert-danger" role="alert">
-                                                    {{form.first_name.errors}}
-                                                </div>
-                                                {% endif %}
-                                                <small class="form-text"> {{form.first_name.help_text}} </small>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="form-group">
-                                                {{form.apellidoP.label_tag}}
-                                                {{form.apellidoP}}
-
-                                                {% if form.apellidoP.errors %}
-                                                <div class="alert alert-danger" role="alert">
-                                                    {{form.apellidoP.errors}}
-                                                </div>
-                                                {% endif %}
-                                                <small class="form-text"> {{form.apellidoP.help_text}} </small>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="form-group">
-                                                {{form.apellidoM.label_tag}}
-                                                {{form.apellidoM}}
-                                                {% if form.apellidoM.errors %}
-                                                <div class="alert alert-danger" role="alert">
-                                                    {{form.apellidoM.errors}}
-                                                </div>
-                                                {% endif %}
-                                                <small class="form-text"> {{form.apellidoM.help_text}} </small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {% comment %} <div class="form-group mb-2">
-                                        {{form.school.label}}
-                                        {{form.school}}
-                                        {% if form.school.errors %}
-                                        <div class="alert alert-danger" role="alert">
-                                            {{form.school.errors}}
-                                        </div>
-                                        {% endif %}
-                                        <small class="form-text"> {{form.school.help_text}} </small>
-                                    </div> {% endcomment %}
-
-                                    <div class="form-group mt-3">
-                                        <label for="email">Email: <i class="bi bi-check"
-                                                style="color: green; width: 50px;"></i> </label>
-                                        <input type="email" class="form-control mb-3" value="{{request.user.email}}"
-                                            aria-label="Disabled input example" disabled>
-                                    </div>
-
-
-                                    <!--Cambiar contraseña-->
-                                    <div class="form-group">
-                                        <a href="{% url 'registration:change_password' %}">Cambiar contraseña</a>
-                                    </div>
-
-
-                                    <input type="submit" class="btn btn-primary btn-block mt-3" value="Actualizar">
-                                </div>
-                            </div>
-                        </form>
-
                     </div>
-                    <div class="card-footer">
-                        {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
-                        {% endcomment %}
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
-</main>
+</div>
 {% endblock %}

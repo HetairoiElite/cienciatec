@@ -1,0 +1,73 @@
+<style>
+    .absolute-logo {
+        position: fixed;
+        top: 84px;
+        left: -20px;
+        width: 20%;
+        height: 100%;
+        z-index: 1;
+    }
+</style>
+
+
+
+<div class="top-bar-container" data-sticky-container>
+    <div class="sticky sticky-topbar" data-sticky data-options="anchor: page; marginTop: 0; stickyOn: small;">
+        <div class="top-bar" style="background-color: #212531;">
+            <div class="top-bar-left ">
+                <ul class="dropdown menu" data-dropdown-menu style="background-color: #212531;">
+                    {% comment %} <li class="menu-text align-self-middle" style="color: white;">{{home.title}}
+                    </li>
+                    {% endcomment %}
+                    <li class="align-self-middle"><button class="button primary " type="button"
+                            data-toggle="offCanvasLeft">
+                            <i class="fi-list"></i>
+                            <span id="menuop">Menu</span>
+
+                        </button></li>
+
+                    <li><a href="{% url 'home' %}"><img id="brand" src="{{home.brand_image.url}}" width="160px"></a>
+                    </li>
+                    {# menu #}
+
+                </ul>
+            </div>
+            <div class="top-bar-right" id="inicio" style="background-color: #212531;">
+                <ul class="menu">
+                    <li><a class="button primary" href="{% url 'home' %}">
+                            <i class="fi-home"></i>
+                            <span>Inicio</span>
+                        </a></li>
+                    {% if not request.user.is_authenticated %}
+
+                    <li><a class="button success" style="color:white;" href="{% url 'login' %}">
+                            <i class="fi-lock"></i>
+                            Iniciar sesión</a></li>
+
+                    <li><a class="button primary" href="{% url 'registration:signup' %}">
+                            <i class="fi-burst-new"></i>
+                            Registrarse</a></li>
+
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+
+                    <li><a class="button secondary" href="{% url 'registration:profile' %}?edit">
+                            <i class="fi-torso"></i>
+                            <span id="perfil">Perfil</span>
+                        </a></li>
+                    <li><a class="button alert" href="{% url 'logout' %}">
+                            <i class="fi-power"></i>
+                            <span id="exit">Salir</span>
+                        </a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        {% load static %}
+        
+    </div>
+
+</div>
+<div class="absolute-logo">
+    <img src="{% static 'core/img/bookmarklogo.png' %}" width="70%">
+</div>

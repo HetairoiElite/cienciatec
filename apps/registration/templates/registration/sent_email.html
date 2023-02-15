@@ -3,23 +3,31 @@
 
 {% block content %}
 <!-- Content Se ha enviado un email de confirmación alert success -->
-{% if status == "success" %}
-<div class="alert alert-success">
-    <h4>¡Gracias por registrarte!</h4>
-    <p>Se ha enviado un email de confirmación a tu dirección de correo electrónico. Por favor, revisa tu bandeja de
-        entrada y sigue las instrucciones para activar tu cuenta.</p>
-</div>
-{% elif status == "warning"%}
-<div class="alert alert-warning">
-    <h4>¡Ya estás registrado!</h4>
-    <p>Ya has confirmado tu cuenta. Puedes iniciar sesión en el sistema.</p>
-</div>
-{% elif status == "error"%}
+<div class="grid-x grid-margin-x align-center">
+    <div class="cell medium-9 large-9" style="margin-top: 2em;">
 
-<div class="alert alert-danger">
-    <h4>¡Error!</h4>
-    <p>Ha ocurrido un error al intentar confirmar tu cuenta. Por favor, inténtalo de nuevo.</p>
-</div>
+        {% if status == "success" %}
+        <div class="callout success">
+            <h4>¡Gracias por registrarte!</h4>
+            <p>Se ha enviado un email de confirmación a tu dirección de correo electrónico. Por favor, revisa tu bandeja
+                de
+                entrada y sigue las instrucciones para activar tu cuenta.</p>
+        </div>
 
-{% endif %}
+        {% elif status == "warning"%}
+
+        <div class="callout warning">
+            <h4>¡Ya estás registrado!</h4>
+            <p>Ya has confirmado tu cuenta. Puedes iniciar sesión en el sistema.</p>
+        </div>
+        {% elif status == "error"%}
+
+        <div class="callout alert">
+            <h4>¡Error!</h4>
+            <p>Ha ocurrido un error al intentar confirmar tu cuenta. Por favor, inténtalo de nuevo.</p>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
 {% endblock content %}

@@ -7,21 +7,22 @@
     .calendar {
         width: 98%;
         margin: auto;
-        font-size: 13px;
+        font-size: 1px;
     }
 
     .calendar tr,
-    .calendar td {
-    }
+    .calendar td {}
 
     .calendar th {
         padding: 10px;
         text-align: center;
-        font-size: 18px;
+        font-size: 5px;
     }
 
     .calendar td {
         width: 200px;
+        font-size: 1px;
+
         height: 150px;
         padding: 20px 0px 0px 5px;
     }
@@ -46,9 +47,6 @@
         box-shadow: 0 0 0 0;
     }
 
-    .clearfix {
-        margin: 15px;
-    }
 
     .table .noday {
         background-color: #F9F7F7;
@@ -57,15 +55,27 @@
 {% endblock styles %}
 
 {% block content %}
+<div class="grid-x grid-padding-x align-justify text-center" style="margin-top: 2em;">
+    <div class="cell small-6 large 4"> <a class="button info" href={{ previous_month }}>
+            <i class="fi-arrow-left"></i>
+            Anterior
 
-<div class="clearfix">
-    <a class="btn btn-info left" href={{ previous_month }}><i class="fa-solid fa-arrow-left"></i> Mes anterior </a>
-    <a class="btn btn-info right" href={{ next_month }}><i class="fa-solid fa-arrow-right"></i> Mes siguiente </a>
+        </a></div>
+    <div class="cell small-6 large 4">
+        <a class="button success " href={{ next_month }}>
+
+            Siguiente
+            <i class="fi-arrow-right"></i>
+        </a></div>
 </div>
 
-<div class="container" >
-    {{calendar}}
 
+<div class="grid-x grid-margin-x align-center">
+
+    <div class="grid-x grid-padding-x small-12 medium-12 large-10 " style="margin-top: 2em; fon-size:10px; font-size:inherit;">
+
+        {{calendar}}
+    </div>
 </div>
 
 {% endblock content %}

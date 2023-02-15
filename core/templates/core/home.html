@@ -4,10 +4,93 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
+
+
+
+
+<!-- primer bloque del home -->
+{% comment %} <div class="gridx-grid-margin-x align-right" style="margin-top: 1em;">
+    <div class="cell small-11 large-5 align-self-middle">
+        <div class="card" >
+            <img src="{% static 'core/img/python.jpg' %}">
+            <div class="card-section">
+                <h4><a href="/entradas/1/">Fundamentos de Python</a></h4>
+                <p>Todo lo que debes saber de Python desde 0</p>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+<div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
+
+    <!-- bloque de blog principal -->
+    <div class="cell small-11 large-5 align-self-middle">
+        <div class="card" style="width: 100%;">
+            <img src="{% static 'core/img/python.jpg' %}">
+            <div class="card-section">
+                <h4><a href="/entradas/1/">Fundamentos de Python</a></h4>
+                <p>Todo lo que debes saber de Python desde 0</p>
+            </div>
+        </div>
+    </div>
+    <!-- FIN bloque de blog principal -->
+
+    <!-- bloque de blog principal -->
+    <div class="cell small-12 large-6 grid-x grid-margin-x">
+
+        <div class="cell small-6 large-6">
+            <div class="card" style="width: 100%;">
+                <img src="{% static 'core/img/cpp.jpeg' %}" style="height:150px">
+                <div class="card-section">
+                    <a href="/entradas/5/">
+                        <h5>Cómo programar en C++</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="cell small-6 large-6">
+            <div class="card" style="width: 100%;">
+                <img src="{% static 'core/img/python.jpg' %}" style="height:150px">
+                <div class="card-section">
+                    <a href="/entradas/4/">
+                        <h5>Arte con IA</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="cell small-6 large-6">
+            <div class="card" style="width: 100%;">
+                <img src="{% static 'core/img/testcode_mail_from_django.png' %}" style="height:150px">
+                <div class="card-section">
+                    <a href="/entradas/3/">
+                        <h5>Funciones para todos los lenguajes</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="cell small-6 large-6">
+            <div class="card" style="width: 100%;">
+                <img src="{% static 'core/img/java.jpg' %}" style="height:150px">
+                <div class="card-section">
+                    <a href="/entradas/2/">
+                        <h5>Como programar en Java</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- FIN bloque de blog principal -->
+</div>
+
 <!-- Imagen cnetrada -->
 <div class="container text-center mb-3">
     <img src="{{home.image.url}}" class="img-fluid" alt="Responsive image">
 </div>
+
 
 
 

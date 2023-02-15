@@ -4,129 +4,210 @@
 
 {% block content %}
 
+<style>
+    hr {
+        border: solid #dddddd;
+        border-width: 1px 0 0;
+        clear: both;
+        margin: 1.25em 0 1.1875em;
+        height: 0;
+    }
+</style>
 
-<main role="main">
-    <div class="container">
+<div class="grid-x grid-margin-x align-center">
+    <div class="cell medium-9 large-9" style="margin-top: 2em;">
+
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white">Propuesta de articulo</p>
+                </h4>
+
+            </div>
+            <div class="card-section">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}"
+                    role="alert">
+                    {{ message }}
+                </div>
+
+                {% endfor %}
+                {% endif %}
 
 
-        <div class="row mt-3">
-            <div class="col-md-10 mx-auto mb-5">
-                <div class="card">
-                    <div class="card-header bg-dark text-light">
-                        <h3 class="card-title">Propuesta de articulo</h3>
-                    </div>
-                    <div class="card-body">
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
-                            role="alert">
-                            {{ message }}
+                <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+
+                    <div id="form-general">
+                        <h5>Artículo</h5>
+                        <div class="callout primary">
+                            <h6>Podrás editar la información durante el evento de recepción de propuestas.</h6>
+                        </div>
+                        {% block general %}
+
+                        {% endblock general %}
+
+                        <h5>Autor</h5>
+                        <div class="callout primary">
+                            <h6>Si necesitas editar los datos del autor ingresa a tu perfil para editarlo:
+                                <a href="{% url 'registration:profile' %}?edit">Perfil</a>
+                            </h6>
+                        </div>
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12 large-4">
+                                <label for="id_nombre">Nombre</label>
+                                <input type="text" name="nombre" value="{{ user.first_name }}" disabled>
+                            </div>
+                            <div class="cell small-12 large-4">
+                                <label for="id_apellido_paterno">Apellido paterno</label>
+                                <input type="text" name="apellido_paterno" value="{{ user.last_name.split.0 }}"
+                                    disabled>
+                            </div>
+                            <div class="cell small-12 large-4">
+                                <label for="id_apellido_materno">Apellido materno</label>
+                                <input type="text" name="apellido_materno" value="{{ user.last_name.split.1 }}"
+                                    disabled>
+                            </div>
+                            <div class="cell small-12 large-12">
+                                <label for="id_email">Correo electrónico</label>
+                                <input type="text" name="email" value="{{ user.email }}" disabled>
+                            </div>
                         </div>
 
+                    </div>
+
+
+
+                    <!--coautores-->
+                    <h5>Coautores</h5>
+                    <div class="callout primary">
+                        <h6>Agrega a los coautores de tu articulo, no debes agregarte a ti mismo.</h6>
+                    </div>
+
+                    <div id="formset-coauthor">
+                        {% block formset_coauthor %}{% endblock formset_coauthor %}
+
+                    </div>
+                    <div class="mb-3">
+                        <!--Transparent add button-->
+                        <span>
+                            <button style="text-decoration:none" class="button clear success" id="add-form_coautor"
+                                type="button">
+                                <i class="fi-plus"></i>
+                                Agregar coautor</button>
+                            {% block buttons_coauthor %}{% endblock buttons_coauthor %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!--imagenes-->
+                    <h5>Imágenes</h5>
+
+                    <!--Help text warning-->
+                    <div class="callout primary">
+                        <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
+                            futuras
+                            correciones.</h6>
+                    </div>
+
+                    <div id="formset-image">
+                        {{ article_image_formset.management_form }}
+                        {% for imagen_form in article_image_formset %}
+                        {% for hidden in imagen_form.hidden_fields %}
+                        {{ hidden }}
                         {% endfor %}
-                        {% endif %}
-
-
-                        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-                            <hr class="border border-primary border-3 opacity-75">
-
-                            <div id="form-general">
-                                {% block general %}
-
-                                {% endblock general %}
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12 large-12">
+                                {{ imagen_form.image.label_tag }}
+                                {{ imagen_form.image }}
                             </div>
 
-
-                            <hr class="border border-primary border-3 opacity-75">
-
-                            <!--coautores-->
-                            <h5>Coautores</h5>
-
-                            <div id="formset-coauthor">
-                                {% block formset_coauthor %}{% endblock formset_coauthor %}
-
-                            </div>
-                            <div class="mb-3">
-                                <!--Transparent add button-->
-                                <button style="text-decoration:none" class="btn btn-link text-success"
-                                    id="add-form_coautor" type="button">
-                                    <i class="fas fa-plus-circle"></i>
-                                    Agregar coautor</button>
-                                <hr class="border border-success border-2 opacity-75">
-                            </div>
-
-                            <hr class="border border-primary border-3 opacity-75">
-
-                            <!--imagenes-->
-                            <h5>Imágenes</h5>
-
-                            <!--Help text warning-->
-                            <div class="alert alert-info" role="alert">
-                                <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
-                                    futuras
-                                    correciones.</h6>
-                            </div>
-
-                            <div id="formset-image">
-                                {{ article_image_formset.management_form }}
-                                {% for imagen_form in article_image_formset %}
-                                {{ imagen_form.as_p }}
-                                {% endfor %}
-                            </div>
-
-                            <div class="mb-3">
-                                <!--Transparent add button-->
-                                <button style="text-decoration:none" class="btn btn-link text-success"
-                                    id="add-form_image" type="button">
-                                    <i class="fas fa-plus-circle"></i>
-                                    Agregar imagen</button>
-                                <hr class="border border-success border-2 opacity-75">
-                            </div>
-
-                            <hr class="border border-primary border-3 opacity-75">
-
-                            <button type="submit" class="btn btn-primary">Enviar</button>
-
-
-                        </form>
-
-                    </div>
-                    <div class="card-footer">
-                        {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
-                        {% endcomment %}
-                        <div id="empty_form_coauthor" style="display:none">
-                            <div class="row">
-                                <div class="col-4">
-
-                                    {{ coauthor_formset.empty_form.nombre.label_tag }}
-                                    {{ coauthor_formset.empty_form.nombre }}
-
-                                </div>
-                                <div class="col-4">
-                                    {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
-                                    {{ coauthor_formset.empty_form.apellido_paterno }}
-                                </div>
-                                <div class="col-4">
-                                    {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
-                                    {{ coauthor_formset.empty_form.apellido_materno }}
-                                </div>
-                                <div class="col-12">
-                                    {{ coauthor_formset.empty_form.email.label_tag }}
-                                    {{ coauthor_formset.empty_form.email }}
-                                </div>
+                        </div>
+                        {% if article_image_formset.can_delete %}
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12">
+                                {{ imagen_form.DELETE.label_tag }}
+                                {{ imagen_form.DELETE }}
                             </div>
                         </div>
-                        <div id="empty_form_image" style="display:none">
-                            {{ article_image_formset.empty_form.as_p }}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
 
+                    <div class="mb-3">
+                        <!--Transparent add button-->
+                        <span>
+                            <button style="text-decoration:none" class="button clear success" id="add-form_image"
+                                type="button">
+                                <i class="fi-plus"></i>
+                                Agregar imagen</button>
+                            {% block buttons_image %}{% endblock buttons_image %}
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="button hollow primary">Enviar</button>
+
+
+                </form>
+
+            </div>
+            <div class="card-footer">
+                {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
+                {% endcomment %}
+                <div id="empty_form_coauthor" style="display:none">
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell small-12 large-4">
+
+                            {{ coauthor_formset.empty_form.nombre.label_tag }}
+                            {{ coauthor_formset.empty_form.nombre }}
+
+                        </div>
+                        <div class="cell small-12 large-4">
+
+                            {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
+                            {{ coauthor_formset.empty_form.apellido_paterno }}
+                        </div>
+                        <div class="cell small-12 large-4">
+
+                            {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
+                            {{ coauthor_formset.empty_form.apellido_materno }}
+                        </div>
+                        <div class="cell small-12 large-12">
+                            {{ coauthor_formset.empty_form.email.label_tag }}
+                            {{ coauthor_formset.empty_form.email }}
                         </div>
                     </div>
                 </div>
+                <div id="empty_form_image" style="display:none">
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell small-12 large-12">
+                            {{ article_image_formset.empty_form.image.label_tag }}
+                            {{ article_image_formset.empty_form.image }}
+                        </div>
+                    </div>
+
+                    {# if can delete #}
+                    {% if article_image_formset.can_delete %}
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell small-12">
+                            {{ article_image_formset.empty_form.DELETE.label_tag }}
+                            {{ article_image_formset.empty_form.DELETE }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {# end if can delete #}
+                </div>
             </div>
         </div>
-
     </div>
-</main>
+</div>
+
+</div>
+</div>
 
 {% endblock content %}
 
@@ -143,10 +224,13 @@
         var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
         console.log(form_idx);
         // add hr
-        $('#formset-coauthor').append('<hr class="border border-success border-2 opacity-75">');
         $('#formset-coauthor').append($('#empty_form_coauthor').html().replace(/__prefix__/g, form_idx));
         $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-        console.log($('#id_coauthors-TOTAL_FORMS').val());
+
+        // show remove button
+        //$('#remove-form_coautor').show();
+
+
     });
 
     // * article_image_formset
@@ -154,11 +238,13 @@
     $('#add-form_image').click(function () {
         var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
         // add hr 
-        $('#formset-image').append('<hr class="border border-success border-2 opacity-75">');
         $('#formset-image').append($('#empty_form_image').html().replace(/__prefix__/g, form_idx));
         $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-        console.log($('#id_proposal_images-TOTAL_FORMS').val());
+
+        // show remove button 
+        //$('#remove-form_image').show();
     });
+
 
     // * when select "otra" con valor new activar new school field 
 
@@ -199,9 +285,9 @@
             // school required
             $('#id_school').prop('required', true);
         }
+
     });
 </script>
 
 
 {% endblock scripts %}
-

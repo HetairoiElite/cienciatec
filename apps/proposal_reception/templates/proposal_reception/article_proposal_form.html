@@ -5,12 +5,12 @@
 
 {% block general %}
 {% with  article_proposal_form as form  %}
-<div class="row mb-2">
-    <div class="col-12">
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12">
         {{ form.title.label_tag }}
         {{ form.title }}
         {% if form.title.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in form.title.errors %}
             {{ error }}
             {% endfor %}
@@ -18,12 +18,12 @@
         {% endif %}
     </div>
 </div>
-<div class="row mb-2">
-    <div class="col-12">
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12">
         {{ form.modality.label_tag }}
         {{ form.modality }}
         {% if form.modality.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in form.modality.errors %}
             {{ error }}
             {% endfor %}
@@ -32,12 +32,12 @@
     </div>
 </div>
 
-<div class="row mb 2">
-    <div class="col-6">
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12 large-6">
         {{form.school.label_tag}}
         {{form.school}}
         {% if form.school.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in form.school.errors %}
             {{ error }}
             {% endfor %}
@@ -45,15 +45,16 @@
         {% endif %}
     </div>
 
-    <div class="col-6">
+    <div class="cell small-12 large-6">
+        <label for="id_new_school">Credito de escuela:</label>
         {{form.new_school.label_tag}}
         {{form.new_school}}
         {% comment "help text" %}{% endcomment %}
-        <div class="form-text">
+        <div class="help-text">
             {{form.new_school.help_text}}
         </div>
         {% if form.new_school.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in form.new_school.errors %}
             {{ error }}
             {% endfor %}
@@ -61,14 +62,13 @@
         {% endif %}
     </div>
 </div>
-
 {% comment "template" %}{% endcomment %}
-<div class="row mb-2">
-    <div class="col-12">
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12 large-6">
         {{ form.template.label_tag }}
         {{ form.template }}
         {% if form.template.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in form.template.errors %}
             {{ error }}
             {% endfor %}
@@ -79,6 +79,7 @@
 </div>
 {% endwith %}
 
+
 {% endblock general %}
 
 
@@ -86,45 +87,46 @@
 {% block formset_coauthor %}
 {{ coauthor_formset.management_form }}
 {% for coautor_form in coauthor_formset %}
-<div class="row">
-    <div class="col-4">
+
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12 large-4">
         {{ coautor_form.nombre.label_tag }}
         {{ coautor_form.nombre }}
         {% if coautor_form.nombre.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in coautor_form.nombre.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-4">
+    <div class="cell small-12 large-4">
         {{ coautor_form.apellido_paterno.label_tag }}
         {{ coautor_form.apellido_paterno }}
         {% if coautor_form.apellido_paterno.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in coautor_form.apellido_paterno.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-4">
+    <div class="cell small-12 large-4">
         {{ coautor_form.apellido_materno.label_tag }}
         {{ coautor_form.apellido_materno }}
         {% if coautor_form.apellido_materno.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in coautor_form.apellido_materno.errors %}
             {{ error }}
             {% endfor %}
         </div>
         {% endif %}
     </div>
-    <div class="col-12">
+    <div class="cell small-12 large-12">
         {{ coautor_form.email.label_tag }}
         {{ coautor_form.email }}
         {% if coautor_form.email.errors %}
-        <div class="alert alert-danger" role="alert">
+        <div class="callout alert">
             {% for error in coautor_form.email.errors %}
             {{ error }}
             {% endfor %}
@@ -134,3 +136,139 @@
 </div>
 {% endfor %}
 {% endblock formset_coauthor %}
+
+{% block buttons_coauthor %}
+<button style="text-decoration:none" class="button clear alert" id="remove-form_coautor" type="button">
+    <i class="fi-minus-circle"></i>
+    Eliminar coautor</button>
+{% endblock buttons_coauthor %}
+
+{% block buttons_image %}
+<button style="text-decoration:none" class="button clear alert" id="remove-form_image" type="button">
+    <i class="fi-minus-circle"></i>
+    Eliminar imagen</button>
+{% endblock buttons_image %}
+
+
+
+{% block scripts %}
+
+<script>
+    var totalformcoauthor = $('#id_coauthors-TOTAL_FORMS').val();
+    var totalformimage = $('#id_proposal_images-TOTAL_FORMS').val();
+    // * when load page check if select "otra escuela" con valor new activar new school field
+    $(document).ready(function () {
+
+
+        if ($("#id_school option:selected").text() == 'Otra') {
+            $('#id_new_school').prop('disabled', false);
+            $('#id_new_school').focus();
+            // required
+            $('#id_new_school').prop('required', true);
+            // school no required
+            $('#id_school').prop('required', false);
+        } else {
+            $('#id_new_school').prop('disabled', true);
+            $('#id_new_school').val('');
+            // no required
+            $('#id_new_school').prop('required', false);
+            // school required
+            $('#id_school').prop('required', true);
+        }
+
+        // if 2 or more iamges remove button remove
+        if ($('#id_proposal_images-TOTAL_FORMS').val() - totalformimage >= 1) {
+            $('#remove-form_image').show();
+        } else {
+            $('#remove-form_image').hide();
+        }
+
+        // if 2 or more coauthors remove button remove
+        if ($('#id_coauthors-TOTAL_FORMS').val() - totalformcoauthor >= 1) {
+            $('#remove-form_coautor').show();
+        } else {
+            $('#remove-form_coautor').hide();
+        }
+    });
+
+    // * Agregar formularios dinamicamente
+    // * coauthor_formset
+
+    $('#add-form_coautor').click(function () {
+        console.log($('#id_coauthors-TOTAL_FORMS'))
+        var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
+        console.log(form_idx);
+        // add hr
+        $('#formset-coauthor').append($('#empty_form_coauthor').html().replace(/__prefix__/g, form_idx));
+        $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        console.log($('#id_coauthors-TOTAL_FORMS').val());
+
+        // show remove button
+        $('#remove-form_coautor').show();
+
+
+    });
+
+    // * article_image_formset
+
+    $('#add-form_image').click(function () {
+        var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
+        // add hr 
+        $('#formset-image').append($('#empty_form_image').html().replace(/__prefix__/g, form_idx));
+        $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        // show remove button 
+        $('#remove-form_image').show();
+    });
+
+    $('#remove-form_image').click(function () {
+        console.log("totalformcoauthor" + totalformcoauthor)
+        console.log("id_proposal_images-TOTAL_FORMS" + $('#id_proposal_images-TOTAL_FORMS').val());
+        var form_idx = $('#id_proposal_images-TOTAL_FORMS').val() - totalformimage;
+        console.log("form_idx" + form_idx);
+        if (form_idx >= 1) {
+            $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+            form_idx--;
+            $('#formset-image').children().last().remove();
+            $('#formset-image').children().last().remove();
+        }
+        if (form_idx == 0) {
+            $('#remove-form_image').hide();
+        }
+    });
+
+    $('#remove-form_coautor').click(function () {
+        var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
+        console.log(form_idx);
+        if (form_idx >= 1) {
+            console.log(form_idx);
+            $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+            form_idx--;
+            $('#formset-coauthor').children().last().remove();
+            $('#formset-coauthor').children().last().remove();
+        }
+        if (form_idx == 0) {
+            $('#remove-form_coautor').hide();
+        }
+    });
+
+    // * when select "otra" con valor new activar new school field 
+
+    $('#id_school').change(function () {
+        if ($("#id_school option:selected").text() == 'Otra') {
+            $('#id_new_school').prop('disabled', false);
+            $('#id_new_school').focus();
+            // required
+            $('#id_new_school').prop('required', true);
+            // school no required
+            $('#id_school').prop('required', false);
+        } else {
+            $('#id_new_school').prop('disabled', true);
+            $('#id_new_school').val('');
+            // no required
+            $('#id_new_school').prop('required', false);
+            // school required
+            $('#id_school').prop('required', true);
+        }
+    });
+</script>
+{% endblock scripts %}
