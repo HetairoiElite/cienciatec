@@ -74,6 +74,8 @@ class CustomUserAdmin(UserAdmin):
          'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas importantes', {'fields': ('last_login', 'date_joined')}),
     )
+    
+    readonly_fields = ('last_login', 'date_joined')
 
 
 admin.site.unregister(User)
