@@ -43,7 +43,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             ArticleProposal,
             Coauthor,
             form=CoauthorForm,
-            extra=1,
+            extra=0,
             can_delete=False
         )
 
@@ -55,7 +55,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             ArticleProposal,
             ArticleImage,
             form=ArticleImageForm,
-            extra=1,
+            extra=0,
             can_delete=False
         )
 
@@ -80,7 +80,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             ArticleProposal,
             Coauthor,
             form=CoauthorForm,
-            extra=1,
+            extra=0,
             can_delete=False
         )
 
@@ -92,7 +92,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             ArticleProposal,
             ArticleImage,
             form=ArticleImageForm,
-            extra=1,
+            extra=0,
             can_delete=False
         )
 
@@ -170,10 +170,10 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             messages.error(
                 request, 'El periodo de recepción de propuestas ha finalizado')
             
-            return redirect(reverse('index') + '#over')
+            return redirect(reverse('core_dashboard:dashboard') + '#over')
         
         # * if no session 
-        if self.request.session is None:
+        if self.request.user.is_authenticated:
         
             if self.get_object().author != self.request.user.profile:
                 messages.error(request, 'No tienes permisos para editar esa propuesta')
@@ -183,7 +183,7 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_success_url(self):
         messages.success(self.request, 'Propuesta actualizada con éxito')
-        return reverse('proposal_reception:article_proposal_update', kwargs={'pk': self.object.pk})
+        return reverse('core_dashboard:dashboard')
     
     
     def get(self, request, *args, **kwargs):
@@ -256,3 +256,9 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
     
     def form_invalid(self, form, coauthor_formset, article_image_formset):
         return self.render_to_response(self.get_context_data(form=form, coauthor_formset=coauthor_formset, article_image_formset=article_image_formset))
+    
+# from .tasks import go_to_sleep
+
+# def prueba(request):
+#     go_to_sleep.delay(5)
+#     return render(request, 'proposal_reception/prueba.html')
