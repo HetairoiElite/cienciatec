@@ -35,15 +35,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'articles.het-air-oi.studio']
 
 # Daphne
-ASGI_APPLICATION = "cienciatec.asgi.application"
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
+# ASGI_APPLICATION = "cienciatec.asgi.application"
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 # Application definition
 
@@ -60,7 +60,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'jet.dashboard',
     'jet',
-    'daphne',
+    # 'daphne',
     'storages',
     'notifications',
 ]
@@ -73,6 +73,7 @@ LOCAL_APPS = [
     'apps.core_dashboard',
     'apps.events',
     'apps.proposal_reception',
+    'apps.reviewer_assignment',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS +  DJANGO_APPS
@@ -162,6 +163,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 # * Logout
 LOGOUT_REDIRECT_URL = 'home'
 
+# * Login
+LOGIN_REDIRECT_URL = 'home'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -177,3 +181,11 @@ SESSION_COOKIE_AGE = 3600 * 2  # 2 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# # * Celery
+
+# CELERY_BROKER_URL = 'redis://localhost:6379'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_BACKEND = 'django-db'
+# DEBUG=True
