@@ -63,6 +63,7 @@ THIRD_PARTY_APPS = [
     # 'daphne',
     'storages',
     'notifications',
+    'corsheaders'
 ]
 
 LOCAL_APPS = [
@@ -82,6 +83,7 @@ DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
