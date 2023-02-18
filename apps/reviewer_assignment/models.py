@@ -7,11 +7,13 @@ from django.core.exceptions import ValidationError
 
 class RefereeAssignment(Event):
     publication = models.OneToOneField(
-        'events.Publication', on_delete=models.CASCADE, related_name='reviewer_assignment')
+        'Eventos.Publication', on_delete=models.CASCADE, related_name='reviewer_assignment')
 
     class Meta:
         verbose_name = 'Asignación de revisores'
         verbose_name_plural = 'Asignación de revisores'
+        
+        
 
     # * comprobar que la fecha de inicio de la asignación de revisores este
     # * dentro del rango de la publicación
@@ -31,11 +33,11 @@ class RefereeAssignment(Event):
 
 class Assignment(models.Model):
     referee_assignment = models.ForeignKey(
-        'reviewer_assignment.RefereeAssignment', on_delete=models.CASCADE, related_name='assignments')
+        'Asignacion_Arbitros.RefereeAssignment', on_delete=models.CASCADE, related_name='assignments')
     referees = models.ManyToManyField(
         'registration.Profile', related_name='assignments', blank=True, verbose_name='arbitros')
     article = models.OneToOneField(
-        'proposal_reception.ArticleProposal', on_delete=models.CASCADE, related_name='assignments')
+        'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='assignments')
 
     class Meta:
         verbose_name = 'Asignación'
@@ -60,13 +62,13 @@ class Profile(models.Model):
 
 class ArticleProfile(models.Model):
     referee_assignment = models.ForeignKey(
-        'reviewer_assignment.RefereeAssignment', on_delete=models.CASCADE, related_name='profile', verbose_name="Asignación de arbitros")
+        'Asignacion_Arbitros.RefereeAssignment', on_delete=models.CASCADE, related_name='profile', verbose_name="Asignación de arbitros")
     
     article = models.OneToOneField(
-        'proposal_reception.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
+        'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
 
     profiles = models.ManyToManyField(
-        'reviewer_assignment.Profile', related_name='articles', verbose_name='Perfiles')
+        'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles')
 
     class Meta:
         verbose_name = 'Perfil de artículo'

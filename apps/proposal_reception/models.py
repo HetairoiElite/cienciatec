@@ -24,7 +24,7 @@ from core.models import Home
 class ProposalReception(Event):
 
     publication = models.OneToOneField(
-        'events.Publication', on_delete=models.CASCADE, related_name='proposal_reception', verbose_name='Publicación')
+        'Eventos.Publication', on_delete=models.CASCADE, related_name='proposal_reception', verbose_name='Publicación')
 
     class Meta:
         verbose_name = 'Recepción de propuestas'
@@ -97,7 +97,7 @@ class ArticleProposal(TimeStampedModel):
     modality = models.CharField(
         max_length=1, choices=MODALIDADES, verbose_name='Modalidad', db_index=True)
 
-    school = models.ForeignKey('school.School', on_delete=models.CASCADE,
+    school = models.ForeignKey('Escuelas.School', on_delete=models.CASCADE,
                                related_name='article_proposals', verbose_name='Institución de adscripción', null=True, blank=True)
 
     new_school = models.CharField(

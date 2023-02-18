@@ -7,12 +7,14 @@ from apps.school.models import School
 
 
 def custom_upload_to(instance, filename):
-    old_instance = Profile.objects.get(pk=instance.pk)
-    if not old_instance.avatar == 'avatars/default.jpg':
-        old_instance.avatar.delete()
+    try:
+        old_instance = Profile.objects.get(pk=instance.pk)
+        if not old_instance.avatar == 'avatars/default.jpg':
+            old_instance.avatar.delete()
 
-    return 'avatars/' + filename
-
+        return 'avatars/' + filename
+    except:
+        return 'avatars/' + filename
 
 # * Choices type user
 TYPE_USER = (
@@ -25,7 +27,7 @@ class Profile(models.Model):
     avatar = models.ImageField(
         upload_to=custom_upload_to, blank=True, null=True, default='avatars/default.jpg')
     type_user = models.CharField(
-        max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario')
+        max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario', null=True, blank=True)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name='Usuario', related_name='profile')
     # school = models.ForeignKey(
