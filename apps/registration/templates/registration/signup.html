@@ -6,7 +6,7 @@
 
 
 <div class="grid-x grid-margin-x align-center">
-    <div class="cell medium-9 large-9" style="margin-top: 2em;">
+    <div class="cell small-9 medium-9 large-9" style="margin-top: 2em;">
 
         <div class="card" style="width: 100%;">
             <div class="card-divider">
@@ -38,7 +38,16 @@
                                 <span class="required">*</span>
                                 {% endif %}
                             </label>
+
                             {{ field }}
+                            <span class="form-error">
+                                Este campo es requerido
+                                {% if field.field.widget.input_type == 'email' %}
+                                y debe ser un correo electrónico válido
+                                {% elif field.field.widget.input_type == 'password' and field.field.label == 'Confirmar contraseña' %}
+                                y debe coincidir con la contraseña
+                                {% endif %}
+                            </span>
                             {% if field.help_text %}
                             <h5 class="help-text">{{ field.help_text|safe }}</h5>
                             {% endif %}
@@ -55,6 +64,7 @@
                                 </button> {% endcomment %}
                             </div>
                             {% endif %}
+
                         </div>
                     </div>
                     {% endfor %}

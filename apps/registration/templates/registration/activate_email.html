@@ -5,7 +5,8 @@
 {% block content %}
 <!--Success alert email activado-->
 <div class="grid-x grid-margin-x align-center">
-    <div class="cell medium-6 large-8" style="margin-top: 2em;">
+    <div class="cell grid-y small-9 medium-6 large-8" style="margin-top: 2em; height: 1000px;">
+
         {% if status == "success" %}
 
         <div class="callout success">
@@ -17,7 +18,7 @@
 
         <!--Error alert email no activado-->
 
-        <div class="callout alert">
+        <div class="callout alert ">
             <h3>¡Error!</h5>
                 <p>¡El link de activación es inválido! porque ya fue utilizado o no existe.</p>
         </div>
@@ -33,6 +34,7 @@
         </div>
         {% endif %}
     </div>
+
 </div>
 
 {% endblock %}
