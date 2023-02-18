@@ -124,11 +124,16 @@ class Publication(Event):
         #     raise ValidationError('La publicación debe durar al menos 36 días')
 
     def save(self):
-        current_pub = Publication.objects.get_current()
-        self.current = True
-        current_pub.current = False
+        try:
+            
+            
+            current_pub = Publication.objects.get_current()
+            self.current = True
+            current_pub.current = False
 
-        super().save()
+            super().save()
+        except:
+            super().save()
 
 
 # * 1. Recepción de propuestas
