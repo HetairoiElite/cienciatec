@@ -22,7 +22,7 @@ class CustomLoginForm(AuthenticationForm):
         self.fields['password'].label = 'Contraseña'
 
 
-    def username(self):
+    def clean_username(self):
         # * username or email
         username = self.cleaned_data.get('username')
         if '@' in username:
@@ -94,7 +94,12 @@ class SignUpForm(forms.Form):
         self.fields['password1'].widget.attrs.update(
             {'class': 'form-control mb-2', 'placeholder': 'Contraseña'})
         self.fields['password2'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Confirmar contraseña'})
+            {'class': 'form-control mb-2', 
+             'placeholder': 'Confirmar contraseña',
+             'aria-describedby':'example1Hint3',
+             'aria-errormessage':'example1Error3',
+             'data-equalto':'id_password1'
+             })
 
         self.fields['type_user'].widget.attrs.update(
             {'class': 'form-check-input'})
@@ -125,10 +130,6 @@ class SignUpForm(forms.Form):
         """
         self.fields['password2'].help_text = 'Introduce la misma contraseña.'
 
-        # * if required entonces agregar *
-
-        for field in self.fields:
-            self.fields[field].label += '*'
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
