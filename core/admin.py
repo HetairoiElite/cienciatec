@@ -152,16 +152,19 @@ class HomeAdmin(admin.ModelAdmin):
     favicon_preview.short_description = 'Favicon'
 
     def current_publication(self, obj):
-        publication = obj.publications.filter(current=True).first()
-        print(publication)
-        # * get current publication change url
-        change_url = reverse(
-            'admin:events_publication_change', args=[publication.id])
-        print(change_url)
+        try:
+            publication = obj.publications.filter(current=True).first()
+            print(publication)
+            # * get current publication change url
+            change_url = reverse(
+                'admin:events_publication_change', args=[publication.id])
+            print(change_url)
 
-        return format_html(
-            '<a href="{}">{}</a>'.format(change_url, publication)
-        )
+            return format_html(
+                '<a href="{}">{}</a>'.format(change_url, publication)
+            )
+        except:
+            return 'No hay publicación actual'
 
         #  return format_html(
         #     '<a href="{}">{}</a>'.format(
