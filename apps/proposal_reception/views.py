@@ -11,6 +11,10 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.urls import reverse
 
+# * method decorators
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
 from django.views.generic import TemplateView, UpdateView
 
 # * locals
@@ -114,7 +118,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             article_image_formset.save()
 
             messages.success(request, 'Propuesta enviada con éxito')
-            
+
             return redirect('core_dashboard:dashboard')
 
         context = {
@@ -128,69 +132,82 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
 
     # * if artiproposal date is over, add error message
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
 
         # * fecha actual
         now = timezone.now()
 
         print(now)
+        try:
 
-        if now > publication.proposal_reception.end_date:
-            # ¨* add error message
+            if now > publication.proposal_reception.end_date:
+                # ¨* add error message
 
+                messages.error(
+                    request, 'El periodo de recepción de propuestas ha finalizado')
+
+                return redirect(reverse('home') + '#over')
+        except:
             messages.error(
-                request, 'El periodo de recepción de propuestas ha finalizado')
-
-            return redirect(reverse('index') + '#over')
+                request, 'No se ha definido un periodo de recepción de propuestas')
+            return redirect(reverse('home') + '#over')
 
         return super().dispatch(request, *args, **kwargs)
+
 
 class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'proposal_reception/article_proposal_update.html'
 
     model = ArticleProposal
-    
+
     context_object_name = 'article_proposal'
-        
+
     form_class = ArticleProposalUpdateForm
-    
+
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         # * login required
-        
+
         # * if artiproposal date is over, add error message
-        
+
         # * fecha actual
-        now = timezone.now()
-        
-        print(now)
-        
-        if now > publication.proposal_reception.end_date:
+        try:
+            now = timezone.now()
+
+            print(now)
+
+            if now > publication.proposal_reception.end_date:
             # ¨* add error message
-            
+
+                messages.error(
+                    request, 'El periodo de recepción de propuestas ha finalizado')
+
+                return redirect(reverse('core_dashboard:dashboard') + '#over')
+
+        # * if no session
+            if self.request.user.is_authenticated:
+
+                if self.get_object().author != self.request.user.profile:
+                    messages.error(
+                        request, 'No tienes permisos para editar esa propuesta')
+                    return redirect('core_dashboard:dashboard')
+        except:
             messages.error(
-                request, 'El periodo de recepción de propuestas ha finalizado')
-            
-            return redirect(reverse('core_dashboard:dashboard') + '#over')
-        
-        # * if no session 
-        if self.request.user.is_authenticated:
-        
-            if self.get_object().author != self.request.user.profile:
-                messages.error(request, 'No tienes permisos para editar esa propuesta')
-                return redirect('core_dashboard:dashboard')
-        
+                request, 'No se ha definido un periodo de recepción de propuestas')
+            return redirect(reverse('core_dashboard:dashboard')+ '#over')
+
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get_success_url(self):
         messages.success(self.request, 'Propuesta actualizada con éxito')
         return reverse('core_dashboard:dashboard')
-    
-    
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        
+
         form = self.get_form()
-        
+
         coauthor_formset = inlineformset_factory(
             ArticleProposal,
             Coauthor,
@@ -198,7 +215,7 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             extra=0,
             can_delete=True
         )(instance=self.object)
-        
+
         article_image_formset = inlineformset_factory(
             ArticleProposal,
             ArticleImage,
@@ -206,21 +223,21 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             extra=0,
             can_delete=True
         )(instance=self.object)
-        
+
         context = self.get_context_data(
             form=form,
             coauthor_formset=coauthor_formset,
             article_image_formset=article_image_formset
         )
-        
+
         return self.render_to_response(context)
-    
+
     def post(self, request, *args, **kwargs):
-       
+
         self.object = self.get_object()
-        
+
         form = self.get_form()
-        
+
         coauthor_formset = inlineformset_factory(
             ArticleProposal,
             Coauthor,
@@ -228,7 +245,7 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             extra=0,
             can_delete=True
         )(request.POST, instance=self.object)
-         
+
         article_image_formset = inlineformset_factory(
             ArticleProposal,
             ArticleImage,
@@ -236,27 +253,26 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             extra=0,
             can_delete=True
         )(request.POST, request.FILES, instance=self.object)
-        
-        
+
         if form.is_valid() and article_image_formset.is_valid() and coauthor_formset.is_valid():
             return self.form_valid(form, coauthor_formset, article_image_formset)
         else:
             return self.form_invalid(form, coauthor_formset, article_image_formset)
-         
+
         # if form.is_valid() and coauthor_formset.is_valid() and article_image_formset.is_valid():
         #     return self.form_valid(form, coauthor_formset, article_image_formset)
         # else:
         #     return self.form_invalid(form, coauthor_formset, article_image_formset)
-        
+
     def form_valid(self, form, coauthor_formset, article_image_formset):
         self.object = form.save()
         coauthor_formset.save()
         article_image_formset.save()
         return super().form_valid(form)
-    
+
     def form_invalid(self, form, coauthor_formset, article_image_formset):
         return self.render_to_response(self.get_context_data(form=form, coauthor_formset=coauthor_formset, article_image_formset=article_image_formset))
-    
+
 # from .tasks import go_to_sleep
 
 # def prueba(request):
