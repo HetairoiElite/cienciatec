@@ -44,7 +44,11 @@ class CustomUserAdmin(UserAdmin):
     image_tag.short_description = 'Avatar'
 
     def get_type_user(self, obj):
-        return obj.profile.type_user
+        try:
+            
+            return obj.profile.get_type_user_display()
+        except:
+            return None 
 
     get_type_user.short_description = 'Tipo de usuario'
 
@@ -63,6 +67,7 @@ class CustomUserAdmin(UserAdmin):
         ('groups', RelatedFieldAjaxListFilter),
         ('is_active'),
         ('date_joined'),
+        ('profile__type_user'),
     )
 
     # list_filter = (
