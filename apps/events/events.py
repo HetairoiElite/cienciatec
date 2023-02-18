@@ -2,8 +2,8 @@ from django.db import models
 from datetime import datetime
 
 class Event(models.Model):
-    title = models.CharField(
-        max_length=100, verbose_name='Titulo', help_text='Titulo', default='Nuevo envento')
+    # title = models.CharField(
+    #     max_length=100, verbose_name='Titulo', help_text='Titulo', default='Nuevo envento')
 
     start_date = models.DateTimeField(
         verbose_name='Fecha de Inicio', help_text='Fecha de Inicio')
