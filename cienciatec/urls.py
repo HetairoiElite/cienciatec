@@ -42,7 +42,7 @@ urlpatterns = [
     # path('celery-progress/', include('celery_progress.urls')),
     
     # * proposal reception
-    path('recepcion-propuestas/', include('apps.proposal_reception.urls')),
+    path('tablero/recepcion-propuestas/', include('apps.proposal_reception.urls')),
 
     re_path(r'^inbox/notifications/',
             include(notifications_urls, namespace='notifications')),
