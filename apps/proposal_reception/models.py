@@ -218,7 +218,7 @@ class ArticleProposal(TimeStampedModel):
             
         else:
             import subprocess
-            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR / 'downloads/Recepcion_de_articulo_EDIT.docx', '--outdir', settings.BASE_DIR / 'downloads'])
+            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR / 'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
             print(output)
             
         with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
