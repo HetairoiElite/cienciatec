@@ -2,178 +2,200 @@
 {% load static %}
 {% block title %}Tablero{% endblock title %}
 
+{% block path %}
+{# Path #}
+<li><a href="{% url 'home' %}">Inicio</a></li>
+<li>
+    <span class="show-for-sr">Current: </span> Tablero
+</li>
+{% endblock path %}
+
 {% block content %}
 
+<div class="grid-x grid-margin-x align-center">
 
-
-
-<div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
     <!--Mensajes-->
     {% if not request.user.profile.type_user == "2" %}
 
-    <div class="cell small-10 medium-10 large-11 align-self-middle">
+    <div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
         <div class="card" style="width: 100%;">
             <div class="card-divider">
+
                 <h4 class="cell medium-6">
-                    <p class="text-center title-white"> Etapa #1: {{current_publication.proposal_reception}}</p>
+                    <p class="text-center title-white"> Etapa #1: Recepción de propuestas</p>
                 </h4>
             </div>
             <div class="card-section">
-                {% comment %} <div class="card">
-                    <div class="card-header bg-primary text-light">
-                        <h3 class="card-title"></h3>
-                    </div>
-                    <div class="card-body"> {% endcomment %}
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div
-                            class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
-                            {{ message }}
-                        </div>
-
-                        {% endfor %}
-                        {% endif %}
-                        {% with articles=user.profile.article_proposal.all %}
-
-                        <table>
-                            <thead>
-                                <th>Titulo</th>
-                                <th>Estado</th>
-                                <th class="text-center">Carta
-                                    <br> de <br>recepción</th>
-                                <th>Acciones</th>
-                            </thead>
-
-
-
-                            {% for article in articles %}
-                            {% if article.proposal_reception == current_publication.proposal_reception %}
-
-                            <tbody>
-                                <tr>
-                                    <td style="font-size:15px">{{ article.title }}</td>
-                                    <td class="text-center">
-                                        <small> {% if article.status == "2" %}
-                                            <i class="fi-check" style="color: green;"></i>
-
-                                            &nbsp; Recibido
-                                        </small>
-
-                                        {% else %}
-                                        Sin recibir
-                                        {% endif %}
-
-                                    </td>
-                                    <td class="text-center">
-                                        <!--Ver dictamen-->
-                                        {% if article.reception_letter.url is not null %}
-                                        <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
-                                            style="text-decoration: none;" target="_blank">
-                                            <i class="fi-eye"></i>
-                                            Ver</a>
-
-                                        {% endif %}
-                                    </td>
-
-                                    <td class="text-center">
-                                        <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
-                                            style="text-decoration: none;" target="_blank" class="btn btn-link">
-                                            <i class="fi-pencil"></i>
-                                            Editar</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-
-                            {% endif %}
-
-                            {% endfor %}
-
-                            {% endwith %}
-                        </table>
-
-
-
-
-                    </div>
-
+                {% if messages %}
+                {% for message in messages %}
+                <div
+                    class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
+                    {{ message }}
                 </div>
+
+
+
+                {% endfor %}
+                {% endif %}
+
+                {% if user.profile.article_proposal.all.count != 0 %}
+
+
+                <div class="grid-x grid-paggin-x cell align-center large-8">
+                    <div class="callout primary">
+                        <p>
+                            Cuando su propuesta sea recibida, recibirá un correo electrónico con su carta de recepción.
+                            También
+                            podrá ver su carta de recepción desde el botón "Ver" en la columna "Carta de recepción".
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+                {% with articles=user.profile.article_proposal.all %}
+
+                <table>
+                    <thead>
+                        <th>Titulo</th>
+                        <th>Estado</th>
+                        <th class="text-center">Carta de recepción</th>
+                        <th>Acciones</th>
+                    </thead>
+
+
+
+                    {% for article in articles %}
+                    {% if article.publication == current_publication %}
+
+                    <tbody>
+                        <tr>
+                            <td style="font-size:15px">{{ article.title }}</td>
+                            <td class="text-center">
+                                <small> {% if article.status == "2" %}
+                                    <i class="fi-check" style="color: green;"></i>
+
+                                    &nbsp; Recibido
+                                </small>
+
+                                {% else %}
+                                Sin recibir
+                                {% endif %}
+
+                            </td>
+                            <td class="text-center">
+                                <!--Ver dictamen-->
+                                {% if article.reception_letter.url is not null %}
+                                <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
+                                    style="text-decoration: none;" target="_blank">
+                                    <i class="fi-eye"></i>
+                                    Ver</a>
+
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
+                                    style="text-decoration: none;" target="_blank" class="btn btn-link">
+                                    <i class="fi-pencil"></i>
+                                    Editar</a>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% endwith %}
+                </table>
+
+
+                <div class="grid-x grid-paggin-x cell align-center large-8">
+                    <div class="cell medium-4 large-3 small-6">
+                        <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Iniciar
+                            propuesta</a>
+                    </div>
+                </div>
+
             </div>
-            {% endif %}
+
         </div>
-        {% comment %}
-        <div class="container">
-            <div draggable="true" class="box">A</div>
-            <div draggable="true" class="box">B</div>
-            <div draggable="true" class="box">C</div>
-        </div> {% endcomment %}
-        {% endblock content %}
+    </div>
+    {% endif %}
+</div>
+{% comment %}
+<div class="container">
+    <div draggable="true" class="box">A</div>
+    <div draggable="true" class="box">B</div>
+    <div draggable="true" class="box">C</div>
+</div> {% endcomment %}
+{% endblock content %}
 
-        {% block scripts %}
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
 
-                var dragSrcEl = null;
+        var dragSrcEl = null;
 
-                function handleDragStart(e) {
-                    this.style.opacity = '0.4';
+        function handleDragStart(e) {
+            this.style.opacity = '0.4';
 
-                    dragSrcEl = this;
+            dragSrcEl = this;
 
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/html', this.innerHTML);
-                }
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
 
-                function handleDragOver(e) {
-                    if (e.preventDefault) {
-                        e.preventDefault();
-                    }
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
 
-                    e.dataTransfer.dropEffect = 'move';
+            e.dataTransfer.dropEffect = 'move';
 
-                    return false;
-                }
+            return false;
+        }
 
-                function handleDragEnter(e) {
-                    this.classList.add('over');
-                }
+        function handleDragEnter(e) {
+            this.classList.add('over');
+        }
 
-                function handleDragLeave(e) {
-                    this.classList.remove('over');
-                }
+        function handleDragLeave(e) {
+            this.classList.remove('over');
+        }
 
-                function handleDrop(e) {
-                    if (e.stopPropagation) {
-                        e.stopPropagation(); // stops the browser from redirecting.
-                    }
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation(); // stops the browser from redirecting.
+            }
 
-                    if (dragSrcEl != this) {
-                        dragSrcEl.innerHTML = this.innerHTML;
-                        this.innerHTML = e.dataTransfer.getData('text/html');
-                    }
+            if (dragSrcEl != this) {
+                dragSrcEl.innerHTML = this.innerHTML;
+                this.innerHTML = e.dataTransfer.getData('text/html');
+            }
 
-                    return false;
-                }
+            return false;
+        }
 
-                function handleDragEnd(e) {
-                    this.style.opacity = '1';
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
 
-                    items.forEach(function (item) {
-                        item.classList.remove('over');
-                    });
-                }
-
-
-                let items = document.querySelectorAll('.container .box');
-                items.forEach(function (item) {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragenter', handleDragEnter);
-                    item.addEventListener('dragover', handleDragOver);
-                    item.addEventListener('dragleave', handleDragLeave);
-                    item.addEventListener('drop', handleDrop);
-                    item.addEventListener('dragend', handleDragEnd);
-                });
+            items.forEach(function (item) {
+                item.classList.remove('over');
             });
-        </script>
+        }
 
-        {% endblock scripts %}
+
+        let items = document.querySelectorAll('.container .box');
+        items.forEach(function (item) {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragenter', handleDragEnter);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('dragleave', handleDragLeave);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+    });
+</script>
+
+{% endblock scripts %}
