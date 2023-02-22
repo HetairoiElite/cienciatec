@@ -1,6 +1,16 @@
 {% extends "core/base.html" %}
 
-
+{% block path %}
+{# Path #}
+<li><a href="{% url 'home' %}">Inicio</a></li>
+<li><a href="{% url 'core_dashboard:dashboard' %}">Tablero</a></li>
+{% comment %} <li class="disabled">Recepcion de articulos {% endcomment %}
+    {% comment %} </li> {% endcomment %}
+<li class="disabled">Propuesta de artículo</li>
+<li>
+    <span class="show-for-sr">Current: </span> {% block current %}{% endblock current %}
+</li>
+{% endblock path %}
 
 {% block content %}
 
@@ -14,197 +24,212 @@
     }
 </style>
 
-<div class="grid-x grid-margin-x align-center">
-    <div class="cell medium-9 large-9" style="margin-top: 2em;">
 
-        <div class="card" style="width: 100%;">
-            <div class="card-divider">
-                <h4 class="cell medium-6">
-                    <p class="text-center title-white">Propuesta de articulo</p>
-                </h4>
+<div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
-            </div>
-            <div class="card-section">
-                {% if messages %}
-                {% for message in messages %}
-                <div class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}"
-                    role="alert">
-                    {{ message }}
+
+
+    <div class="grid-x grid-margin-x align-center">
+        <div class="cell small-9 medium-9 large-9">
+
+            <div class="card" style="width: 100%;">
+                <div class="card-divider">
+                    <h4 class="cell medium-6">
+                        <p class="text-center title-white">Propuesta de articulo</p>
+                    </h4>
+
                 </div>
+                <div class="card-section">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}"
+                        role="alert">
+                        {{ message }}
+                    </div>
 
-                {% endfor %}
-                {% endif %}
+                    {% endfor %}
+                    {% endif %}
 
+                    <form action="" method="post" enctype="multipart/form-data" data-abide novalidate>{% csrf_token %}
 
-                <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                        <div id="form-general">
+                            <h5>Artículo</h5>
+                            <div class="callout primary">
+                                <h6>Podrás editar la propuesta de tu articulo hasta que sea recibido por el personal de
+                                    la revista.</h6>
+                                </h6>
+                            </div>
+                            {% block general %}
 
-                    <div id="form-general">
-                        <h5>Artículo</h5>
-                        <div class="callout primary">
-                            <h6>Podrás editar la información durante el evento de recepción de propuestas.</h6>
+                            {% endblock general %}
+
+                            <h5>Autor</h5>
+                            <div class="callout primary">
+                                <h6>Si necesitas editar los datos del autor ingresa a tu perfil para editarlo:
+                                    <a href="{% url 'registration:profile' %}?edit">Perfil</a>
+                                </h6>
+                            </div>
+                            <div class="grid-x grid-padding-x">
+                                <div class="cell small-12 large-4">
+                                    <label for="id_nombre">Nombre</label>
+                                    <input type="text" name="nombre" value="{{ user.first_name }}" disabled>
+                                </div>
+                                <div class="cell small-12 large-4">
+                                    <label for="id_apellido_paterno">Apellido paterno</label>
+                                    <input type="text" name="apellido_paterno" value="{{ user.last_name.split.0 }}"
+                                        disabled>
+                                </div>
+                                <div class="cell small-12 large-4">
+                                    <label for="id_apellido_materno">Apellido materno</label>
+                                    <input type="text" name="apellido_materno" value="{{ user.last_name.split.1 }}"
+                                        disabled>
+                                </div>
+                                <div class="cell small-12 large-12">
+                                    <label for="id_email">Correo electrónico</label>
+                                    <input type="text" name="email" value="{{ user.email }}" disabled>
+                                </div>
+                            </div>
+
                         </div>
-                        {% block general %}
 
-                        {% endblock general %}
 
-                        <h5>Autor</h5>
+
+                        <!--coautores-->
+                        <h5>Coautores</h5>
                         <div class="callout primary">
-                            <h6>Si necesitas editar los datos del autor ingresa a tu perfil para editarlo:
-                                <a href="{% url 'registration:profile' %}?edit">Perfil</a>
-                            </h6>
+                            <h6>Agrega a los coautores de tu articulo, no debes agregarte a ti mismo.</h6>
                         </div>
+
+                        <div id="formset-coauthor">
+                            {% block formset_coauthor %}{% endblock formset_coauthor %}
+
+                        </div>
+                        <div class="mb-3">
+                            <!--Transparent add button-->
+                            <span>
+                                <button style="text-decoration:none" class="button clear success" id="add-form_coautor"
+                                    type="button">
+                                    <i class="fi-plus"></i>
+                                    Agregar coautor</button>
+                                {% block buttons_coauthor %}{% endblock buttons_coauthor %}
+
+                            </span>
+
+                        </div>
+
+
+                        <!--imagenes-->
+                        <h5>Imágenes</h5>
+
+                        <!--Help text warning-->
+                        <div class="callout primary">
+                            <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
+                                futuras
+                                correciones.</h6>
+                        </div>
+
+                        <div id="formset-image">
+                            {{ article_image_formset.management_form }}
+                            {% for imagen_form in article_image_formset %}
+                            {% for hidden in imagen_form.hidden_fields %}
+                            {{ hidden }}
+                            {% endfor %}
+                            <div class="grid-x grid-padding-x">
+                                <div class="cell small-12 large-12">
+                                    {{ imagen_form.image.label_tag }}
+                                    {{ imagen_form.image }}
+                                </div>
+
+                            </div>
+                            {% if article_image_formset.can_delete %}
+                            <div class="grid-x grid-padding-x">
+                                <div class="cell small-12">
+                                    {{ imagen_form.DELETE.label_tag }}
+                                    {{ imagen_form.DELETE }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <!--Transparent add button-->
+                            <span>
+                                <button style="text-decoration:none" class="button clear success" id="add-form_image"
+                                    type="button">
+                                    <i class="fi-plus"></i>
+                                    Agregar imagen</button>
+                                {% block buttons_image %}{% endblock buttons_image %}
+                            </span>
+
+                        </div>
+
+
+                        <button type="submit" class="button hollow primary">Enviar</button>
+
+
+                    </form>
+
+                </div>
+                <div class="card-footer">
+                    {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
+                    {% endcomment %}
+                    <div id="empty_form_coauthor" style="display:none">
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12 large-4">
-                                <label for="id_nombre">Nombre</label>
-                                <input type="text" name="nombre" value="{{ user.first_name }}" disabled>
+
+                                {{ coauthor_formset.empty_form.nombre.label_tag }}
+                                {{ coauthor_formset.empty_form.nombre }}
+
                             </div>
                             <div class="cell small-12 large-4">
-                                <label for="id_apellido_paterno">Apellido paterno</label>
-                                <input type="text" name="apellido_paterno" value="{{ user.last_name.split.0 }}"
-                                    disabled>
+
+                                {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
+                                {{ coauthor_formset.empty_form.apellido_paterno }}
                             </div>
                             <div class="cell small-12 large-4">
-                                <label for="id_apellido_materno">Apellido materno</label>
-                                <input type="text" name="apellido_materno" value="{{ user.last_name.split.1 }}"
-                                    disabled>
+
+                                {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
+                                {{ coauthor_formset.empty_form.apellido_materno }}
                             </div>
                             <div class="cell small-12 large-12">
-                                <label for="id_email">Correo electrónico</label>
-                                <input type="text" name="email" value="{{ user.email }}" disabled>
+                                {{ coauthor_formset.empty_form.email.label_tag }}
+                                {{ coauthor_formset.empty_form.email }}
                             </div>
+
+                            {# if can delete #}
+                            {% if coauthor_formset.can_delete %}
+                            <div class="cell small-12">
+                                {{ coauthor_formset.empty_form.DELETE.label_tag }}
+                                {{ coauthor_formset.empty_form.DELETE }}
+                            </div>
+                            {% endif %}
+                            {# end if can delete #}
                         </div>
-
                     </div>
-
-
-
-                    <!--coautores-->
-                    <h5>Coautores</h5>
-                    <div class="callout primary">
-                        <h6>Agrega a los coautores de tu articulo, no debes agregarte a ti mismo.</h6>
-                    </div>
-
-                    <div id="formset-coauthor">
-                        {% block formset_coauthor %}{% endblock formset_coauthor %}
-
-                    </div>
-                    <div class="mb-3">
-                        <!--Transparent add button-->
-                        <span>
-                            <button style="text-decoration:none" class="button clear success" id="add-form_coautor"
-                                type="button">
-                                <i class="fi-plus"></i>
-                                Agregar coautor</button>
-                            {% block buttons_coauthor %}{% endblock buttons_coauthor %}
-
-                        </span>
-
-                    </div>
-
-
-                    <!--imagenes-->
-                    <h5>Imágenes</h5>
-
-                    <!--Help text warning-->
-                    <div class="callout primary">
-                        <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
-                            futuras
-                            correciones.</h6>
-                    </div>
-
-                    <div id="formset-image">
-                        {{ article_image_formset.management_form }}
-                        {% for imagen_form in article_image_formset %}
-                        {% for hidden in imagen_form.hidden_fields %}
-                        {{ hidden }}
-                        {% endfor %}
+                    <div id="empty_form_image" style="display:none">
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12 large-12">
-                                {{ imagen_form.image.label_tag }}
-                                {{ imagen_form.image }}
+                                {{ article_image_formset.empty_form.image.label_tag }}
+                                {{ article_image_formset.empty_form.image }}
                             </div>
-
                         </div>
+
+                        {# if can delete #}
                         {% if article_image_formset.can_delete %}
                         <div class="grid-x grid-padding-x">
                             <div class="cell small-12">
-                                {{ imagen_form.DELETE.label_tag }}
-                                {{ imagen_form.DELETE }}
+                                {{ article_image_formset.empty_form.DELETE.label_tag }}
+                                {{ article_image_formset.empty_form.DELETE }}
                             </div>
                         </div>
                         {% endif %}
-                        {% endfor %}
+                        {# end if can delete #}
                     </div>
-
-                    <div class="mb-3">
-                        <!--Transparent add button-->
-                        <span>
-                            <button style="text-decoration:none" class="button clear success" id="add-form_image"
-                                type="button">
-                                <i class="fi-plus"></i>
-                                Agregar imagen</button>
-                            {% block buttons_image %}{% endblock buttons_image %}
-                        </span>
-
-                    </div>
-
-
-                    <button type="submit" class="button hollow primary">Enviar</button>
-
-
-                </form>
-
-            </div>
-            <div class="card-footer">
-                {% comment %} <a href="{% url 'profile' %}" class="btn btn-secondary">Volver</a>
-                {% endcomment %}
-                <div id="empty_form_coauthor" style="display:none">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12 large-4">
-
-                            {{ coauthor_formset.empty_form.nombre.label_tag }}
-                            {{ coauthor_formset.empty_form.nombre }}
-
-                        </div>
-                        <div class="cell small-12 large-4">
-
-                            {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
-                            {{ coauthor_formset.empty_form.apellido_paterno }}
-                        </div>
-                        <div class="cell small-12 large-4">
-
-                            {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
-                            {{ coauthor_formset.empty_form.apellido_materno }}
-                        </div>
-                        <div class="cell small-12 large-12">
-                            {{ coauthor_formset.empty_form.email.label_tag }}
-                            {{ coauthor_formset.empty_form.email }}
-                        </div>
-                    </div>
-                </div>
-                <div id="empty_form_image" style="display:none">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12 large-12">
-                            {{ article_image_formset.empty_form.image.label_tag }}
-                            {{ article_image_formset.empty_form.image }}
-                        </div>
-                    </div>
-
-                    {# if can delete #}
-                    {% if article_image_formset.can_delete %}
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12">
-                            {{ article_image_formset.empty_form.DELETE.label_tag }}
-                            {{ article_image_formset.empty_form.DELETE }}
-                        </div>
-                    </div>
-                    {% endif %}
-                    {# end if can delete #}
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>
 </div>
@@ -288,6 +313,11 @@
 
     });
 </script>
-
+<script>
+    // * when submit form show loading
+    $(document).on('submit', 'form', function () {
+        $('#loading').show();
+    });
+</script>
 
 {% endblock scripts %}
