@@ -38,6 +38,10 @@
     }
 </style>
 
+{% block styles %}
+
+{% endblock %}
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -96,8 +100,9 @@
     </style>
 
 
+
     <!-- FIN del primer bloque home -->
-    <div class="off-canvas-wrapper">
+    <div class="off-canvas-wrapper" style="margin-bottom: 100px;">
         <div class="off-canvas position-left" style="background-color: #212531;" id="offCanvasLeft" data-off-canvas>
             <button class="close-button" style="color:white;" aria-label="Close menu" type="button" data-close>
                 <span aria-hidden="true">&times;</span>
@@ -164,7 +169,34 @@
         <div class="off-canvas-content" data-off-canvas-content>
             {% include 'core/includes/header.html' %}
 
+
             <div class="grid-container">
+                <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
+
+                    <div class="cell align-left large-10 medium-10 small-10">
+                        <a href="{{request.META.HTTP_REFERER}}" class="button clear
+                        {% if request.META.HTTP_REFERER ==  request.build_absolute_uri %}
+                        disabled
+                        {% endif %}
+                        ">
+                            <i class="fi-arrow-left"></i>
+                            Volver
+
+                        </a>
+
+                        <nav aria-label="You are here:" role="navigation">
+                            <ul class="breadcrumbs">
+                                {% block path %}
+
+                                {% endblock path %}
+                                <li>
+
+                                </li>
+                            </ul>
+                        </nav>
+
+                    </div>
+                </div>
 
                 {% block content %}
 
@@ -220,13 +252,6 @@
 
     {% block scripts %}
     {% endblock scripts %}
-
-    <script>
-        // * when submit form show loading
-        $(document).on('submit', 'form', function () {
-            $('#loading').show();
-        });
-    </script>
 </body>
 
 </html>
