@@ -157,7 +157,7 @@ class HomeAdmin(admin.ModelAdmin):
             print(publication)
             # * get current publication change url
             change_url = reverse(
-                'admin:events_publication_change', args=[publication.id])
+                'admin:Eventos_publication_change', args=[publication.id])
             print(change_url)
 
             return format_html(
