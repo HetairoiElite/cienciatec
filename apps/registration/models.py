@@ -30,14 +30,9 @@ class Profile(models.Model):
         max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario', null=True, blank=True)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name='Usuario', related_name='profile')
-    # school = models.ForeignKey(
-    #     School, on_delete=models.CASCADE, verbose_name='Escuela', null=True, blank=True)
-    # first_join = models.BooleanField(default=True)
 
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Creado en')
-    updated_at = models.DateTimeField(
-        auto_now=True, verbose_name='Actualizado en')
+    profiles = models.ManyToManyField(
+        'Asignacion_Arbitros.Profile', verbose_name='Perfiles de articulos', related_name='article_profiles', blank=True)
 
     def __str__(self):
         return self.user.first_name + ' ' + self.user.last_name
@@ -66,4 +61,3 @@ def ensure_profile_exists(sender, instance, **kwargs):
     if kwargs.get('created', False):
         profile = Profile.objects.get_or_create(user=instance)
         print("Profile created!")
-
