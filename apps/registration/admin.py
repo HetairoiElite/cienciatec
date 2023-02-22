@@ -30,13 +30,22 @@ class InlineProfile(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
-    fields = ('avatar', 'type_user')
     radio_fields = {'type_user': admin.HORIZONTAL}
 
+    def get_fields(self, request, obj=None):
+        if obj.profile.type_user != '2':
+            return ('avatar', 'type_user', )
+        else:
+            return ('avatar', 'type_user', 'profiles')
+
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj.profile.type_user != '2':
+            return ('avatar', 'type_user', )
+        else:
+            return ('avatar', 'type_user', 'profiles')
 
 class CustomUserAdmin(UserAdmin):
-
-    change_list_template = 'admin/users/change_list.html'
 
     def image_tag(self, obj):
         return format_html('<img src="{}" width="100" height="100" />'.format(obj.profile.avatar.url))
@@ -45,14 +54,13 @@ class CustomUserAdmin(UserAdmin):
 
     def get_type_user(self, obj):
         try:
-            
+
             return obj.profile.get_type_user_display()
         except:
-            return None 
+            return None
 
     get_type_user.short_description = 'Tipo de usuario'
 
-    actions = None
     inlines = (InlineProfile,)
     model = User
     list_display = ('username', 'image_tag', 'email', 'first_name',
@@ -79,7 +87,7 @@ class CustomUserAdmin(UserAdmin):
          'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas importantes', {'fields': ('last_login', 'date_joined')}),
     )
-    
+
     readonly_fields = ('last_login', 'date_joined')
 
 
