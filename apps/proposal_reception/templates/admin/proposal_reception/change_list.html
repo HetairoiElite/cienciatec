@@ -1,0 +1,38 @@
+{% extends "admin/change_list.html" %}
+
+{% block info %}
+<div class="callout primary">
+
+    <p> <i class="fi-info"></i> Todos los artículos deben estar marcados como recibidos antes de enviar las cartas de
+        recepción.
+    </p>
+
+    <p>
+        Instrucciones para recibir propuestas de artículo.
+        <ul>
+            <li>
+                Ingrese al detalle de la propuesta dando clic a su titulo.
+            </li>
+            <li>
+                Busque el campo "Estatus".
+            </li>
+            <li>
+                Cambie el estatus de "En espera" a "Recibido".
+            </li>
+        </ul>
+    </p>
+
+    <p>
+        Instrucciones para enviar cartas de recepción.
+
+        <li>
+            Cuando sea el día de finalización de recepción de propuestas seleccione todos las propuestas recibidas con
+            la casilla que se encuentra a la izquierda de la columna titulo y
+            ejecute la acción "Enviar carta de recepción."
+        </li>
+    </p>
+    <p>Para mejorar la velocidad de recepción seleccione todos los articulos con la casilla adyacente al titulo y
+        ejecute la acción "Marcar como recibido".</p>
+
+</div>
+{% endblock info %}
