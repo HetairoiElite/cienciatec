@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.utils.html import format_html
 
 from .models import *
-
+from apps.reviewer_assignment.models import *
 # * user
 from apps.registration.models import Profile
 
@@ -44,23 +44,6 @@ class CoauthorInline(admin.TabularInline):
                        'apellido_paterno', 'apellido_materno')
 
 
-# @admin.action(description='Enviar dictamen de arbitraje')
-# def send_arbitration_report(modeladmin, request, queryset):
-#     try:
-#         # * check if queryset has none approved articles
-
-#         if queryset.filter(is_approved=None).exists():
-#             raise Exception('Tiene artículos sin dictaminar')
-
-#         for article in queryset:
-#             article.send_arbitration_report()
-
-
-#         modeladmin.message_user(request, 'Se han enviado los dictámenes de arbitraje', level=messages.SUCCESS)
-
-#     except Exception as e:
-#         modeladmin.message_user(request, str(e), level=messages.ERROR)
-
 @admin.action(description='Enviar carta de recepción')
 def send_reception_letter(modeladmin, request, queryset):
     try:
@@ -86,10 +69,27 @@ def mark_as_received(modeladmin, request, queryset):
     # go_to_sleep.delay(10)
     # * add context to view
     queryset.update(status='2')
+
+    for article in queryset:
+        # * create assignment and profile for each article
+
+        Assignment.objects.get_or_create(
+            article=article,
+            publication=article.publication,
+        )
+
+        ArticleProfile.objects.get_or_create(
+            article=article,
+            publication=article.publication,
+        )
+    
+
     messages.success(request, 'Se han marcado como recibidos')
 
 
 class ArticleProposalAdmin(admin.ModelAdmin):
+
+    change_list_template = "admin/proposal_reception/change_list.html"
 
     # actions = [send_arbitration_report]
     actions = [mark_as_received, send_reception_letter]
@@ -137,23 +137,36 @@ class ArticleProposalAdmin(admin.ModelAdmin):
         ('school', RelatedFieldAjaxListFilter),
         ('modality'),
         ('status'),
-        ('proposal_reception__publication__numero_publicacion'),
+        ('publication__numero_publicacion'),
         # ('is_approved')
     )
 
     fieldsets = (
-        (None, {'fields': ('proposal_reception', 'title',
-         'author_link', 'modality', 'school', 'template', 'status')},),
+        (None, {'fields': ('publication', 'title',
+         'author_link', 'modality', 'school', 'new_school', 'template', 'status')},),
     )
 
-    readonly_fields = ('proposal_reception', 'title',
-                       'author_link', 'modality', 'school', 'template', )
+    readonly_fields = ('publication', 'title',
+                       'author_link', 'modality', 'school', 'new_school', 'template', )
 
     def message_user(self, request, message, level):
         pass
 
     def save_model(self, request, obj, form, change):
         if change:
+
+            if obj.status == '2':
+                # * create assignment and profile for each article
+
+                Assignment.objects.get_or_create(
+                    article=obj,
+                    publication=obj.publication,
+                )
+
+                ArticleProfile.objects.get_or_create(
+                    article=obj,
+                    publication=obj.publication,
+                )
 
             # * translate message
 
