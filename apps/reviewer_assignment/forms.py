@@ -10,7 +10,7 @@ class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
         fields = [
-            'referee_assignment',
+            'publication',
             'referees',
             'article',
         ]
@@ -32,7 +32,3 @@ class AssignmentForm(forms.ModelForm):
             [(reviewer.id, reviewer.user.get_full_name())
              for reviewer in Profile.objects.filter(type_user="2")]
             
-        print(self.fields['referees'].choices)
-        # self.fields['article'].choices = [('', '---------')] + \
-        #     [(article.id, article.title)
-        #      for article in Article.objects.all()]
