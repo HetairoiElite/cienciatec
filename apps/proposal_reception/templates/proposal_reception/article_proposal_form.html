@@ -2,6 +2,11 @@
 
 {% block title %}Propuesta de articulo{% endblock title %}
 
+{% block current %}
+Crear propuesta de articulo
+{% endblock current %}
+
+
 
 {% block general %}
 {% with  article_proposal_form as form  %}
@@ -229,7 +234,6 @@
             $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) - 1);
             form_idx--;
             $('#formset-image').children().last().remove();
-            $('#formset-image').children().last().remove();
         }
         if (form_idx == 0) {
             $('#remove-form_image').hide();
@@ -238,12 +242,10 @@
 
     $('#remove-form_coautor').click(function () {
         var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
-        console.log(form_idx);
+        console.log('form_idx: ' + form_idx);
         if (form_idx >= 1) {
-            console.log(form_idx);
             $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) - 1);
             form_idx--;
-            $('#formset-coauthor').children().last().remove();
             $('#formset-coauthor').children().last().remove();
         }
         if (form_idx == 0) {
