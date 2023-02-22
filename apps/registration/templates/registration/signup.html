@@ -1,6 +1,17 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% block title %}Registro{% endblock %}
+
+{% block path %}
+
+<li>
+    <a href="{% url 'home' %}">Inicio</a>
+</li>
+<li>
+    <span class="show-for-sr">Current: </span> Registro
+</li>
+{% endblock path %}
+
 {% block content %}
 <!--Container card-->
 

@@ -1,10 +1,16 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% block title %}Perfil{% endblock %}
+
+{% block path %}
+<li><a href="{% url 'home' %}">Inicio</a></li>
+<li>
+    <span class="show-for-sr">Current: </span> Perfil
+</li>
+
+{% endblock path %}
+
 {% block content %}
-
-
-
 
 <div class="grid-x grid-margin-x align-center">
     <div class="cell small-9 medium-8 large-9" style="margin-top: 2em;">
@@ -41,7 +47,7 @@
                                     {{form.avatar.label_tag}}
                                     {{form.avatar}}
                                 </div>
-                              
+
                             </div>
                             <div class="cell medium-12 large-4">
                                 <label for="">
@@ -81,6 +87,20 @@
                                 {% endif %}
                                 <small class="help-text"> {{form.apellidoM.help_text}} </small>
                             </div>
+
+                            {% if request.user.profile.type_user == '2' %}
+                            <div class="cell medium-12">
+                                {{form.profiles.label_tag}}
+                                {{form.profiles}}
+                                {% if form.profiles.errors %}
+                                <div class="callout alert" data-closable>
+                                    {{form.profiles.errors}}
+                                </div>
+                                {% endif %}
+                                <small class="help-text"> {{form.profiles.help_text}} </small>
+                            </div>
+                            {% endif %}
+                            
                             <div class="cell medium-12">
                                 <label for="email">Email: <i class="fi-check" style="color: green; width: 50px;"></i>
                                 </label>
@@ -91,6 +111,8 @@
                             <div class="cell medium 12">
                                 <a href="{% url 'registration:change_password' %}">Cambiar contraseña</a>
                             </div>
+
+
                             <br>
                             <br>
                             <div class="cell medium-12">

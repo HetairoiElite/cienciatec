@@ -2,6 +2,18 @@
 {% block title %}Iniciar sesión{% endblock title %}
 {% load static %}
 
+{% block path %}
+
+<li>
+    <a href="{% url 'home' %}">Inicio</a>
+</li>
+<li>
+    <span class="show-for-sr">Current: </span> Acceso
+</li>
+
+
+{% endblock path %}
+
 
 {% block content %}
 <!--Container card-->
