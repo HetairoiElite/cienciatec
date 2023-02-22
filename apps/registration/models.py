@@ -19,7 +19,7 @@ def custom_upload_to(instance, filename):
 # * Choices type user
 TYPE_USER = (
     ('1', 'Autor'),
-    ('2', 'Evaluador'),
+    ('2', 'Arbitro'),
 )
 
 
