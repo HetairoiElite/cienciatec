@@ -3,6 +3,21 @@
 
 {% block title %}Home{% endblock title %}
 
+{% block path %}
+
+<nav aria-label="You are here:" role="navigation">
+    <ul class="breadcrumbs">
+        <li>
+            <span class="show-for-sr">Current: </span>inicio
+        </li>
+        <li>
+
+        </li>
+    </ul>
+</nav>
+
+{% endblock path %}
+
 {% block content %}
 
 
@@ -11,7 +26,7 @@
 <!-- primer bloque del home -->
 {% comment %} <div class="gridx-grid-margin-x align-right" style="margin-top: 1em;">
     <div class="cell small-11 large-5 align-self-middle">
-        <div class="card" >
+        <div class="card">
             <img src="{% static 'core/img/python.jpg' %}">
             <div class="card-section">
                 <h4><a href="/entradas/1/">Fundamentos de Python</a></h4>
@@ -20,6 +35,115 @@
         </div>
     </div>
 </div> {% endcomment %}
+
+{% if request.user.is_authenticated %}
+{% if request.user.profile.type_user == "1" %}
+<div class="grid-x grid-margin-x align-center" style=" margin-bottom: 5em;">
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell ">
+            <div class="callout primary">
+                <h5>¡Hola {{request.user.first_name}}!</h5>
+                <p>
+                    Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
+                    podrás
+                    crear tus propios artículos y publicarlos en la revista.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+
+        <div class="cell">
+            <div class="callout primary">
+                <h5>¿Qué es lo que puedes hacer?</h5>
+                <p>
+                    Puedes crear tus propios artículos y publicarlos en la revista, además de poder ver los
+                    artículos
+                    publicados por otros autores.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell">
+            <div class="callout primary">
+                <h5>¿Cómo puedo crear un artículo?</h5>
+                <p>
+                    Para crear un artículo debes iniciar una propuesta de artículo, una vez que tu propuesta sea
+                    recibida
+                    por el personal de la revista, se llevará un proceso de revisión y una vez que sea aprobada,
+                    podrás
+                    publicar tu artículo. Podrás ver el seguimiento en el <a
+                        href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de actividades.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell text-center">
+            <div class="button primary">
+                <a href="{% url 'proposal_reception:article_proposal_form' %}" style="color: white;">Crear
+                    propuesta de
+                    artículo</a>
+                <i class="fas fa-plus"></i>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif request.user.profile.type_user == "2" %}
+{# Arbirto #}
+<div class="grid-x grid-margin-x align-center" style="margin-top: 3em; margin-bottom: 5em;">
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell ">
+            <div class="callout primary">
+                <h5>¡Hola {{request.user.first_name}}!</h5>
+                <p>
+                    Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
+                    podrás
+                    arbitrar los artículos que se han propuesto para publicar en la revista.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell">
+            <div class="callout primary">
+                <h5>¿Qué es lo que puedes hacer?</h5>
+                <p>
+                    Puedes arbitrar los artículos que se han propuesto para publicar en la revista. Agregar tus
+                    correcciones
+                    y sugerencias para mejorar el artículo.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+        <div class="cell">
+            <div class="callout primary">
+                <h5>¿Cómo puedo arbitrar un artículo?</h5>
+                <p>
+                    Para arbitrar un artículo primero debes actualizar tus perfiles de arbitraje, puedes hacerlo
+                    en tu
+                    <a href="{% url 'registration:profile' %}?edit#id_profiles">perfil</a>. Una vez que hayas
+                    actualizado tus perfiles de
+                    arbitraje,
+                    debes esperar las asignaciones de artículos que se te han hecho. Cuando te hayan asignado un
+                    artículo, podrás verlo en el <a href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de
+                    actividades. Después de haber
+                    terminado de arbitrar el artículo, podrás enviarlo para su revisión.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
 
 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
