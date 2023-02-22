@@ -17,31 +17,11 @@ from model_utils.models import TimeStampedModel
 
 from apps.events.events import Event
 from core.models import Home
+from apps.reviewer_assignment.models import Assignment, ArticleProfile
+
+from .managers import ArticleProposalManager
 
 # Create your models here.
-
-
-class ProposalReception(Event):
-
-    publication = models.OneToOneField(
-        'Eventos.Publication', on_delete=models.CASCADE, related_name='proposal_reception', verbose_name='Publicación')
-
-    class Meta:
-        verbose_name = 'Recepción de propuestas'
-        verbose_name_plural = 'Recepción de propuestas'
-
-    # * comprobar que la fecha de inicio de la recepción este
-    # * dentro del rango de la publicación
-
-    def clean(self):
-        if not self.publication.check_overlap(self.start_date, self.end_date):
-            raise ValidationError(
-                'La fecha de inicio de la recepción de propuestas debe estar dentro del rango de la publicación')
-
-        super().clean()
-
-    def __str__(self):
-        return 'Recepción de propuestas de la publicación #' + str(self.publication.numero_publicacion)
 
 
 # * custom upload to template user
@@ -74,8 +54,13 @@ def custom_upload_to_reception_letter(instance, filename):
 
 
 class ArticleProposal(TimeStampedModel):
-    proposal_reception = models.ForeignKey(
-        ProposalReception, on_delete=models.CASCADE, related_name='article_proposals', verbose_name='Recepción de propuestas')
+    
+    objects = ArticleProposalManager.as_manager()
+    
+    publication = models.OneToOneField(
+        'Eventos.Publication', on_delete=models.CASCADE, related_name='article_proposals',
+        verbose_name='Publicación')
+
     title = models.CharField(
         max_length=100, verbose_name='Titulo', unique=True)
 
@@ -101,7 +86,7 @@ class ArticleProposal(TimeStampedModel):
                                related_name='article_proposals', verbose_name='Institución de adscripción', null=True, blank=True)
 
     new_school = models.CharField(
-        max_length=100, verbose_name='Institución NO normalizada', null=True, blank=True)
+        max_length=100, verbose_name='Credito de escuela', null=True, blank=True)
 
     template = models.FileField(
         verbose_name='Plantilla', upload_to=custom_upload_to_user_template)
@@ -133,9 +118,10 @@ class ArticleProposal(TimeStampedModel):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)    
+        self.slug = slugify(self.title)
         
         super().save(*args, **kwargs)
+        
 
     def send_reception_letter(self):
 
@@ -202,11 +188,11 @@ class ArticleProposal(TimeStampedModel):
         from dotenv import load_dotenv
         load_dotenv()
         import os
-        
+
         DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
-        
+
         if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.local':
-        
+
             from docx2pdf import convert
             import pythoncom
 
@@ -215,75 +201,24 @@ class ArticleProposal(TimeStampedModel):
             convert(settings.BASE_DIR / f'downloads/Carta_de_recepcion.docx',
                     settings.BASE_DIR / f'downloads/Carta_de_recepcion.pdf')
 
-            
         else:
             import subprocess
-            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR / 'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
+            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
+                                             'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
             print(output)
-            
+
         with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
 
             from django.core.files import File
 
             file = File(file)
             self.reception_letter.save(
-                    f'Carta_de_recepcion_{self.title}.pdf', file)
+                f'Carta_de_recepcion_{self.title}.pdf', file)
 
         self.save()
 
         reception_letter.current_number += 1
         reception_letter.save()
-            
-
-    # def send_reception_letter(self):
-
-    # def send_arbitration_report(self):
-    #     print('send_arbitration_report')
-
-    #     print(settings.MEDIA_ROOT + '/templates/arbitration_report.docx')
-
-    #     if self.is_approved:
-    #         doc = DocxTemplate(settings.MEDIA_ROOT +
-    #                            '/home/DICTAMEN-APROBADO_edit.docx')
-    #     else:
-    #         doc = DocxTemplate(settings.MEDIA_ROOT +
-    #                            '/home/DICTAMEN-NO-APROBADO_edit.docx')
-
-    #     context = {
-    #         'titulo': self.title,
-    #         'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
-    #         'numero': self.proposal_reception.publication.numero_publicacion,
-    #         # * now formato ejemplo: 6 de junio de 2021
-    #         'fecha': timezone.now().strftime('%d de %B de %Y'),
-    #     }
-
-    #     print(context)
-
-    #     doc.render(context)
-    #     doc.save(settings.MEDIA_ROOT + '/home/dictamen.docx')
-
-    #     # * docx2pdf
-    #     from docx2pdf import convert
-
-    #     import pythoncom
-
-    #     pythoncom.CoInitialize()
-
-    #     convert(settings.MEDIA_ROOT + '/home/dictamen.docx',
-    #             settings.MEDIA_ROOT + '/home/dictamen.pdf')
-
-    #     # * upload dictamen to dictamen field
-
-    #     # * binary file
-    #     with open(settings.MEDIA_ROOT + '/home/dictamen.pdf', 'rb') as f:
-
-    #         from django.core.files import File
-
-    #         file = File(f)
-
-    #         self.dictamen.save('dictamen.pdf', file, save=True)
-
-        # self.save()
 
 
 # * Imagenes de la propuesta
