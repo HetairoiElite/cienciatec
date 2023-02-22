@@ -1,16 +1,23 @@
 {% extends "admin/base.html" %}
 
 {% load static %}
+
 {% comment %} {% load i18n static jet_tags %} {% endcomment %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrastyle %}
+
 <div id="loading" style="display:none;">
     <img id="loading-image" src="{% static 'core/img/loading.gif' %}" alt="Loading..." />
 </div>
 
+<link rel="stylesheet" href="{% static 'core/foundation-icons/foundation-icons.css' %}">
+
+
 <style>
+   
+
     hr {
         border: solid #dddddd;
         border-width: 1px 0 0;
@@ -36,20 +43,77 @@
     #loading-image {
         z-index: 100;
     }
+
+    .callout {
+        position: relative;
+        margin: 0 0 1rem 0;
+        padding: 1rem;
+        border: 1px solid rgba(10, 10, 10, 0.25);
+        border-radius: 0;
+        background-color: white;
+        color: #0a0a0a;
+    }
+
+    .callout> :first-child {
+        margin-top: 0;
+    }
+
+    .callout> :last-child {
+        margin-bottom: 0;
+    }
+
+    .callout.primary {
+        background-color: #d7ecfa;
+        color: #0a0a0a;
+    }
+
+    .callout.secondary {
+        background-color: #eaeaea;
+        color: #0a0a0a;
+    }
+
+    .callout.success {
+        background-color: #e1faea;
+        color: #0a0a0a;
+    }
+
+    .callout.warning {
+        background-color: #fff3d9;
+        color: #0a0a0a;
+    }
+
+    .callout.alert {
+        background-color: #f7e4e1;
+        color: #0a0a0a;
+    }
+
+    .callout.small {
+        padding-top: 0.5rem;
+        padding-right: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    .callout.large {
+        padding-top: 3rem;
+        padding-right: 3rem;
+        padding-bottom: 3rem;
+        padding-left: 3rem;
+    }
 </style>
 <style>
-.today{
-    background-color: #F9F0B8;
-}
+    .today {
+        background-color: yellow;
+    }
 
-.noday{
-    background-color: #ddd;
-}
-/*
-.event {
-    background-color: red;
-}
-*/
+    .noday {
+        background-color: #ddd;
+    }
+
+
+    .event {
+        background-color: #F9F0B8;
+    }   
 </style>
 {% endblock extrastyle %}
 
@@ -89,9 +153,11 @@ Bienvenido
     });
 </script>
 
-{% comment %} <script src="{% static 'admin/js/vendor/jquery/jquery.js' as url %}{{ url|jet_append_version }}" type="text/javascript">
+{% comment %} <script src="{% static 'admin/js/vendor/jquery/jquery.js' as url %}{{ url|jet_append_version }}"
+    type="text/javascript">
 </script> {% endcomment %}
-{% comment %} <script src="{% static 'admin/js/jquery.init.js' as url %}{{ url|jet_append_version }}"></script> {% endcomment %}
+{% comment %} <script src="{% static 'admin/js/jquery.init.js' as url %}{{ url|jet_append_version }}"></script>
+{% endcomment %}
 {% endblock %}
 
 {% block nav-global %}{% endblock nav-global %}
