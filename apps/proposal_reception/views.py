@@ -32,7 +32,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 # * article proposal form view
-publication = Publication.objects.get_current()
 
 
 class ProposalFormView(LoginRequiredMixin, TemplateView):
@@ -75,6 +74,9 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+
+        publication = Publication.objects.get_current()
+
         article_proposal_form = ArticleProposalForm(
             request.POST, request.FILES)
 
@@ -107,7 +109,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             article_proposal = article_proposal_form.save(commit=False)
             article_proposal.author = request.user.profile
 
-            article_proposal.proposal_reception = publication.proposal_reception
+            article_proposal.publication = publication
 
             article_proposal.save()
 
@@ -135,24 +137,13 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
 
-        # * fecha actual
-        now = timezone.now()
+        publication = Publication.objects.get_current()
 
-        print(now)
-        try:
-
-            if now > publication.proposal_reception.end_date:
-                # ¨* add error message
-
-                messages.error(
-                    request, 'El periodo de recepción de propuestas ha finalizado')
-
-                return redirect(reverse('home') + '#over')
-        except:
+        if not publication:
             messages.error(
-                request, 'No se ha definido un periodo de recepción de propuestas')
-            return redirect(reverse('home') + '#over')
-
+                request, 'No se ha definido un periodo de publicación')
+            return redirect('core_dashboard:dashboard')
+    
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -168,35 +159,20 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         # * login required
+        publication = Publication.objects.get_current()
 
-        # * if artiproposal date is over, add error message
+        # * if not publication
 
-        # * fecha actual
-        try:
-            now = timezone.now()
-
-            print(now)
-
-            if now > publication.proposal_reception.end_date:
-            # ¨* add error message
-
-                messages.error(
-                    request, 'El periodo de recepción de propuestas ha finalizado')
-
-                return redirect(reverse('core_dashboard:dashboard') + '#over')
-
-        # * if no session
-            if self.request.user.is_authenticated:
-
-                if self.get_object().author != self.request.user.profile:
-                    messages.error(
-                        request, 'No tienes permisos para editar esa propuesta')
-                    return redirect('core_dashboard:dashboard')
-        except:
+        if not publication:
             messages.error(
-                request, 'No se ha definido un periodo de recepción de propuestas')
-            return redirect(reverse('core_dashboard:dashboard')+ '#over')
+                request, 'No se ha definido un periodo de publicación')
+            return redirect('core_dashboard:dashboard')
 
+        if request.user.profile != self.get_object().author:
+            messages.error(
+                request, 'No tienes permiso para editar esta propuesta')
+            return redirect('core_dashboard:dashboard')
+        
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -272,9 +248,3 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_invalid(self, form, coauthor_formset, article_image_formset):
         return self.render_to_response(self.get_context_data(form=form, coauthor_formset=coauthor_formset, article_image_formset=article_image_formset))
-
-# from .tasks import go_to_sleep
-
-# def prueba(request):
-#     go_to_sleep.delay(5)
-#     return render(request, 'proposal_reception/prueba.html')
