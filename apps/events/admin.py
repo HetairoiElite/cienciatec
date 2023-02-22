@@ -10,65 +10,26 @@ from django.contrib import messages
 from django.utils.html import format_html
 # Register your models here.
 
-# * inline for publication
-
-
-class PorposalReceptionInline(admin.StackedInline):
-    model = ProposalReception
-    fk_name = 'publication'
-    can_delete = False
-    
-class ReviewerAssignmentInline(admin.StackedInline):
-    model = RefereeAssignment
-    fk_name = 'publication'
-    can_delete = False
-
-
-class ArticleReviewInline(admin.StackedInline):
-    model = ArticleReview
-    fk_name = 'publication'
-    can_delete = False
-
-
-class CorrectionsSendingInline(admin.StackedInline):
-    model = CorrectionsSending
-    fk_name = 'publication'
-    can_delete = False
-
-
-class CorrectionsReceptionInline(admin.StackedInline):
-    model = CorrectionsReception
-    fk_name = 'publication'
-    can_delete = False
-
-
-class FinalReportSendingInline(admin.StackedInline):
-    model = FinalReportSending
-    fk_name = 'publication'
-    can_delete = False
-
-
-class ArticlePublicationInline(admin.StackedInline):
-    model = ArticlePublication
-    fk_name = 'publication'
-    can_delete = False
-
-
 class PublicationAdmin(admin.ModelAdmin):
     list_display = ['numero_publicacion', 'start_date', 'end_date']
     change_list_template = 'admin/events/change_list.html'
 
-    readonly_fields = ['home']
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['numero_publicacion', 'home']
+        else:
+            return ['home']
+
+    def get_exclude(self, request, obj=None):
+        if obj:
+            return []
+        else:
+            return ['current']
 
     inlines = [
-        PorposalReceptionInline,
-        ReviewerAssignmentInline,
-        ArticleReviewInline,
-        CorrectionsSendingInline,
-        CorrectionsReceptionInline,
-        FinalReportSendingInline,
-        ArticlePublicationInline
+       
     ]
+
 
     # radio_fields = {
     #     'home': admin.VERTICAL,
@@ -167,8 +128,17 @@ class PublicationAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if change:
             messages.add_message(request, messages.SUCCESS,
-                                 format_html('La <a href="{}">{}</a> ha sido actualizada correctamente.', reverse('admin:events_publication_change', args=[obj.id]), obj))
+                                 format_html('La <a href="{}">{}</a> ha sido actualizada correctamente.', reverse('admin:Eventos_publication_change', args=[obj.id]), obj))
+        else:
+            messages.add_message(request, messages.SUCCESS,
+                                 format_html('La <a href="{}">{}</a> ha sido creada correctamente.', reverse('admin:Eventos_publication_change', args=[obj.id]), obj))
+
         super().save_model(request, obj, form, change)
+        
+    def delete_model(self, request, obj):
+        messages.add_message(request, messages.SUCCESS,
+                             format_html('La <a href="{}">{}</a> ha sido eliminada correctamente.', reverse('admin:Eventos_publication_change', args=[obj.id]), obj))
+        super().delete_model(request, obj)
 
 
 admin.site.register(Publication, PublicationAdmin)
