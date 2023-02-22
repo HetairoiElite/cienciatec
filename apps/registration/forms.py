@@ -1,3 +1,4 @@
+from apps.reviewer_assignment.models import Profile as RefeereProfile
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
@@ -20,7 +21,6 @@ class CustomLoginForm(AuthenticationForm):
             {'class': 'form-control mb-2', 'placeholder': 'Contraseña'})
         self.fields['username'].label = 'Usuario o email'
         self.fields['password'].label = 'Contraseña'
-
 
     def clean_username(self):
         # * username or email
@@ -94,11 +94,11 @@ class SignUpForm(forms.Form):
         self.fields['password1'].widget.attrs.update(
             {'class': 'form-control mb-2', 'placeholder': 'Contraseña'})
         self.fields['password2'].widget.attrs.update(
-            {'class': 'form-control mb-2', 
+            {'class': 'form-control mb-2',
              'placeholder': 'Confirmar contraseña',
-             'aria-describedby':'example1Hint3',
-             'aria-errormessage':'example1Error3',
-             'data-equalto':'id_password1'
+             'aria-describedby': 'example1Hint3',
+             'aria-errormessage': 'example1Error3',
+             'data-equalto': 'id_password1'
              })
 
         self.fields['type_user'].widget.attrs.update(
@@ -129,7 +129,6 @@ class SignUpForm(forms.Form):
             <li>Tu contraseña no puede ser completamente numérica.</li>
         """
         self.fields['password2'].help_text = 'Introduce la misma contraseña.'
-
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -267,32 +266,28 @@ class ProfileUpdateForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     apellidoP = forms.CharField(max_length=30)
     apellidoM = forms.CharField(max_length=30)
-    # school = forms.ChoiceField(choices=[(0, 'Selecciona una escuela')])
+    # * many to many profiles
+    profiles = forms.ModelMultipleChoiceField(
+        queryset=RefeereProfile.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
     def __init__(self, user=None, *args, **kwargs):
         super(ProfileUpdateForm, self).__init__(*args, **kwargs)
-
-        # * choices for school
-
-        # choices = [(0, 'Selecciona una escuela')]
-        # choices.extend([(school.id, school.name)
-        #                for school in School.objects.all()])
-
-        # self.fields['school'].choices = choices
 
         # * labels
         self.fields['avatar'].label = 'Imagen de perfil'
         self.fields['first_name'].label = 'Nombre(s)'
         self.fields['apellidoP'].label = 'Apellido paterno'
         self.fields['apellidoM'].label = 'Apellido materno'
-        # self.fields['school'].label = 'Escuela'
+        self.fields['profiles'].label = 'Perfiles de arbitraje'
 
         # * attrs
         self.fields['avatar'].widget.attrs['class'] = 'help-text'
         self.fields['first_name'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoP'].widget.attrs['class'] = 'form-control mb-2'
         self.fields['apellidoM'].widget.attrs['class'] = 'form-control mb-2'
-        # self.fields['school'].widget.attrs['class'] = 'form-control mb-2'
 
         # * placeholders
         self.fields['first_name'].widget.attrs['placeholder'] = 'Nombre(s)'
@@ -302,12 +297,15 @@ class ProfileUpdateForm(forms.Form):
         self.fields['first_name'].help_text = '30 caracteres o menos. Máximo 2 nombres.'
         self.fields['apellidoP'].help_text = '30 caracteres o menos.'
         self.fields['apellidoM'].help_text = '30 caracteres o menos.'
+        self.fields['profiles'].help_text = 'Selecciona los perfiles para los que deseas arbitrar.'
 
         # * help text
 
         # self.fields['school'].help_text = 'Escuela a la que perteneces. Si no aparece tu escuela, contacta a un administrador para agregarla.'
 
         # * initial values
+        
+        self.fields['profiles'].initial = [profile.id for profile in user.profile.profiles.all()]
 
         # * get user from kwargs
 
@@ -320,12 +318,6 @@ class ProfileUpdateForm(forms.Form):
             self.fields['apellidoM'].initial = user.last_name.split()[1]
         except:
             pass
-
-        # try:
-        #     self.fields['school'].initial = profile.school.id
-        # except:
-        #     self.fields['school'].initial = 0
-        # self.fields['avatar'].initial = profile.avatar
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
@@ -409,15 +401,16 @@ class ProfileUpdateForm(forms.Form):
 
         profile = Profile.objects.get(user=user)
 
-        # try:
-        #     # school = School.objects.get(id=school)
-        #     profile.school = school
-        # except:
-        #     pass
-
         if avatar != None:
             profile.avatar = avatar
-
+            
+        # * profiles
+        profiles = self.cleaned_data.get('profiles')
+        
+        profile.profiles.clear()
+        
+        profile.profiles.set(profiles)
+    
         profile.save()
 
         return user
