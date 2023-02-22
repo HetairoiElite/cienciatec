@@ -5,40 +5,28 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 
-class RefereeAssignment(Event):
-    publication = models.OneToOneField(
-        'Eventos.Publication', on_delete=models.CASCADE, related_name='reviewer_assignment')
-
-    class Meta:
-        verbose_name = 'Asignación de revisores'
-        verbose_name_plural = 'Asignación de revisores'
-        
-        
-
-    # * comprobar que la fecha de inicio de la asignación de revisores este
-    # * dentro del rango de la publicación
-
-    def clean(self):
-        if not self.publication.check_overlap(self.start_date, self.end_date):
-            raise ValidationError(
-                'La fecha de inicio de la asignación de revisores debe estar dentro del rango de la publicación')
-
-        super().clean()
-
-    def __str__(self):
-        return 'Asignación de revisores de la publicación #' + str(self.publication.numero_publicacion)
-
 # * modelo asignación de arbitros
 
 
 class Assignment(models.Model):
-    referee_assignment = models.ForeignKey(
-        'Asignacion_Arbitros.RefereeAssignment', on_delete=models.CASCADE, related_name='assignments')
+    publication = models.OneToOneField(
+        'Eventos.Publication', on_delete=models.CASCADE, related_name='assignments',
+        verbose_name='Publicación')
+
     referees = models.ManyToManyField(
         'registration.Profile', related_name='assignments', blank=True, verbose_name='arbitros')
     article = models.OneToOneField(
-        'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='assignments')
+        'Recepcion_Propuestas.ArticleProposal',
+        verbose_name='Artículo',
+        on_delete=models.CASCADE, related_name='assignments')
 
+    STATUS_CHOICES = (
+        ('P', 'Pendiente'),
+        ('A', 'Asignado'),
+    )
+
+    status = models.CharField(verbose_name='Estatus', max_length=1, choices=STATUS_CHOICES, default='P')
+        
     class Meta:
         verbose_name = 'Asignación'
         verbose_name_plural = 'Asignaciones'
@@ -50,7 +38,8 @@ class Assignment(models.Model):
 
 
 class Profile(models.Model):
-    profile = models.CharField(max_length=100, unique=True, verbose_name='Perfil')
+    profile = models.CharField(
+        max_length=100, unique=True, verbose_name='Perfil')
 
     class Meta:
         verbose_name = 'Perfil'
@@ -61,9 +50,10 @@ class Profile(models.Model):
 
 
 class ArticleProfile(models.Model):
-    referee_assignment = models.ForeignKey(
-        'Asignacion_Arbitros.RefereeAssignment', on_delete=models.CASCADE, related_name='profile', verbose_name="Asignación de arbitros")
-    
+    publication = models.OneToOneField(
+        'Eventos.Publication', on_delete=models.CASCADE, related_name='article_profiles',
+        verbose_name='Publicación')
+
     article = models.OneToOneField(
         'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
 
