@@ -57,15 +57,75 @@ class CustomLoginForm(AuthenticationForm):
 
 
 class SignUpForm(forms.Form):
-    username = forms.CharField(max_length=30, required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    apellidoP = forms.CharField(max_length=30, required=True)
-    apellidoM = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(max_length=254, required=True)
+    username = forms.CharField(
+        max_length=30,
+        required=True,
+        label='Nombre de usuario',
+        help_text='30 caracteres o menos. Solo letras, números y @/./+/-/_',
+        widget=forms.TextInput(attrs={
+            # 'pattern': 'regexusername',
+            'placeholder': 'Nombre de usuario'
+        }),
+    )
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        label='Nombre(s)',
+        help_text='30 caracteres o menos. Máximo 2 nombres.',
+        widget=forms.TextInput(attrs={'pattern': 'regex2name',
+                                      'placeholder': 'Nombre(s)'
+                                      }),
+    )
+    apellidoP = forms.CharField(
+        max_length=30,
+        required=True,
+        label='Apellido paterno',
+        widget=forms.TextInput(attrs={'pattern': 'regexalpha',
+                                      'placeholder': 'Apellido paterno'
+                                      }),
+        help_text='30 caracteres o menos. Solo letras y espacios.',
+    )
+    apellidoM = forms.CharField(
+        max_length=30,
+        required=True,
+        label='Apellido materno',
+        widget=forms.TextInput(attrs={'pattern': 'regexalpha',
+                                      'placeholder': 'Apellido materno'
+                                      }),
+        help_text='30 caracteres o menos. Solo letras y espacios.',
+    )
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        label='Correo electrónico',
+        help_text='Se te enviará un correo electrónico para activar tu cuenta.',
+        widget=forms.EmailInput(
+            attrs={'pattern': 'email',
+                   'placeholder': 'Correo electrónico'
+                   })
+    )
     password1 = forms.CharField(
-        max_length=30, required=True, widget=forms.PasswordInput)
+        max_length=30,
+        required=True,
+        label='Contraseña',
+        widget=forms.PasswordInput(
+            attrs={'data-validator': 'validpassword',
+                   'placeholder': 'Contraseña'
+                   }),
+        help_text="""<li>Tu contraseña no puede ser muy similar a tus otros datos personales.</li>
+            <li>Tu contraseña debe contener al menos 8 caracteres.</li>
+            <li>Tu contraseña no puede ser una contraseña comúnmente usada.</li>
+            <li>Tu contraseña no puede ser completamente numérica.</li>"""
+    )
     password2 = forms.CharField(
-        max_length=30, required=True, widget=forms.PasswordInput)
+        max_length=30,
+        required=True,
+        label='Confirmar contraseña',
+        widget=forms.PasswordInput(attrs={'data-equalto': 'id_password1',
+                                          'placeholder': 'Confirmar contraseña'
+                                          }),
+        help_text='Introduce la misma contraseña.'
+    )
     type_user = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=TYPE_USER,
@@ -75,60 +135,6 @@ class SignUpForm(forms.Form):
         
                       Si eres evaluador deberás esperar a que un administrador valide tu cuenta.""",
     )
-
-    def __init__(self, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Nombre de usuario'})
-
-        self.fields['first_name'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Nombre'})
-
-        self.fields['apellidoP'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Apellido paterno'})
-        self.fields['apellidoM'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Apellido materno'})
-        self.fields['email'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Correo electrónico'})
-
-        self.fields['password1'].widget.attrs.update(
-            {'class': 'form-control mb-2', 'placeholder': 'Contraseña'})
-        self.fields['password2'].widget.attrs.update(
-            {'class': 'form-control mb-2',
-             'placeholder': 'Confirmar contraseña',
-             'aria-describedby': 'example1Hint3',
-             'aria-errormessage': 'example1Error3',
-             'data-equalto': 'id_password1'
-             })
-
-        self.fields['type_user'].widget.attrs.update(
-            {'class': 'form-check-input'})
-
-        # * labels
-
-        self.fields['username'].label = 'Nombre de usuario'
-        self.fields['first_name'].label = 'Nombre(s)'
-        self.fields['apellidoP'].label = 'Apellido paterno'
-        self.fields['apellidoM'].label = 'Apellido materno'
-        self.fields['email'].label = 'Correo electrónico'
-        self.fields['password1'].label = 'Contraseña'
-        self.fields['password2'].label = 'Confirmar contraseña'
-        self.fields['type_user'].label = 'Tipo de usuario'
-
-        # * help text
-
-        self.fields['username'].help_text = '30 caracteres o menos.'
-        self.fields['first_name'].help_text = '30 caracteres o menos. Máximo 2 nombres.'
-        self.fields['apellidoP'].help_text = '30 caracteres o menos.'
-        self.fields['apellidoM'].help_text = '30 caracteres o menos.'
-        self.fields['email'].help_text = 'Se te enviará un correo de confirmación.'
-        self.fields['password1'].help_text = """
-            <li>Tu contraseña no puede ser muy similar a tus otros datos personales.</li>
-            <li>Tu contraseña debe contener al menos 8 caracteres.</li>
-            <li>Tu contraseña no puede ser una contraseña comúnmente usada.</li>
-            <li>Tu contraseña no puede ser completamente numérica.</li>
-        """
-        self.fields['password2'].help_text = 'Introduce la misma contraseña.'
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -148,90 +154,24 @@ class SignUpForm(forms.Form):
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
+        first_name = first_name.strip()
+        first_name = first_name.capitalize()
 
-        # * Max 2 names
-        if len(first_name.split()) > 2:
-            raise forms.ValidationError(
-                'El nombre solo puede contener 2 nombres.')
-
-        # * Only letters
-        if len(first_name) > 30:
-            raise forms.ValidationError(
-                'El nombre debe contener máximo 30 caracteres.')
-
-        if len(first_name) < 3:
-            raise forms.ValidationError(
-                'El nombre debe contener al menos 3 caracteres.')
-
-        if len(first_name.split()) == 2:
-            first_name = first_name.split()
-            for name in first_name:
-                if not name.isalpha():
-                    raise forms.ValidationError(
-                        'El nombre solo puede contener letras.')
-
-            first_name = first_name[0].capitalize(
-            ) + ' ' + first_name[1].capitalize()
-
-        print(first_name)
         return first_name
 
     def clean_apellidoP(self):
         apellidoP = self.cleaned_data.get('apellidoP')
-        if len(apellidoP) > 30:
-            raise forms.ValidationError(
-                'El apellido paterno debe contener máximo 30 caracteres.')
-
-        if len(apellidoP) < 3:
-            raise forms.ValidationError(
-                'El apellido paterno debe contener al menos 3 caracteres.')
-
-        if not apellidoP.isalpha():
-            raise forms.ValidationError(
-                'El apellido paterno solo puede contener letras y no debe llevar espacios.')
-
+        apellidoP = apellidoP.strip()
         apellidoP = apellidoP.capitalize()
 
         return apellidoP
 
     def clean_apellidoM(self):
         apellidoM = self.cleaned_data.get('apellidoM')
-        if len(apellidoM) > 30:
-            raise forms.ValidationError(
-                'El apellido materno debe contener máximo 30 caracteres.')
-
-        if len(apellidoM) < 3:
-            raise forms.ValidationError(
-                'El apellido materno debe contener al menos 3 caracteres.')
-
-        if not apellidoM.isalpha():
-            raise forms.ValidationError(
-                'El apellido materno solo puede contener letras y no debe llevar espacios.')
-
+        apellidoM = apellidoM.strip()
         apellidoM = apellidoM.capitalize()
 
         return apellidoM
-
-    def clean_password1(self):
-        password1 = self.cleaned_data.get('password1')
-        if len(password1) < 8:
-            raise forms.ValidationError(
-                'La contraseña debe contener al menos 8 caracteres'
-            )
-
-        return password1
-
-    def clean_password2(self):
-
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
-
-        if password1 != password2:
-            raise forms.ValidationError(
-                'Las contraseñas no coinciden'
-            )
-
-        return
 
     def save(self):
         username = self.cleaned_data.get('username')
@@ -263,49 +203,50 @@ class SignUpForm(forms.Form):
 
 class ProfileUpdateForm(forms.Form):
     avatar = forms.ImageField(required=False)
-    first_name = forms.CharField(max_length=30)
-    apellidoP = forms.CharField(max_length=30)
-    apellidoM = forms.CharField(max_length=30)
+    first_name = forms.CharField(
+        max_length=30,
+        label='Nombre(s)',
+        # * attrs
+        widget=forms.TextInput(
+            attrs={'pattern': 'regex2name',
+                   'placeholder': 'Nombre(s)'
+                   }),
+        help_text='30 caracteres o menos. Máximo 2 nombres.'
+    )
+    apellidoP = forms.CharField(
+        max_length=30,
+        label='Apellido paterno',
+        widget=forms.TextInput(
+            attrs={'pattern': 'regexalpha',
+                   'placeholder': 'Apellido paterno'
+                   }),
+        help_text='30 caracteres o menos.'
+    )
+    apellidoM = forms.CharField(
+        max_length=30,
+        label='Apellido materno',
+        widget=forms.TextInput(
+            attrs={'pattern': 'regexalpha',
+                   'placeholder': 'Apellido materno'
+                   }),
+        help_text='30 caracteres o menos.'
+    )
     # * many to many profiles
     profiles = forms.ModelMultipleChoiceField(
+        label='Perfiles de arbitraje',
         queryset=RefeereProfile.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=False,
+        help_text='Selecciona los perfiles para los que deseas arbitrar.'
     )
 
     def __init__(self, user=None, *args, **kwargs):
         super(ProfileUpdateForm, self).__init__(*args, **kwargs)
 
-        # * labels
-        self.fields['avatar'].label = 'Imagen de perfil'
-        self.fields['first_name'].label = 'Nombre(s)'
-        self.fields['apellidoP'].label = 'Apellido paterno'
-        self.fields['apellidoM'].label = 'Apellido materno'
-        self.fields['profiles'].label = 'Perfiles de arbitraje'
-
-        # * attrs
-        self.fields['avatar'].widget.attrs['class'] = 'help-text'
-        self.fields['first_name'].widget.attrs['class'] = 'form-control mb-2'
-        self.fields['apellidoP'].widget.attrs['class'] = 'form-control mb-2'
-        self.fields['apellidoM'].widget.attrs['class'] = 'form-control mb-2'
-
-        # * placeholders
-        self.fields['first_name'].widget.attrs['placeholder'] = 'Nombre(s)'
-        self.fields['apellidoP'].widget.attrs['placeholder'] = 'Apellido paterno'
-        self.fields['apellidoM'].widget.attrs['placeholder'] = 'Apellido materno'
-
-        self.fields['first_name'].help_text = '30 caracteres o menos. Máximo 2 nombres.'
-        self.fields['apellidoP'].help_text = '30 caracteres o menos.'
-        self.fields['apellidoM'].help_text = '30 caracteres o menos.'
-        self.fields['profiles'].help_text = 'Selecciona los perfiles para los que deseas arbitrar.'
-
-        # * help text
-
-        # self.fields['school'].help_text = 'Escuela a la que perteneces. Si no aparece tu escuela, contacta a un administrador para agregarla.'
-
         # * initial values
-        
-        self.fields['profiles'].initial = [profile.id for profile in user.profile.profiles.all()]
+
+        self.fields['profiles'].initial = [
+            profile.id for profile in user.profile.profiles.all()]
 
         # * get user from kwargs
 
@@ -321,66 +262,21 @@ class ProfileUpdateForm(forms.Form):
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
+        first_name = first_name.strip()
+        first_name = first_name.capitalize()
 
-        # * Max 2 names
-        if len(first_name.split()) > 2:
-            raise forms.ValidationError(
-                'El nombre solo puede contener 2 nombres.')
-
-        # * Only letters
-        if len(first_name) > 30:
-            raise forms.ValidationError(
-                'El nombre debe contener máximo 30 caracteres.')
-
-        if len(first_name) < 3:
-            raise forms.ValidationError(
-                'El nombre debe contener al menos 3 caracteres.')
-
-        if len(first_name.split()) == 2:
-            first_name = first_name.split()
-            for name in first_name:
-                if not name.isalpha():
-                    raise forms.ValidationError(
-                        'El nombre solo puede contener letras.')
-
-            first_name = first_name[0].capitalize(
-            ) + ' ' + first_name[1].capitalize()
-
-        print(first_name)
         return first_name
 
     def clean_apellidoP(self):
         apellidoP = self.cleaned_data.get('apellidoP')
-        if len(apellidoP) > 30:
-            raise forms.ValidationError(
-                'El apellido paterno debe contener máximo 30 caracteres.')
-
-        if len(apellidoP) < 3:
-            raise forms.ValidationError(
-                'El apellido paterno debe contener al menos 3 caracteres.')
-
-        if not apellidoP.isalpha():
-            raise forms.ValidationError(
-                'El apellido paterno solo puede contener letras y no debe llevar espacios.')
-
+        apellidoP = apellidoP.strip()
         apellidoP = apellidoP.capitalize()
 
         return apellidoP
 
     def clean_apellidoM(self):
         apellidoM = self.cleaned_data.get('apellidoM')
-        if len(apellidoM) > 30:
-            raise forms.ValidationError(
-                'El apellido materno debe contener máximo 30 caracteres.')
-
-        if len(apellidoM) < 3:
-            raise forms.ValidationError(
-                'El apellido materno debe contener al menos 3 caracteres.')
-
-        if not apellidoM.isalpha():
-            raise forms.ValidationError(
-                'El apellido materno solo puede contener letras y no debe llevar espacios.')
-
+        apellidoM = apellidoM.strip()
         apellidoM = apellidoM.capitalize()
 
         return apellidoM
@@ -389,7 +285,6 @@ class ProfileUpdateForm(forms.Form):
         first_name = self.cleaned_data.get('first_name')
         apellidoP = self.cleaned_data.get('apellidoP')
         apellidoM = self.cleaned_data.get('apellidoM')
-        school = self.cleaned_data.get('school')
         avatar = self.cleaned_data.get('avatar')
 
         user = self.user
@@ -403,14 +298,14 @@ class ProfileUpdateForm(forms.Form):
 
         if avatar != None:
             profile.avatar = avatar
-            
+
         # * profiles
         profiles = self.cleaned_data.get('profiles')
-        
+
         profile.profiles.clear()
-        
+
         profile.profiles.set(profiles)
-    
+
         profile.save()
 
         return user
