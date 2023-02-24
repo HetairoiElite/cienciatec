@@ -215,39 +215,64 @@
     <script src="{% static 'core/node_modules/what-input/dist/what-input.js' %}"></script>
     <script src="{% static 'core/node_modules/foundation-sites/dist/js/foundation.min.js' %}"></script>
     <script>
-        $(document).foundation();
-    </script>
+        Foundation.Abide.defaults.patterns['regex2name'] = /^([A-ZÑÁÉÍÓÚ]{1}[a-zñáéíóú]+\s*){1,2}$/;
+        Foundation.Abide.defaults.patterns['regexalpha'] = /^[A-ZÑÁÉÍÓÚ]{1}[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/;
+        
+        Foundation.Abide.defaults.validators['validpassword'] = function (el, required, parent) {
+            var password = el.val();
+            var url = "{% url 'registration:check_password' %}";
+            var result = false;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    'password': password,
+                },
+                async: false,
+                success: function (data) {
+                    console.log(data)
+                    console.log(data.is_valid)
+                    if (data.is_valid == true) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+                }
+            });
+            console.log('result' + result)
+            return result;
+        };
 
-    <script>
-        // * on resizing
+        Foundation.Abide.defaults.validators['regex2title'] = function (el) {
+            console.log(el.val())
+            var title = el.val();
+            var url = "{% url 'proposal_reception:check_title' %}";
+            var result = false;
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    'title': title,
+                    'id': '{{article_proposal.id}}'
+                },
+                async: false,
+                success: function (data) {
+                    console.log(data)
+                    console.log(data.is_taken)
+                    if (data.is_taken == true) {
+                        result = false;
+                    } else {
+                        result = true;
+                    }
+                }
+            });
+            console.log('result' + result)
+            return result;
+        };
 
-        $(window).resize(function () {
-            var width = $(window).width();
-            if (width < 640) {
-                // display css none
+        
 
-                $('#inicio').hide();
-
-                // * image width to 50px
-            } else {
-                $('#inicio').show();
-                // * image width to 160px
-            }
-        });
-
-        // * on loading
-
-        $(document).ready(function () {
-            var width = $(window).width();
-            if (width < 640) {
-                // display css none
-                $('#inicio').hide();
-                // * image width to 50px
-            } else {
-                $('#inicio').show();
-                // * image width to 160px
-            }
-        });
+        $(document).foundation()
     </script>
 
     {% block scripts %}
