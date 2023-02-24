@@ -5,6 +5,9 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils import timezone
+# * Email
+from django.core.mail import EmailMessage
+
 # * slugify
 from django.utils.text import slugify
 
@@ -57,7 +60,7 @@ class ArticleProposal(TimeStampedModel):
     
     objects = ArticleProposalManager.as_manager()
     
-    publication = models.OneToOneField(
+    publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='article_proposals',
         verbose_name='Publicación')
 
@@ -214,6 +217,22 @@ class ArticleProposal(TimeStampedModel):
             file = File(file)
             self.reception_letter.save(
                 f'Carta_de_recepcion_{self.title}.pdf', file)
+            
+            email = EmailMessage(
+                subject='Carta de recepción',
+                body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
+                f'Adjunto se encuentra la carta de recepción de su propuesta de artículo "{self.title}"\n\n'
+                f'Atentamente,\n'
+                f'Comité Editorial de Ciencia y Tecnología',
+                from_email='Jonathan90090@gmail.com',
+                to=[self.author.user.email],
+                reply_to=['jonathan90090@gmail.com'],
+            )
+            
+            email.attach_file(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf')
+            
+            email.send()
+        
 
         self.save()
 
