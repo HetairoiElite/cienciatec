@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from notifications.signals import notify
 from django.contrib.auth.models import User
 
 from django.views.generic import TemplateView
