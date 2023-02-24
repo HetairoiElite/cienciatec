@@ -13,4 +13,8 @@ urlpatterns = [
          new_link_active_email, name='resend_link_email'),
     path('profile/', UpdateProfile.as_view(), name='profile'),
     path('change_password/', CustomPasswordChangeView.as_view(), name='change_password'),
+    
+    # * validaciones
+    path('check-password/', ValidatePasswordView.as_view(), name='check_password'),
+    
 ]
