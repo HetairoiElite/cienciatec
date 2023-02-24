@@ -44,8 +44,16 @@ class AssignmentAdmin(admin.ModelAdmin):
                              'La asignación del artículo' + obj.article.title + ' se ha eliminado correctamente'))
         obj.delete()
 
+class ArticleProfileAdmin(admin.ModelAdmin):
+    
+    readonly_fields = ('article', 'publication')
+    
+    
 
 admin.site.register(Assignment, AssignmentAdmin)
 
-admin.site.register(ArticleProfile)
+admin.site.register(ArticleProfile, ArticleProfileAdmin)
 admin.site.register(Profile)
+# * expresión regular para dos nombres máximo
+
+reg = r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,50}$'
