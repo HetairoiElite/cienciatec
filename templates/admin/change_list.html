@@ -66,7 +66,7 @@
             {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
 
             {% block info %}{% endblock info %}
-            
+
 
             <form id="changelist-form" method="post" {% if cl.formset and cl.formset.is_multipart %}
                 enctype="multipart/form-data" {% endif %} novalidate>{% csrf_token %}
@@ -83,7 +83,8 @@
 
 
                 {% if action_form and actions_on_top and cl.show_admin_actions %}
-                <h4 style="top: 30px; position: relative;">Acciones:</h4>
+                <h4 style="top: 30px; position: relative;"><i class="fi fi-laptop"></i>
+                    Acciones:</h4>
 
                 {% endif %}
 
