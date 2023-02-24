@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 
 
 class Assignment(models.Model):
-    publication = models.OneToOneField(
+    publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='assignments',
         verbose_name='Publicación')
 
@@ -32,7 +32,7 @@ class Assignment(models.Model):
         verbose_name_plural = 'Asignaciones'
 
     def __str__(self):
-        return 'Asignación al artículo ' + str(self.article)
+        return  str(self.article)
 
 # * perfil de articulo
 
@@ -50,7 +50,7 @@ class Profile(models.Model):
 
 
 class ArticleProfile(models.Model):
-    publication = models.OneToOneField(
+    publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='article_profiles',
         verbose_name='Publicación')
 
@@ -58,11 +58,11 @@ class ArticleProfile(models.Model):
         'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
 
     profiles = models.ManyToManyField(
-        'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles')
+        'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles', blank=True)
 
     class Meta:
         verbose_name = 'Perfil de artículo'
         verbose_name_plural = 'Perfiles de artículo'
 
     def __str__(self):
-        return 'Perfil de artículo de ' + str(self.article)
+        return str(self.article)
