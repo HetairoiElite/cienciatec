@@ -50,7 +50,9 @@
                     {% endfor %}
                     {% endif %}
 
-                    <form action="" method="post" enctype="multipart/form-data" data-abide novalidate>{% csrf_token %}
+                    <form action="" method="post" enctype="multipart/form-data" id="form_article" class="custom"
+                        data-abide novalidate>
+                        {% csrf_token %}
 
                         <div id="form-general">
                             <h5>Artículo</h5>
@@ -111,7 +113,12 @@
                                     type="button">
                                     <i class="fi-plus"></i>
                                     Agregar coautor</button>
-                                {% block buttons_coauthor %}{% endblock buttons_coauthor %}
+                                {% block buttons_coauthor %}
+                                <button style="text-decoration:none" class="button clear alert" id="remove-form_coautor"
+                                    type="button">
+                                    <i class="fi-minus-circle"></i>
+                                    Eliminar coautor</button>
+                                {% endblock buttons_coauthor %}
 
                             </span>
 
@@ -159,7 +166,12 @@
                                     type="button">
                                     <i class="fi-plus"></i>
                                     Agregar imagen</button>
-                                {% block buttons_image %}{% endblock buttons_image %}
+                                {% block buttons_image %}
+                                <button style="text-decoration:none" class="button clear alert" id="remove-form_image"
+                                    type="button">
+                                    <i class="fi-minus-circle"></i>
+                                    Eliminar imagen</button>
+                                {% endblock buttons_image %}
                             </span>
 
                         </div>
@@ -180,21 +192,32 @@
 
                                 {{ coauthor_formset.empty_form.nombre.label_tag }}
                                 {{ coauthor_formset.empty_form.nombre }}
-
+                                <span class="form-error">
+                                    Debe ser un nombre valido (solo letras) y máximo 2 nombres.
+                                </span>
                             </div>
                             <div class="cell small-12 large-4">
 
                                 {{ coauthor_formset.empty_form.apellido_paterno.label_tag }}
                                 {{ coauthor_formset.empty_form.apellido_paterno }}
+                                <span class="form-error">
+                                    Debe ser un apellido valido (solo letras)
+                                </span>
                             </div>
                             <div class="cell small-12 large-4">
 
                                 {{ coauthor_formset.empty_form.apellido_materno.label_tag }}
                                 {{ coauthor_formset.empty_form.apellido_materno }}
+                                <span class="form-error">
+                                    Debe ser un apellido valido (solo letras)
+                                </span>
                             </div>
                             <div class="cell small-12 large-12">
                                 {{ coauthor_formset.empty_form.email.label_tag }}
                                 {{ coauthor_formset.empty_form.email }}
+                                <span class="form-error">
+                                    Debe ser un correo valido
+                                </span>
                             </div>
 
                             {# if can delete #}
@@ -213,25 +236,22 @@
                                 {{ article_image_formset.empty_form.image.label_tag }}
                                 {{ article_image_formset.empty_form.image }}
                             </div>
-                        </div>
+                            {% if article_image_formset.can_delete %}
 
-                        {# if can delete #}
-                        {% if article_image_formset.can_delete %}
-                        <div class="grid-x grid-padding-x">
                             <div class="cell small-12">
                                 {{ article_image_formset.empty_form.DELETE.label_tag }}
                                 {{ article_image_formset.empty_form.DELETE }}
                             </div>
+                            {% endif %}
+
                         </div>
-                        {% endif %}
-                        {# end if can delete #}
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-</div>
+    </div>
 </div>
 
 {% endblock content %}
@@ -241,6 +261,29 @@
 {% block extra %}{% endblock extra %}
 
 <script>
+    // * when load page check if select "otra escuela" con valor new activar new school field
+    init_form_idx_coauthors = $('#id_coauthors-TOTAL_FORMS').val();
+    init_form_idx_images = $('#id_proposal_images-TOTAL_FORMS').val();
+
+    $(document).ready(function () {
+
+
+        if ($("#id_school option:selected").text() == 'Otra') {
+            $('#id_new_school').prop('disabled', false);
+            $('#id_new_school').focus();
+            // required
+            // school no required
+        } else {
+            $('#id_new_school').prop('disabled', true);
+            $('#id_new_school').val('');
+            // no required
+            // school required
+
+        }
+
+        $('#remove-form_coautor').hide();
+        $('#remove-form_image').hide();
+    });
     // * Agregar formularios dinamicamente
     // * coauthor_formset
 
@@ -251,14 +294,44 @@
         // add hr
         $('#formset-coauthor').append($('#empty_form_coauthor').html().replace(/__prefix__/g, form_idx));
         $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        Foundation.reInit($('#form_article'));
 
-        // show remove button
-        //$('#remove-form_coautor').show();
+        $('#remove-form_coautor').show();
 
 
     });
 
+    $('#remove-form_coautor').click(function () {
+        var form_idx = $('#id_coauthors-TOTAL_FORMS').val();
+        console.log('form_idx: ' + form_idx);
+        console.log('init_form_idx_coauthors: ' + init_form_idx_coauthors);
+        if (form_idx >= init_form_idx_coauthors) {
+            $('#id_coauthors-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+            form_idx--;
+            $('#formset-coauthor').children().last().remove();
+        }
+        if (form_idx == init_form_idx_coauthors) {
+            $('#remove-form_coautor').hide();
+        }
+    });
+
     // * article_image_formset
+
+
+
+    $('#remove-form_image').click(function () {
+        var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
+        console.log('form_idx: ' + form_idx);
+        console.log('init_form_idx_images: ' + init_form_idx_images);
+        if (form_idx >= init_form_idx_images) {
+            $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+            form_idx--;
+            $('#formset-image').children().last().remove();
+        }
+        if (form_idx == init_form_idx_images) {
+            $('#remove-form_image').hide();
+        }
+    });
 
     $('#add-form_image').click(function () {
         var form_idx = $('#id_proposal_images-TOTAL_FORMS').val();
@@ -267,8 +340,10 @@
         $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
         // show remove button 
-        //$('#remove-form_image').show();
+        $('#remove-form_image').show();
     });
+
+
 
 
     // * when select "otra" con valor new activar new school field 
@@ -278,39 +353,13 @@
             $('#id_new_school').prop('disabled', false);
             $('#id_new_school').focus();
             // required
-            $('#id_new_school').prop('required', true);
             // school no required
-            $('#id_school').prop('required', false);
         } else {
             $('#id_new_school').prop('disabled', true);
             $('#id_new_school').val('');
             // no required
-            $('#id_new_school').prop('required', false);
             // school required
-            $('#id_school').prop('required', true);
         }
-    });
-
-    // * when load page check if select "otra escuela" con valor new activar new school field
-    $(document).ready(function () {
-
-
-        if ($("#id_school option:selected").text() == 'Otra') {
-            $('#id_new_school').prop('disabled', false);
-            $('#id_new_school').focus();
-            // required
-            $('#id_new_school').prop('required', true);
-            // school no required
-            $('#id_school').prop('required', false);
-        } else {
-            $('#id_new_school').prop('disabled', true);
-            $('#id_new_school').val('');
-            // no required
-            $('#id_new_school').prop('required', false);
-            // school required
-            $('#id_school').prop('required', true);
-        }
-
     });
 </script>
 <script>

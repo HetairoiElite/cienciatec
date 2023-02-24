@@ -12,26 +12,16 @@
     <div class="cell small-12">
         {{ form.title.label_tag }}
         {{ form.title }}
-        {% if form.title.errors %}
-        <div class="callout alert">
-            {% for error in form.title.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <span class="form-error">
+            El titulo debe ser único.
+        </span>
     </div>
 </div>
 <div class="grid-x grid-padding-x">
     <div class="cell small-12">
         {{ form.modality.label_tag }}
         {{ form.modality }}
-        {% if form.modality.errors %}
-        <div class="callout alert">
-            {% for error in form.modality.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+
     </div>
 </div>
 
@@ -96,46 +86,30 @@
     <div class="cell small-12 large-4">
         {{ coautor_form.nombre.label_tag }}
         {{ coautor_form.nombre }}
-        {% if coautor_form.nombre.errors %}
-        <div class="callout alert">
-            {% for error in coautor_form.nombre.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <span class="form-error">
+            Debe ser un nombre valido (solo letras) y máximo 2 nombres.
+        </span>
     </div>
     <div class="cell small-12 large-4">
         {{ coautor_form.apellido_paterno.label_tag }}
         {{ coautor_form.apellido_paterno }}
-        {% if coautor_form.apellido_paterno.errors %}
-        <div class="callout alert">
-            {% for error in coautor_form.apellido_paterno.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <span class="form-error">
+            Debe ser un apellido valido (solo letras).
+        </span>
     </div>
     <div class="cell small-12 large-4">
         {{ coautor_form.apellido_materno.label_tag }}
         {{ coautor_form.apellido_materno }}
-        {% if coautor_form.apellido_materno.errors %}
-        <div class="callout alert">
-            {% for error in coautor_form.apellido_materno.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <span class="form-error">
+            Debe ser un apellido valido (solo letras).
+        </span>
     </div>
     <div class="cell small-12 large-12">
         {{ coautor_form.email.label_tag }}
         {{ coautor_form.email }}
-        {% if coautor_form.email.errors %}
-        <div class="callout alert">
-            {% for error in coautor_form.email.errors %}
-            {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <span class="form-error">
+            Debe ser un correo valido.
+        </span>
     </div>
 </div>
 {% if coauthor_formset.can_delete %}
