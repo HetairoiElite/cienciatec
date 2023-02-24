@@ -16,6 +16,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from django.views.generic import TemplateView, UpdateView
+from django.views.generic import View
+from django.http.response import JsonResponse
+
 
 # * locals
 
@@ -143,7 +146,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
             messages.error(
                 request, 'No se ha definido un periodo de publicación')
             return redirect('core_dashboard:dashboard')
-    
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -172,7 +175,7 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
             messages.error(
                 request, 'No tienes permiso para editar esta propuesta')
             return redirect('core_dashboard:dashboard')
-        
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -248,3 +251,27 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_invalid(self, form, coauthor_formset, article_image_formset):
         return self.render_to_response(self.get_context_data(form=form, coauthor_formset=coauthor_formset, article_image_formset=article_image_formset))
+
+# * check title view (ajax)
+
+
+class CheckTitleView(View):
+
+    def get(self, request, *args, **kwargs):
+        title = request.GET.get('title', None)
+
+        title = title.strip()
+
+        print('hola')
+        id = request.GET.get('id', None)
+        try:
+            data = {
+                'is_taken': ArticleProposal.objects.filter(title__iexact=title).exclude(id=id).exists()
+            }
+        except:
+            data = {
+                'is_taken': ArticleProposal.objects.filter(title__iexact=title).exists()
+            }
+        return JsonResponse(data)
+
+
