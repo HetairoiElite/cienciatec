@@ -19,6 +19,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 
+# * validate password
+from django.contrib.auth import password_validation
+
+# * views
+from django.views.generic import View
+
+from django.http import JsonResponse
+
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 
 # * locals
@@ -203,3 +211,19 @@ class CustomPasswordChangeView(PasswordChangeView):
         messages.add_message(self.request, messages.SUCCESS, 'Contraseña actualizada correctamente')
         return reverse('registration:profile')+ '?edit'
     
+class ValidatePasswordView(View):
+
+    def get(self, request, *args, **kwargs):
+        # * password withouth user
+        password = request.GET.get('password', None)
+
+        try:
+            validate = password_validation.validate_password(password)
+            data = {
+                'is_valid': True
+            }
+        except:
+            data = {
+                'is_valid': False
+            }
+        return JsonResponse(data)
