@@ -44,23 +44,8 @@ class CoauthorInline(admin.TabularInline):
                        'apellido_paterno', 'apellido_materno')
 
 
-@admin.action(description='Enviar carta de recepción')
-def send_reception_letter(modeladmin, request, queryset):
-    try:
-        # * check if queryset has none approved articles
-
-        if queryset.filter(status='1').exists():
-            raise Exception(
-                'Hay artículos sin recibir. Marque como recibido antes de enviar la carta de recepción')
-
-        for article in queryset:
-            article.send_reception_letter()
-
-        messages.success(
-            request, 'Se han enviado las cartas de recepción')
-
-    except Exception as e:
-        messages.error(request, str(e))
+# @admin.action(description='Enviar carta de recepción')
+# def send_reception_letter(modeladmin, request, queryset):
 
 
 @admin.action(description='Marcar como recibido')
@@ -68,7 +53,6 @@ def mark_as_received(modeladmin, request, queryset):
     # from .tasks import go_to_sleep
     # go_to_sleep.delay(10)
     # * add context to view
-    queryset.update(status='2')
 
     for article in queryset:
         # * create assignment and profile for each article
@@ -82,9 +66,21 @@ def mark_as_received(modeladmin, request, queryset):
             article=article,
             publication=article.publication,
         )
-    
 
-    messages.success(request, 'Se han marcado como recibidos')
+    try:
+        # * check if queryset has none approved articles
+        for article in queryset:
+            if article.status != '2':
+                article.send_reception_letter()
+
+        # messages.success(
+            # request, 'Se han enviado las cartas de recepción')
+        queryset.update(status='2')
+            
+        messages.success(request, 'Se han marcado como recibidos')  
+
+    except Exception as e:
+        messages.error(request, str(e))
 
 
 class ArticleProposalAdmin(admin.ModelAdmin):
@@ -92,7 +88,7 @@ class ArticleProposalAdmin(admin.ModelAdmin):
     change_list_template = "admin/proposal_reception/change_list.html"
 
     # actions = [send_arbitration_report]
-    actions = [mark_as_received, send_reception_letter]
+    actions = [mark_as_received]
 
     def has_add_permission(self, request, obj=None):
         if not request.user.is_superuser:
@@ -123,7 +119,13 @@ class ArticleProposalAdmin(admin.ModelAdmin):
             })
         return super().render_change_form(request, context, add, change, form_url, obj)
 
-    list_display = ('title', 'author_link', 'template', 'new_school', 'status')
+    def download_template(self, obj):
+        return format_html(f'<a href="{obj.template.url}"><i class="fi fi-download"></i> Descargar</a>')
+    
+    
+    download_template.short_description = "Plantilla"
+
+    list_display = ('title', 'author_link', 'download_template', 'new_school', 'status')
     search_fields = ('title', 'author__user__username',
                      'author__user__first_name', 'author__user__last_name')
 
