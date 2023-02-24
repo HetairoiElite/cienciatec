@@ -62,7 +62,6 @@ THIRD_PARTY_APPS = [
     'jet',
     # 'daphne',
     'storages',
-    'notifications',
     'corsheaders'
 ]
 
@@ -79,7 +78,6 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS +  DJANGO_APPS
 
-DJANGO_NOTIFICATIONS_CONFIG = {'USE_JSONFIELD': True}
 
 
 MIDDLEWARE = [
