@@ -17,7 +17,7 @@
 
 
 <div class="grid-x grid-margin-x align-center">
-    <div class="cell small-9 medium-9 large-9" style="margin-top: 2em;">
+    <div class="cell small-9 medium-9 large-9">
 
         <div class="card" style="width: 100%;">
             <div class="card-divider">
@@ -32,10 +32,6 @@
                     {% if form.errors %}
                     <div class="callout alert">
                         <h6><i class="fi-alert"></i> Por favor, corrija los siguientes errores:</h6>
-                        {% comment %}
-                        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-                            <span aria-hidden="true">&times;</span>
-                        </button> {% endcomment %}
                     </div>
                     {% endif %}
                     {% csrf_token %}
@@ -48,17 +44,29 @@
                                 {% if field.field.required %}
                                 <span class="required">*</span>
                                 {% endif %}
+                                {{ field }}
+                                <span class="form-error">
+                                    {# show message error #}
+                                    Este campo es requerido.
+                                    {% if field.label == 'Nombre(s)' %}
+                                    Debe ser un nombre valido (solo letras). Máximo 2 nombres.
+                                    {% elif field.label == 'Nombre de usuario' %}
+                                    
+                                    {% elif 'Apellido' in field.label %}
+                                    Debe ser un apellido valido (solo letras).
+                                    {% elif field.label == 'Correo electrónico' %}
+                                    Debe ser un correo valido.
+                                    {% elif field.label == 'Contraseña' %}
+                                    Contraseña no valida.
+                                    {% elif field.label == 'Confirmar contraseña' %}
+                                    Las contraseñas no coinciden.
+                                    {% elif field.label == 'Tipo de usuario' %}
+                                    Debe seleccionar un tipo de usuario.
+                                    {% endif %}
+                                </span>
                             </label>
 
-                            {{ field }}
-                            <span class="form-error">
-                                Este campo es requerido
-                                {% if field.field.widget.input_type == 'email' %}
-                                y debe ser un correo electrónico válido
-                                {% elif field.field.widget.input_type == 'password' and field.field.label == 'Confirmar contraseña' %}
-                                y debe coincidir con la contraseña
-                                {% endif %}
-                            </span>
+
                             {% if field.help_text %}
                             <h5 class="help-text">{{ field.help_text|safe }}</h5>
                             {% endif %}
@@ -69,10 +77,6 @@
                                     <strong>{{ field.label }}</strong>: {{ error }}<br>
                                     {% endfor %}
                                 </p>
-                                {% comment %} <button class="close-button" aria-label="Dismiss alert" type="button"
-                                    data-close>
-                                    <span aria-hidden="true">&times;</span>
-                                </button> {% endcomment %}
                             </div>
                             {% endif %}
 

@@ -13,7 +13,7 @@
 {% block content %}
 
 <div class="grid-x grid-margin-x align-center">
-    <div class="cell small-9 medium-8 large-9" style="margin-top: 2em;">
+    <div class="cell small-9 medium-8 large-9">
         <div class="card" style="width: 100%;">
             <div class="card-divider">
                 <h4 class="cell medium-6">
@@ -33,7 +33,7 @@
                 </div>
                 {% endfor %}
                 {% endif %}
-                <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <form action="" method="post" enctype="multipart/form-data" data-abide novalidate>{% csrf_token %}
                     <div class="grid-x grid-container">
                         <div class="cell grid-x medium-12 large-2 align-center">
                             <div class="row align-center">
@@ -53,14 +53,10 @@
                                 <label for="">
                                     {{form.first_name.label_tag}}
                                     {{form.first_name}}
+                                    <span class="form-error">
+                                        Debe ser un nombre valido (solo letras). Máximo 2 nombres.
+                                    </span>
                                 </label>
-                                {% if form.first_name.errors %}
-                                <div class="callout alert" data-closable>
-
-                                    {{form.first_name.errors}}
-                                </div>
-                                {% endif %}
-
                                 <small class="help-text"> {{form.first_name.help_text}} </small>
                             </div>
                             <div class="cell medium-12 large-4">
@@ -68,23 +64,22 @@
 
                                     {{form.apellidoP.label_tag}}
                                     {{form.apellidoP}}
+                                    <span class="form-error">
+                                        Debe ser un apellido valido (solo letras).
+                                    </span>
                                 </label>
 
-                                {% if form.apellidoP.errors %}
-                                <div class="callout alert" data-closable>
-                                    {{form.apellidoP.errors}}
-                                </div>
-                                {% endif %}
                                 <small class="help-text"> {{form.apellidoP.help_text}} </small>
                             </div>
                             <div class="cell medium-12 large-4">
-                                {{form.apellidoM.label_tag}}
-                                {{form.apellidoM}}
-                                {% if form.apellidoM.errors %}
-                                <div class="callout alert" data-closable>
-                                    {{form.apellidoM.errors}}
-                                </div>
-                                {% endif %}
+                                <label>
+                                    {{form.apellidoM.label_tag}}
+                                    {{form.apellidoM}}
+                                    <span class="form-error">
+                                        Debe ser un apellido valido (solo letras).
+                                    </span>
+                                </label>
+
                                 <small class="help-text"> {{form.apellidoM.help_text}} </small>
                             </div>
 
@@ -100,7 +95,7 @@
                                 <small class="help-text"> {{form.profiles.help_text}} </small>
                             </div>
                             {% endif %}
-                            
+
                             <div class="cell medium-12">
                                 <label for="email">Email: <i class="fi-check" style="color: green; width: 50px;"></i>
                                 </label>

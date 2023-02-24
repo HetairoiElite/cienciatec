@@ -99,8 +99,9 @@
         <p class="format-font" style="text-align: center; margin-top: 50px;">
             Verifica tu correo:
             <hr style="background-color: #52EB99; width:50px">
-            <div class="format-font" style="text-align: center; margin-top: 30px;">
-                <a href="{{protocol}}://{{domain}}{% url 'registration:activate' uidb64=uid token=token %}" class="my-button">Verificar</a>
+            <div class="format-font" style="text-align: center; margin-top: 30px; ">
+                <a href="{{protocol}}://{{domain}}{% url 'registration:activate' uidb64=uid token=token %}"
+                    class="my-button" style="color:white; decoration:none">Verificar</a>
             </div>
 
         </p>

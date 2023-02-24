@@ -2,10 +2,20 @@
 {% load static %}
 {% block title %}{{ title }}{% endblock %}
 
+{% block path %}
+
+<li>
+    <a href="{% url 'home' %}">Inicio</a>
+</li>
+<li>
+    <span class="show-for-sr">Current: </span> Activación de cuenta
+</li>
+{% endblock path %}
+
 {% block content %}
 <!--Success alert email activado-->
 <div class="grid-x grid-margin-x align-center">
-    <div class="cell grid-y small-9 medium-6 large-8" style="margin-top: 2em; height: 1000px;">
+    <div class="cell grid-y small-9 medium-6 large-8" style=" height: 1000px;">
 
         {% if status == "success" %}
 
