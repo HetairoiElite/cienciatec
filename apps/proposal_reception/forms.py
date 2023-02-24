@@ -20,7 +20,13 @@ class ArticleProposalForm(forms.ModelForm):
         ]
 
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Título del artículo', 'required': 'true'}),
+            'title': forms.TextInput(
+                attrs={
+                    'class': 'form-control mb-2 ',
+                    'placeholder': 'Título del artículo',
+                    'required': 'true',
+                    'data-validator': 'regex2title'
+                }),
             'modality': forms.Select(attrs={'class': 'form-control mb-2 ', 'required': 'true'}),
             # 'placeholder': 'Escuela
             'school': forms.Select(attrs={
@@ -96,10 +102,31 @@ class CoauthorForm(forms.ModelForm):
         ]
 
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Nombre(s)', 'required': 'true'}),
-            'apellido_paterno': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Apellido paterno', 'required': 'true'}),
-            'apellido_materno': forms.TextInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Apellido materno', 'required': 'true'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control mb-2 ', 'placeholder': 'Correo electrónico', 'required': 'true'}),
+            'nombre': forms.TextInput(attrs={
+                'class': 'text-capitalize', 'placeholder': 'Nombre(s)',
+                'required': 'true', 'pattern': 'regex2name',
+            }),
+            'apellido_paterno': forms.TextInput(
+                attrs={
+                    'class': 'form-control mb-2 ',
+                    'placeholder': 'Apellido paterno',
+                    'required': 'true',
+                    'pattern': 'regexalpha'
+                }),
+            'apellido_materno': forms.TextInput(
+                attrs={
+                    'class': 'form-control mb-2 ',
+                    'placeholder': 'Apellido materno',
+                    'required': 'true',
+                    'pattern': 'regexalpha'
+                }),
+            'email': forms.EmailInput(
+                attrs={
+                    'class': 'form-control mb-2 ',
+                    'placeholder': 'Correo electrónico',
+                    'required': 'true',
+                    'pattern': 'email'
+                }),
         }
 
         labels = {
@@ -109,41 +136,12 @@ class CoauthorForm(forms.ModelForm):
             'email': 'Correo electrónico',
         }
 
-    def clean_nombre(self):
-        nombre = self.cleaned_data['nombre']
-
-        # *max 2 names
-        if len(nombre.split(' ')) > 2:
-            raise forms.ValidationError(
-                'El nombre no puede tener más de dos nombres')
-
-        # * if 2 names check if they are valid
-        if len(nombre.split(' ')) == 2:
-            if not nombre.split(' ')[0].isalpha() or not nombre.split(' ')[1].isalpha():
-                raise forms.ValidationError(
-                    'El nombre solo puede contener letras')
-
-        # * if 1 name check if it is valid
-        if len(nombre.split(' ')) == 1:
-            if not nombre.isalpha():
-                raise forms.ValidationError(
-                    'El nombre solo puede contener letras')
-
-        return nombre
-
-    def clean_apellido_paterno(self):
-        apellido_paterno = self.cleaned_data['apellido_paterno']
-        if not apellido_paterno.isalpha():
-            raise forms.ValidationError(
-                'El apellido paterno solo puede contener letras')
-        return apellido_paterno
-
-    def clean_apellido_materno(self):
-        apellido_materno = self.cleaned_data['apellido_materno']
-        if not apellido_materno.isalpha():
-            raise forms.ValidationError(
-                'El apellido materno solo puede contener letras')
-        return apellido_materno
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['nombre'].required = True
+            self.fields['apellido_paterno'].required = True
+            self.fields['apellido_materno'].required = True
+            self.fields['email'].required = True
 
 
 class ArticleImageForm(forms.ModelForm):
@@ -158,6 +156,7 @@ class ArticleImageForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={
                 'class': 'form-control mb-2 ',
                 'accept': '.jpg, .jpeg, .png',
+                'required': 'true'
             }),
         }
 
