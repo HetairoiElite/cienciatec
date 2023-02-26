@@ -39,11 +39,11 @@ class InlineProfile(admin.StackedInline):
             return ('avatar', 'type_user', 'profiles')
 
 
-    def get_readonly_fields(self, request, obj=None):
-        if obj.profile.type_user != '2':
-            return ('avatar', 'type_user', )
-        else:
-            return ('avatar', 'type_user', 'profiles')
+    # def get_readonly_fields(self, request, obj=None):
+    #     if obj.profile.type_user != '2':
+    #         return ('avatar',  )
+    #     else:
+    #         return ('avatar', 'profiles')
 
 class CustomUserAdmin(UserAdmin):
 
@@ -62,6 +62,12 @@ class CustomUserAdmin(UserAdmin):
     get_type_user.short_description = 'Tipo de usuario'
 
     inlines = (InlineProfile,)
+    
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return list()
+        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
+    
     model = User
     list_display = ('username', 'image_tag', 'email', 'first_name',
                     'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
