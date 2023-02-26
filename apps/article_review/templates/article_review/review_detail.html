@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}Arbitraje de la propuesta {{review.assignment}}
+{% endblock title %}
+
+
+{% block path %}
+<li>
+    <a href="{% url 'home' %}">Inicio</a>
+</li>
+<li>
+    <span>Arbitraje de la propuesta {{review.assignment}}</span>
+</li>
+{% endblock path %}
+
+{% block content %}
+<div class="grid-x align-center">
+    <div class="cell large-10">
+        <embed src="{{review.assignment.article.template_as_pdf.url}}" width="100%" height="1000px" />
+    </div>
+</div>
+
+{% endblock content %}
