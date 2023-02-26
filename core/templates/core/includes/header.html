@@ -1,19 +1,25 @@
 <style>
     .absolute-logo {
-        position: fixed;
-        top: 84px;
+        position: relative;
         width: 20%;
-        height: 100%;
-        z-index: 1;
+        height: 10px;
+        top: -100%;
+        margin-top: -1%;
+        margin-left: -2%;
     }
 </style>
+{% load static %}
 
 
 
 <div class="top-bar-container" data-sticky-container>
+
     <div class="sticky sticky-topbar" data-sticky data-options="anchor: page; marginTop: 0; stickyOn: small;">
-        <div class="top-bar" style="background-color: #212531;">
+
+        <div class="top-bar" style="background-color: #212531; margin-bottom:0;">
+
             <div class="top-bar-left ">
+
                 <ul class="dropdown menu" data-dropdown-menu style="background-color: #212531;">
                     {% comment %} <li class="menu-text align-self-middle" style="color: white;">{{home.title}}
                     </li>
@@ -42,7 +48,6 @@
                     <li><a class="button success" style="color:white;" href="{% url 'login' %}">
                             <i class="fi-lock"></i>
                             Iniciar sesión</a></li>
-
                     <li><a class="button primary" href="{% url 'registration:signup' %}">
                             <i class="fi-burst-new"></i>
                             Registrarse</a></li>
@@ -62,11 +67,10 @@
                 </ul>
             </div>
         </div>
-        {% load static %}
-        
-    </div>
 
-</div>
-<div class="absolute-logo">
-    <img src="{% static 'core/img/bookmarklogo.png' %}" width="70%">
+        <div class="absolute-logo">
+            <img src="{% static 'core/img/bookmarklogo.png' %}"  width="70%">
+        </div>
+    </div>
+   
 </div>
