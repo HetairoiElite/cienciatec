@@ -57,10 +57,10 @@ def mark_as_received(modeladmin, request, queryset):
     for article in queryset:
         # * create assignment and profile for each article
 
-        Assignment.objects.get_or_create(
-            article=article,
-            publication=article.publication,
-        )
+        # Assignment.objects.get_or_create(
+        #     article=article,
+        #     publication=article.publication,
+        # )
 
         ArticleProfile.objects.get_or_create(
             article=article,
@@ -72,6 +72,7 @@ def mark_as_received(modeladmin, request, queryset):
         for article in queryset:
             if article.status != '2':
                 article.send_reception_letter()
+                article.generate_template_as_pdf()
 
         # messages.success(
             # request, 'Se han enviado las cartas de recepción')
