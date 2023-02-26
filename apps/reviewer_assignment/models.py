@@ -1,6 +1,7 @@
 from django.db import models
 from apps.events.events import Event
 from django.core.exceptions import ValidationError
+from apps.article_review.models import Review
 
 # Create your models here.
 
@@ -14,7 +15,7 @@ class Assignment(models.Model):
         verbose_name='Publicación')
 
     referees = models.ManyToManyField(
-        'registration.Profile', related_name='assignments', blank=True, verbose_name='arbitros')
+        'registration.Profile', related_name='assignments', verbose_name='arbitros')
     article = models.OneToOneField(
         'Recepcion_Propuestas.ArticleProposal',
         verbose_name='Artículo',
@@ -26,6 +27,10 @@ class Assignment(models.Model):
     )
 
     status = models.CharField(verbose_name='Estatus', max_length=1, choices=STATUS_CHOICES, default='P')
+    
+    # * completado
+    
+    completed = models.BooleanField(verbose_name='Completado', default=False)
         
     class Meta:
         verbose_name = 'Asignación'
@@ -59,6 +64,13 @@ class ArticleProfile(models.Model):
 
     profiles = models.ManyToManyField(
         'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles', blank=True)
+    
+    STATUS_CHOICES = (
+        ('P', 'Pendiente'),
+        ('A', 'Perfiles asignados'),
+    )
+    
+    status = models.CharField(verbose_name='Estatus', max_length=1, choices=STATUS_CHOICES, default='P')
 
     class Meta:
         verbose_name = 'Perfil de artículo'
