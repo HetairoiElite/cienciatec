@@ -43,6 +43,9 @@ urlpatterns = [
     # * proposal reception
     path('tablero/recepcion-propuestas/', include('apps.proposal_reception.urls')),
 
+
+    # * article review
+    path('tablero/revision-articulos/', include('apps.article_review.urls')),
     
     
 ]
