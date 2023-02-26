@@ -56,10 +56,19 @@ def custom_upload_to_reception_letter(instance, filename):
         return f'letters/{instance.author.user.username}/{filename}'
 
 
+def custom_upload_to_template_as_pdf(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.template_as_pdf.delete()
+        return f'templates/{instance.author.user.username}/{filename}'
+    except ArticleProposal.DoesNotExist:
+        return f'templates/{instance.author.user.username}/{filename}'
+
+
 class ArticleProposal(TimeStampedModel):
-    
+
     objects = ArticleProposalManager.as_manager()
-    
+
     publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='article_proposals',
         verbose_name='Publicación')
@@ -94,6 +103,9 @@ class ArticleProposal(TimeStampedModel):
     template = models.FileField(
         verbose_name='Plantilla', upload_to=custom_upload_to_user_template)
 
+    template_as_pdf = models.FileField(
+        verbose_name='Plantilla en PDF', upload_to=custom_upload_to_template_as_pdf, null=True, blank=True)
+
    # * Keep icons in approved field
 
     # is_approved = models.BooleanField(
@@ -122,9 +134,51 @@ class ArticleProposal(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
-        
+
         super().save(*args, **kwargs)
-        
+
+    def generate_template_as_pdf(self):
+        from dotenv import load_dotenv
+        import os
+
+        load_dotenv()
+
+        DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+
+        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.local':
+            from docx2pdf import convert
+            import pythoncom
+            import shutil
+
+            pythoncom.CoInitialize()
+
+            # * copy template to downloads folder
+            shutil.copy(self.template.path, settings.BASE_DIR /
+                        'downloads' / 'template.docx')
+
+            convert(settings.BASE_DIR / 'downloads' / 'template.docx',
+                    settings.BASE_DIR / 'downloads' / 'template.pdf')
+
+        else:
+            import subprocess
+            import boto3
+            # * download template from s3
+            s3 = boto3.resource('s3')
+            path = self.template.path
+
+            bucket = s3.Bucket(os.getenv('AWS_STORAGE_BUCKET_NAME'))
+            bucket.download_file(path, settings.BASE_DIR /
+                                 'downloads' / 'template.docx')
+
+            output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
+                                              settings.BASE_DIR / 'downloads' / 'template.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
+
+        with open(settings.BASE_DIR / 'downloads' / 'template.pdf', 'rb') as f:
+            from django.core.files import File
+            self.template_as_pdf.save(f'{self.title}.pdf',
+                                      File(f))
+
+        self.save()
 
     def send_reception_letter(self):
 
@@ -217,7 +271,7 @@ class ArticleProposal(TimeStampedModel):
             file = File(file)
             self.reception_letter.save(
                 f'Carta_de_recepcion_{self.title}.pdf', file)
-            
+
             email = EmailMessage(
                 subject='Carta de recepción',
                 body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
@@ -228,11 +282,11 @@ class ArticleProposal(TimeStampedModel):
                 to=[self.author.user.email],
                 reply_to=['jonathan90090@gmail.com'],
             )
-            
-            email.attach_file(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf')
-            
+
+            email.attach_file(settings.BASE_DIR /
+                              'downloads/Carta_de_recepcion.pdf')
+
             email.send()
-        
 
         self.save()
 
