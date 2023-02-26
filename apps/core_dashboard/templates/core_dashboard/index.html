@@ -121,6 +121,86 @@
 
         </div>
     </div>
+    {% else %}
+    <div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white"> Asignaciones</p>
+                </h4>
+            </div>
+            <div class="card-section">
+                {% if messages %}
+                {% for message in messages %}
+                <div
+                    class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
+                    {{ message }}
+                </div>
+
+                {% endfor %}
+                {% endif %}
+
+                {% if user.profile.assignments.all.count != 0 %}
+                <div class="grid-x grid-padding-x cell align-center ">
+                    <div class="callout primary cell">
+                        <p>
+                            Se le asignó la revisión de las siguientes propuestas:
+                        </p>
+                    </div>
+                </div>
+
+
+                <table>
+                    <thead>
+                        <th>Propuesta</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </thead>
+                    {% with assignments=user.profile.assignments.all %}
+                    {% for assignment in assignments %}
+                    <tbody>
+                        <tr>
+                            <td style="font-size:15px">{{ assignment.article.title }}</td>
+                            <td class="text-center">
+                                <small> {% if assignment.completed %}
+                                    <i class="fi-check" style="color: green;"></i>
+
+                                    &nbsp; Completado
+                                </small>
+
+                                {% else %}
+                                Sin completar
+                                {% endif %}
+                            </td>
+                            <td >
+                                <div class="grid-x grid-padding-x align-center">
+                                    <div class="cell medium-6 " >
+                                        
+                                        <a href="{% url 'article_review:review_detail' assignment.review.id %}" <i
+                                            class="fi-eye"></i> Ver</a>
+                                    </div>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    {% endfor %}
+                    {% endwith %}
+                </table>
+
+                {% else %}
+                <div class="grid-x grid-padding-x cell align-center ">
+                    <div class="callout warning cell">
+                        <p>
+                            No se le ha asignado ninguna propuesta para revisar.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% comment %}
