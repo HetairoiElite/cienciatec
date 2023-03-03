@@ -36,11 +36,32 @@ class AssignmentAdmin(admin.ModelAdmin):
         if change:
 
             if 'referees' in form.changed_data and form.cleaned_data['referees'].count() > 0 or obj.referees.count() > 0:
+                obj = form.save()
                 obj.status = 'A'
 
-                Review.objects.get_or_create(
-                    assignment=obj,
-                )
+                for referee in obj.referees.all():
+                    Review.objects.get_or_create(assignment=obj, referee=referee)
+                
+                
+                
+                # * send email to referees
+                from django.contrib.sites.shortcuts import get_current_site
+                from django.core.mail import EmailMessage
+                from django.urls import reverse
+                for referee in obj.referees.all():
+                    email = EmailMessage(
+                        subject='Asignación de artículo',
+                        body=f'Estimado(a) {referee.user.get_full_name()},\n\n'
+                        f'Le informamos que ha sido asignado como árbitro del artículo {obj.article.title}.\n\n'
+                        f'Para acceder al arbitraje del artículo puede verlo en su tablero de actividades, por favor ingrese a la siguiente dirección:\n\n'
+                        f'{get_current_site(request).domain + reverse("core_dashboard:dashboard")}\n\n'
+                        f'Atentamente,\n\n'
+                        f'Comité Editorial de Ciencia y Tecnología',
+                        from_email='jonathan90090@gmail.com',
+                        to=[referee.user.email]
+                    )
+                    
+                    email.send()
 
             else:
                 obj.status = 'P'
@@ -93,7 +114,7 @@ class ArticleProfileAdmin(admin.ModelAdmin):
     # * create assigment for each article when update and status is 2
     def save_model(self, request, obj, form, change):
         if change:
-            if 'profiles' in form.changed_data and form.cleaned_data['profiles'].count() > 0:
+            if 'profiles' in form.changed_data and form.cleaned_data['profiles'].count() > 0 or obj.profiles.count() > 0:
 
                 Assignment.objects.get_or_create(
                     article=obj.article,
