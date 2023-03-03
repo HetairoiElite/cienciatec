@@ -48,6 +48,9 @@ urlpatterns = [
     path('tablero/revision-articulos/', include('apps.article_review.urls')),
     
     
+    # * correction sending
+    path('tablero/envio-correcciones/', include('apps.correction_sending.urls')),
+    
 ]
 
 # * Custom titles for admin site
