@@ -176,6 +176,11 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
                 request, 'No tienes permiso para editar esta propuesta')
             return redirect('core_dashboard:dashboard')
 
+        if self.get_object().status == '2':
+            messages.error(
+                request, 'No puedes editar esta propuesta porque ya fue recibida')
+            return redirect('core_dashboard:dashboard')
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -273,5 +278,3 @@ class CheckTitleView(View):
                 'is_taken': ArticleProposal.objects.filter(title__iexact=title).exists()
             }
         return JsonResponse(data)
-
-
