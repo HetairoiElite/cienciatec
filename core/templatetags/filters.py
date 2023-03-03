@@ -1,7 +1,10 @@
 from django import template
 from django.utils.html import format_html
 from django.urls import reverse
-from django.contrib.auth.models import Group 
+from django.contrib.auth.models import Group
+
+from apps.article_review.models import Review
+from apps.reviewer_assignment.models import Assignment
 
 register = template.Library()
 
@@ -30,12 +33,11 @@ def minutes(value):
 
 # @register.filter
 # def has_notis(value):
-#     notis = Notification.objects.filter(actor_object_id=value.id, verb='message', unread=True)  
+#     notis = Notification.objects.filter(actor_object_id=value.id, verb='message', unread=True)
 #     if notis:
 #         return True
 #     return False
-    
-    
+
 
 # * Filters for notis
 
@@ -124,11 +126,31 @@ def user_context(context):
         return None
     return user
 
+
 @register.filter(name='has_group')
 def has_group(user, group_name):
     try:
-        
+
         group = Group.objects.get(name=group_name)
         return True if group in user.groups.all() else False
+    except:
+        return False
+
+
+@register.filter(name='is_assigned')
+def is_assigned(article):
+    # * check for assignment with article
+    try:
+        if article.assignment.referees.all().count() > 0:
+            return True
+    except:
+        return False
+
+
+@register.filter(name="get_review_id")
+def get_review_id(assignment, user):
+    try:
+        review = Review.objects.filter(assignment=assignment, referee = user.profile)
+        return review[0].id
     except:
         return False
