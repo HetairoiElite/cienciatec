@@ -2,6 +2,7 @@
 
 {% block title %}Arbitraje de la propuesta {{review.assignment}}
 {% endblock title %}
+{% load static %}
 
 
 {% block path %}
@@ -9,15 +10,275 @@
     <a href="{% url 'home' %}">Inicio</a>
 </li>
 <li>
+    <a href="{% url 'core_dashboard:dashboard' %}">Tablero</a>
+</li>
+<li>
     <span>Arbitraje de la propuesta {{review.assignment}}</span>
 </li>
 {% endblock path %}
 
+
 {% block content %}
-<div class="grid-x align-center">
-    <div class="cell large-10">
-        <embed src="{{review.assignment.article.template_as_pdf.url}}" width="100%" height="1000px" />
+
+<div class="grid-x grid-margin-x">
+    <div class="grid-x cell align-center">
+        <div class="grid-x cell large-4 medium-9 ">
+            <canvas id="the-canvas"></canvas>
+        </div>
+        <div class="grid-x cell large-4 medium-9 small-9 align-center">
+
+
+            <div class="grid-x cell medium-4 large-8 small-4 align-center">
+                <div>
+                    <button id="prev" class="button secondary">
+                        <i class="fi-arrow-left"></i>
+                    </button>
+                    <button id="next" class="button secondary">
+                        <i class="fi-arrow-right"></i>
+                    </button>
+                    &nbsp; &nbsp;
+                    <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
+                </div>
+            </div>
+            <div class="grid-x cell medium-4 large-2 small-4 align-center">
+                <div class="cell large-1">
+                    <p><button class="button" data-open="exampleModal11">Notas</button></p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reveal" id="exampleModal11" aria-labelledby="exampleModalHeader11" data-reveal>
+        <h3 class="text-center" id="exampleModalHeader11">Notas y comentarios</h3>
+
+        <div class="grid-margin-x callout primary">
+            <p>Las notas son para que el autor pueda corregir su artículo. Los comentarios son para que el autor pueda
+                mejorar su artículo.</p>
+        </div>
+
+        <form method="post" class="grid-x grid-padding-x" id="form_notes" data-abide novalidate>
+            {% csrf_token %}
+            <div id="formset_notes">
+                {{inline_notes_form.management_form}}
+                {% for note_form in inline_notes_form %}
+
+                {% for hidden in note_form.hidden_fields %}
+                {{hidden}}
+                {% endfor %}
+
+                <div class="grid-x grid-padding-x">
+                    <div class="cell large-3 medium-3 small-3">
+                        <label>
+                            {{note_form.line.label}}
+                            {{note_form.line}}
+                        </label>
+                    </div>
+                    <div class="cell auto">
+                        <label>
+                            {{note_form.description.label}}
+                            {{note_form.description}}
+                        </label>
+                    </div>
+                    {% if inline_notes_form.can_delete %}
+                    <div class="cell large-2">
+                        <label>
+                            {{note_form.DELETE.label}}
+                            {{note_form.DELETE}}
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                {% endfor %}
+            </div>
+            <span>
+                <button style="text-decoration:none" class="button clear success" id="add-form_notes" type="button">
+                    <i class="fi-plus"></i>
+                    Agregar nota</button>
+                <button style="text-decoration:none" class="button clear alert" id="remove-form_notes" type="button">
+                    <i class="fi-minus-circle"></i>
+                    Eliminar nota</button>
+            </span>
+
+            <div class="cell">
+                <label>
+                    {{form.comments.label}}
+                    {{form.comments}}
+
+                </label>
+            </div>
+
+            {# submmit #}
+
+            <div class="cell">
+                <button id="save" class="button" type="submit">Guardar</button>
+            </div>
+        </form>
+        <div id="empty_form_note" style="display:none">
+            {# empty form #}
+            <div class="grid-x grid-padding-x">
+                <div class="cell large-3 medium-3 small-3">
+                    <label>
+                        {{inline_notes_form.empty_form.line.label}}
+                        {{inline_notes_form.empty_form.line}}
+                    </label>
+                </div>
+                <div class="cell auto">
+                    <label>
+                        {{inline_notes_form.empty_form.description.label}}
+                        {{inline_notes_form.empty_form.description}}
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+        <button class="close-button" data-close aria-label="Close Accessible Modal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 </div>
 
 {% endblock content %}
+
+{% block scripts %}
+<script>
+    init_form_idx_notes = $('#id_notes-TOTAL_FORMS').val();
+
+    $(document).ready(function () {
+        $('#remove-form_notes').hide();
+        $('#save').hide();
+
+    });
+
+    $('#add-form_notes').click(function () {
+        var form_idx = $('#id_notes-TOTAL_FORMS').val();
+        $('#formset_notes').append($('#empty_form_note').html().replace(/__prefix__/g, form_idx));
+        $('#id_notes-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        Foundation.reInit($('#form_notes'));
+
+        $('#remove-form_notes').show();
+        $('#save').show();
+
+    });
+
+    $('#remove-form_notes').click(function () {
+        var form_idx = $('#id_notes-TOTAL_FORMS').val();
+        console.log('form_idx: ' + form_idx);
+        console.log('init_form_idx_notes: ' + init_form_idx_notes);
+        if (form_idx >= init_form_idx_notes) {
+            $('#id_notes-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+            form_idx--;
+            $('#formset_notes').children().last().remove();
+        }
+        if (form_idx == init_form_idx_notes) {
+            $('#remove-form_notes').hide();
+            $('#save').hide();
+        }
+    });
+</script>
+
+<script src="{% static 'core/pdfjs-3.4.120-dist/build/pdf.js' %}"></script>
+
+<script>
+    url = '{{review.assignment.article.template_as_pdf.url}}'
+
+    {
+        var pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 0.8,
+            canvas = document.getElementById('the-canvas'),
+            ctx = canvas.getContext('2d');
+
+        /**
+         * Get page info from document, resize canvas accordingly, and render page.
+         * @param num Page number.
+         */
+        function renderPage(num) {
+            pageRendering = true;
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function (page) {
+                var viewport = page.getViewport({
+                    scale: scale
+                });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+
+                // Wait for rendering to finish
+                renderTask.promise.then(function () {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+
+            // Update page counters
+            document.getElementById('page_num').textContent = num;
+        }
+
+        /**
+         * If another page rendering in progress, waits until the rendering is
+         * finised. Otherwise, executes rendering immediately.
+         */
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        /**
+         * Displays previous page.
+         */
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('prev').addEventListener('click', onPrevPage);
+
+        /**
+         * Displays next page.
+         */
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('next').addEventListener('click', onNextPage);
+
+
+
+        /**
+         * Asynchronously downloads PDF.
+         */
+        pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+            // Initial/first page rendering
+            renderPage(pageNum);
+        });
+    }
+</script>
+
+{% endblock scripts %}
