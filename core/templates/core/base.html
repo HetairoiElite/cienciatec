@@ -135,35 +135,37 @@
                                 <i class="fi-calendar"></i>
                                 Calendario</a>
                         </li>
-                        {% if request.user.is_staff %}
-                        <div class="cell large-11">
-                            <li><a style="color:white;" href="{% url 'admin:index' %}">
-                                    <i class="fi-widget"></i>
-                                    Administración</a>
-                            </li>
-                        </div>
-                        {% endif %}
-                        <div class="cell large-11">
-                            <li><a style="color:white;" href="{% url 'logout' %}">
-                                    <i class="fi-power"></i>
-                                    Salir</a></li>
-                        </div>
+                    </div>
+                    {% if request.user.is_staff %}
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'admin:index' %}">
+                                <i class="fi-widget"></i>
+                                Administración</a>
+                        </li>
+                    </div>
+                    {% endif %}
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'logout' %}">
+                                <i class="fi-power"></i>
+                                Salir</a></li>
+                    </div>
 
 
-                        {% else %}
-                        <div class="cell large-11">
-                            <li><a style="color:white;" href="{% url 'login' %}">
-                                    <i class="fi-lock"></i>
-                                    Iniciar sesión</a></li>
-                        </div>
-                        <div class="cell large-11">
-                            <li><a style="color:white;" href="{% url 'registration:signup' %}">
-                                    <i class="fi-torso"></i>
-                                    Registrarse</a></li>
-                        </div>
+                    {% else %}
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'login' %}">
+                                <i class="fi-lock"></i>
+                                Iniciar sesión</a></li>
+                    </div>
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'registration:signup' %}">
+                                <i class="fi-torso"></i>
+                                Registrarse</a></li>
+                    </div>
 
 
-                        {% endif %}
+                    {% endif %}
+                </div>
             </ul>
         </div>
         <div class="off-canvas-content" data-off-canvas-content>
@@ -217,7 +219,7 @@
     <script>
         Foundation.Abide.defaults.patterns['regex2name'] = /^([A-ZÑÁÉÍÓÚ]{1}[a-zñáéíóú]+\s*){1,2}$/;
         Foundation.Abide.defaults.patterns['regexalpha'] = /^[A-ZÑÁÉÍÓÚ]{1}[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/;
-        
+
         Foundation.Abide.defaults.validators['validpassword'] = function (el, required, parent) {
             var password = el.val();
             var url = "{% url 'registration:check_password' %}";
@@ -270,7 +272,7 @@
             return result;
         };
 
-        
+
 
         $(document).foundation()
     </script>
