@@ -1,5 +1,7 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load filters %}
+
 {% block title %}Tablero{% endblock title %}
 
 {% block path %}
@@ -18,190 +20,278 @@
     <!--Mensajes-->
     {% if not request.user.profile.type_user == "2" %}
 
-    <div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
-        <div class="card" style="width: 100%;">
-            <div class="card-divider">
+    <div class="cell small-10 medium-10 large-10 align-self-middle" ">
+        <div class=" card" style="width: 100%;">
+        <div class="card-divider">
 
-                <h4 class="cell medium-6">
-                    <p class="text-center title-white"> Etapa #1: Recepción de propuestas</p>
-                </h4>
+            <h4 class="cell medium-6">
+                <p class="text-center title-white"> Propuestas de artículo</p>
+            </h4>
+        </div>
+        <div class="card-section">
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
+                {{ message }}
             </div>
-            <div class="card-section">
-                {% if messages %}
-                {% for message in messages %}
-                <div
-                    class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
-                    {{ message }}
+
+
+
+            {% endfor %}
+            {% endif %}
+
+            {% if user.profile.article_proposal.all.count != 0 %}
+
+
+            <div class="grid-x grid-paggin-x cell align-center large-8">
+                <div class="callout primary">
+                    <p>
+                        Cuando su propuesta sea recibida, recibirá un correo electrónico con su carta de recepción.
+                        También
+                        podrá ver su carta de recepción desde el botón "Ver" en la columna "Carta de recepción".
+                    </p>
+
+                    <p>
+                        Puedes editar tu propuesta de artículo hasta que sea recibida.
+                    </p>
                 </div>
+            </div>
+
+            {% with articles=user.profile.article_proposal.all %}
+
+            <table>
+                <thead>
+                    <th style="width:30%">Titulo</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center" style="width:10%">Carta de recepción</th>
+                    <th class="text-center" style="width:40%">Acciones</th>
+                </thead>
 
 
 
-                {% endfor %}
-                {% endif %}
+                {% for article in articles %}
+                {% if article.publication == current_publication %}
 
-                {% if user.profile.article_proposal.all.count != 0 %}
+                <tbody>
+                    <tr>
+                        <td style="font-size:15px">{{ article.title }}</td>
+                        <td class="text-center">
 
+                            <small>
+                                {% if article|is_assigned %}
 
-                <div class="grid-x grid-paggin-x cell align-center large-8">
-                    <div class="callout primary">
-                        <p>
-                            Cuando su propuesta sea recibida, recibirá un correo electrónico con su carta de recepción.
-                            También
-                            podrá ver su carta de recepción desde el botón "Ver" en la columna "Carta de recepción".
-                        </p>
-                    </div>
-                </div>
-                {% endif %}
-                {% with articles=user.profile.article_proposal.all %}
-
-                <table>
-                    <thead>
-                        <th>Titulo</th>
-                        <th>Estado</th>
-                        <th class="text-center">Carta de recepción</th>
-                        <th>Acciones</th>
-                    </thead>
-
-
-
-                    {% for article in articles %}
-                    {% if article.publication == current_publication %}
-
-                    <tbody>
-                        <tr>
-                            <td style="font-size:15px">{{ article.title }}</td>
-                            <td class="text-center">
-                                <small> {% if article.status == "2" %}
-                                    <i class="fi-check" style="color: green;"></i>
-
-                                    &nbsp; Recibido
-                                </small>
-
+                                {% if article.assignment.completed %}
+                                <i class="fi-check" style="color: green;"></i>
+                                Arbitrado
                                 {% else %}
+                                {# asignado #}
+                                <i class="fi-info" style="color: blue;"></i>
+                                Asignado
+                                {% endif %}
+
+
+                                {% elif article.status == "2" %}
+                                <i class="fi-check" style="color: green;"></i>
+
+                                &nbsp; Recibido
+
+                                {% elif article.status == "1" %}
                                 Sin recibir
-                                {% endif %}
 
-                            </td>
-                            <td class="text-center">
-                                <!--Ver dictamen-->
-                                {% if article.reception_letter.url is not null %}
-                                <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
-                                    style="text-decoration: none;" target="_blank">
-                                    <i class="fi-eye"></i>
-                                    Ver</a>
+
 
                                 {% endif %}
-                            </td>
-
-                            <td class="text-center">
-                                <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
-                                    style="text-decoration: none;" class="btn btn-link">
-                                    <i class="fi-pencil"></i>
-                                    Editar</a>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    {% endif %}
-
-                    {% endfor %}
-
-                    {% endwith %}
-                </table>
+                            </small>
 
 
-                <div class="grid-x grid-paggin-x cell align-center large-8">
-                    <div class="cell medium-4 large-3 small-6">
-                        <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Iniciar
-                            propuesta</a>
-                    </div>
-                </div>
+                        </td>
+                        <td class="text-center">
+                            <!--Ver dictamen-->
+                            {% if article.reception_letter.url is not null %}
+                            <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
+                                style="text-decoration: none;" target="_blank">
+                                <i class="fi-eye"></i>
+                                Ver</a>
 
-            </div>
+                            {% endif %}
+                        </td>
 
-        </div>
-    </div>
-    {% else %}
-    <div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
-        <div class="card" style="width: 100%;">
-            <div class="card-divider">
+                        <td class="text-center">
+                            {% if article|is_assigned %}
+                            {% if article.assignment.completed %}
 
-                <h4 class="cell medium-6">
-                    <p class="text-center title-white"> Asignaciones</p>
-                </h4>
-            </div>
-            <div class="card-section">
-                {% if messages %}
-                {% for message in messages %}
-                <div
-                    class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
-                    {{ message }}
-                </div>
+                            <a href="" style="text-decoration:none;" class="btn btn-link">
+                                <i class="fi-check"></i>
+                                Corregir</a>
+                            {% else %}
+
+                            {% endif %}
+
+                            {% elif article.status != "2" %}
+
+                            <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
+                                style="text-decoration: none;" class="btn btn-link">
+                                <i class="fi-pencil"></i>
+                                Editar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+
+                {% endif %}
 
                 {% endfor %}
-                {% endif %}
 
-                {% if user.profile.assignments.all.count != 0 %}
-                <div class="grid-x grid-padding-x cell align-center ">
-                    <div class="callout primary cell">
-                        <p>
-                            Se le asignó la revisión de las siguientes propuestas:
-                        </p>
-                    </div>
-                </div>
+                {% endwith %}
 
+            </table>
 
-                <table>
-                    <thead>
-                        <th>Propuesta</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Acciones</th>
-                    </thead>
-                    {% with assignments=user.profile.assignments.all %}
-                    {% for assignment in assignments %}
-                    <tbody>
-                        <tr>
-                            <td style="font-size:15px">{{ assignment.article.title }}</td>
-                            <td class="text-center">
-                                <small> {% if assignment.completed %}
-                                    <i class="fi-check" style="color: green;"></i>
-
-                                    &nbsp; Completado
-                                </small>
-
-                                {% else %}
-                                Sin completar
-                                {% endif %}
-                            </td>
-                            <td >
-                                <div class="grid-x grid-padding-x align-center">
-                                    <div class="cell medium-6 " >
-                                        
-                                        <a href="{% url 'article_review:review_detail' assignment.review.id %}" <i
-                                            class="fi-eye"></i> Ver</a>
-                                    </div>
-                                </div>
-                            </td>
-
-                        </tr>
-                    </tbody>
-                    {% endfor %}
-                    {% endwith %}
-                </table>
-
-                {% else %}
-                <div class="grid-x grid-padding-x cell align-center ">
-                    <div class="callout warning cell">
-                        <p>
-                            No se le ha asignado ninguna propuesta para revisar.
-                        </p>
-                    </div>
-                </div>
-                {% endif %}
+            {% else %}
+            <div class="grid-x grid-paggin-x cell align-center large-8">
+                <p>
+                    No ha iniciado ninguna propuesta de artículo para esta publicación.
+                </p>
             </div>
+            {% endif %}
+            <div class="grid-x grid-paggin-x cell align-center large-8">
+                <div class="cell medium-4 large-3 small-6">
+                    <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Iniciar
+                        propuesta</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% else %}
+<div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
+    <div class="card" style="width: 100%;">
+        <div class="card-divider">
+
+            <h4 class="cell medium-6">
+                <p class="text-center title-white"> Asignaciones</p>
+            </h4>
+        </div>
+        <div class="card-section">
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                class="callout {% if message.tags == 'success' %}success {% elif message.tags == 'error' %}alert {% endif %}">
+                {{ message }}
+            </div>
+
+            {% endfor %}
+            {% endif %}
+
+            {% if user.profile.assignments.all.count != 0 %}
+            <div class="grid-x grid-padding-x cell align-center ">
+                <div class="callout primary cell">
+                    <p>
+                        Se le asignó la revisión de las siguientes propuestas:
+                    </p>
+                </div>
+            </div>
+
+
+            <table>
+                <thead>
+                    <th style="width:20%">
+                        Propuesta</th>
+                    <th class="text-center" style="width:10%">Estado</th>
+                    <th class="text-center" style="width:45%">Acciones</th>
+                </thead>
+                {% with assignments=user.profile.assignments.all %}
+                {% for assignment in assignments %}
+                <tbody>
+                    <tr>
+                        <td style="font-size:15px">{{ assignment.article.title }}</td>
+                        <td class="text-center">
+                            <small> {% if assignment.completed %}
+                                <i class="fi-check" style="color: green;"></i>
+
+                                &nbsp; Completado
+                            </small>
+
+                            {% else %}
+
+                            {% for review in assignment.reviews.all %}
+                            {% if review.referee == request.user.profile %}
+                            {% if review.enviado %}
+                            <i class="fi-info" style="color: green;"></i>
+                            &nbsp; Correciones cargadas
+                            {% else %}
+
+                            Sin completar
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="grid-x  align-center">
+                                <div class="cell">
+
+                                    <a class="button"
+                                        href="{% url 'article_review:review_detail' assignment|get_review_id:request.user %}">
+                                        <i class="fi fi-torso-business"></i> Arbitrar</a>
+                                    &nbsp;
+                                    {% if assignment.review.notes.all.count != 0 %}
+                                    <button class="button" data-open="reveal_{{assignment.article.slug}}">
+                                        {# enviar correciones #}
+                                        <i class="fi fi-mail"></i> Enviar correciones</button>
+
+                                    <div class="reveal" id="reveal_{{assignment.article.slug}}"
+                                        aria-labelledby="header-{{assignment.article.slug}}" data-reveal>
+                                        <h5 id="header-{{assignment.article.slug}}">Enviar correciones
+                                            del artículo {{ assignment.article.title }}
+                                        </h5>
+                                        <div class="callout primary">
+                                            <p class="lead">Una vez que aceptes enviar las correciones con las notas
+                                                agregadas, no podrás modificarlas.</p>
+                                        </div>
+
+                                        <div class="callout alert">
+                                            <p>¿Estás seguro de que deseas enviar las correcciones?</p>
+                                        </div>
+                                        <form method="POST" class="text-center"
+                                            action="{% url 'correction_sending:correction_sending' assignment|get_review_id:request.user %}">
+                                            {% csrf_token %}
+                                            <input class="button success" style="color:white;" type="submit" name="btn"
+                                                value="Si">
+                                            <button class="button alert">No </button>
+                                        </form>
+
+                                        <button class="close-button" data-close aria-label="Close Accessible Modal"
+                                            type="button">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                </tbody>
+                {% endfor %}
+                {% endwith %}
+            </table>
+
+            {% else %}
+            <div class="grid-x grid-padding-x cell align-center ">
+                <div class="callout warning cell">
+                    <p>
+                        No se le ha asignado ninguna propuesta para revisar.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 </div>
 {% comment %}
 <div class="container">
