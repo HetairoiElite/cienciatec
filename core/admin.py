@@ -220,3 +220,52 @@ class HomeAdmin(admin.ModelAdmin):
 
 # * admin
 admin.site.register(Home, HomeAdmin)
+
+
+from django.contrib import admin
+from cabinet.admin import FileAdmin
+from cabinet.models import File
+from django.utils.formats import date_format
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+from django.template.defaultfilters import filesizeformat
+
+# Register your models here.
+
+
+class CustomFileAdmin(FileAdmin):
+
+    @admin.display(description='Detalles')
+    def admin_details(self, instance):
+        details = [
+            instance.caption,
+            instance.copyright,
+            _("Creado en %(created_at)s, ultima modificación %(updated_at)s")
+            % {
+                "created_at": date_format(instance.created_at, "SHORT_DATE_FORMAT"),
+                "updated_at": date_format(instance.updated_at, "SHORT_DATE_FORMAT"),
+            },
+        ]
+        return format_html(
+            "<small>{}</small>",
+            format_html_join(mark_safe("<br>"), "{}", ((d,)
+                             for d in details if d)),
+        )
+        
+    admin_details.short_description = "Detalles"
+    
+    def admin_file_name(self, instance):
+        return format_html(
+            "{} <small>({})</small>",
+            instance.file_name,
+            filesizeformat(instance.file_size),
+        )
+        
+    admin_file_name.short_description = "Nombre del archivo"
+
+# * Unregister the default FileAdmin
+admin.site.unregister(File)
+
+# * Register the custom FileAdmin
+admin.site.register(File, CustomFileAdmin)
