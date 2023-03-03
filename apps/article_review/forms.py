@@ -14,10 +14,16 @@ class ReviewForm(forms.ModelForm):
         labels = {
             'comments': 'Comentarios',
         }
+        
+        widgets = {
+            'comments': forms.Textarea(
+                attrs=({
+                    'placeholder': 'Comentarios',
+                    'rows': 3,
+                })
+            )
+        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['comments'].widget.attrs['rows'] = 10
 
     def clean(self):
         cleaned_data = super().clean()
@@ -25,13 +31,15 @@ class ReviewForm(forms.ModelForm):
         comments = cleaned_data.get('comments')
 
         if len(comments) > 1000:
-            self.add_error('comments', 'El comentario no puede tener más de 1000 caracteres')
+            self.add_error(
+                'comments', 'El comentario no puede tener más de 1000 caracteres')
 
     def save(self, commit=True):
         review = super().save(commit=False)
         review.save()
         return review
-    
+
+
 class NotesForm(forms.ModelForm):
 
     class Meta:
@@ -44,4 +52,20 @@ class NotesForm(forms.ModelForm):
         labels = {
             'description': 'Nota',
             'line': 'Línea',
+        }
+
+        widgets = {
+            'line': forms.NumberInput(
+                attrs=({
+                    'placeholder': 'Línea',
+                    'required': 'true'
+                })
+            ),
+            'description': forms.Textarea(
+                attrs=({
+                    'placeholder': 'Nota',
+                    'rows': 2,
+                    'required': 'true'
+                })
+            )
         }
