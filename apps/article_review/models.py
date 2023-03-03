@@ -16,7 +16,7 @@ class Note(models.Model):
     )
     line = models.PositiveIntegerField(verbose_name='Línea')
     description = models.CharField(max_length=100, verbose_name='Descripción')
-    value = models.BooleanField(verbose_name='Corregido')
+    value = models.BooleanField(verbose_name='Corregido', default=False)
 
     class Meta:
         verbose_name = 'Nota'
@@ -27,11 +27,17 @@ class Note(models.Model):
 
 
 class Review(TimeStampedModel):
-    assignment = models.OneToOneField(
-        'Asignacion_Arbitros.Assignment', on_delete=models.CASCADE, related_name='review', verbose_name='Asignación'
+    referee = models.OneToOneField(
+        'registration.Profile', on_delete=models.CASCADE, related_name='review', verbose_name='Arbitro'        
+    )
+    assignment = models.ForeignKey(
+        'Asignacion_Arbitros.Assignment', on_delete=models.CASCADE, related_name='reviews', verbose_name='Asignación'
     )
 
-    comments = models.TextField(verbose_name='Comentarios', blank=True, null=True)
+    comments = models.TextField(
+        verbose_name='Comentarios', blank=True, null=True)
+
+    enviado = models.BooleanField(verbose_name='Enviado', default=False)
 
     class Meta:
         verbose_name = 'Revisión'
