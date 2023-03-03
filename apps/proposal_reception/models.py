@@ -151,6 +151,13 @@ class ArticleProposal(TimeStampedModel):
             import shutil
 
             pythoncom.CoInitialize()
+            
+            # * delete old template to downloads folder
+            
+            try:
+                os.remove(settings.BASE_DIR / 'downloads' / 'template.docx')
+            except:
+                pass
 
             # * copy template to downloads folder
             shutil.copy(self.template.path, settings.BASE_DIR /
