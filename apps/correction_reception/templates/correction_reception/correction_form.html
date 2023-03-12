@@ -1,0 +1,121 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+Recepción de correciones de la propuesta {{correction}}
+{% endblock title %}
+
+{% block back %}
+<a href="{% url 'core_dashboard:dashboard' %}" class="button clear">
+    {% block back_button %}
+    {{ block.super }}
+    {% endblock back_button %}
+</a>
+{% endblock back %}
+
+{% block path %}
+<li>
+    <a href="{% url 'home' %}">
+        Inicio
+    </a>
+</li>
+<li>
+    <a href="{% url 'core_dashboard:dashboard' %}">
+        Tablero
+    </a>
+</li>
+<li>
+    <a class="disabled">
+        Recepción de correciones
+    </a>
+</li>
+<li>
+    <span class="show-for-sr">Current: </span> {{correction}}
+</li>
+
+{% endblock path %}
+
+{% block content %}
+<div class="grid-x grid-margin-x align-center" style="margin-top: 1em;">
+
+    <!-- bloque de blog principal -->
+    <div class="cell small-9 medium-9 large-9 align-self-middle">
+
+        <div class="card" style="width: 100%;">
+            <div class="card-divider">
+                <h4 class="cell medium-6">
+                    <p class="text-center title-white">Recepción de correciones</p>
+                </h4>
+
+            </div>
+            <div class="card-section">
+
+                <div class="callout primary">
+                    <p>
+                        Sube el documento corregido. Debes marcar todas las correciones para poder enviar el
+                        documento.
+                        Al marcar las correcione estas aceptando que el documento esta corregido y no se volverá a
+                        corregir.
+                    </p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="custom" data-abide novalidate>
+                    {% csrf_token %}
+
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell">
+                            <label>
+                                {{form.correction_file.label}}*:
+                                {{form.correction_file}}
+
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="grid-x grid-padding-x grid-margin-x">
+                        <div class="cell">
+                            {{form.corrections.label}}*:
+                            {% for choice in form.fields.corrections.choices %}
+
+                            <label>
+
+                                {% if forloop.first %}
+
+                                <input data-min-required="{{notes.count}}" type="checkbox" name="corrections"
+                                    value="{{ choice.0 }}" required>
+                                {{ choice.1 }}
+                                {% else %}
+
+                                <input type="checkbox" name="corrections" value="{{ choice.0 }}" required>
+                                {{ choice.1 }}
+                                {% endif %}
+                            </label>
+                            {% endfor %}
+                            <span class="help-text" data-form-error-for="corrections">
+                                Debes marcar todas las correciones.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="grid-x grid-padding-x grid-margin-x">
+                        <div class="cell">
+                            <button class="button" type="submit">Enviar</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script>
+    // * validate checkbox 
+    $('#co').foundation('validateCheckbox', 'corrections');
+</script>
+
+{% endblock scripts %}
