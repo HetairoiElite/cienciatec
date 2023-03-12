@@ -4,6 +4,7 @@ from apps.article_review.models import Review
 from django.contrib import messages
 from django.shortcuts import redirect
 # Create your views here.
+from apps.correction_reception.models import ArticleCorrection
 
 # * Importar los modelos
 
@@ -45,6 +46,10 @@ class CorrectionSendingView(View):
                 else:
                     assignment.completed = True
                     assignment.save()
+                    
+                    ArticleCorrection.objects.get_or_create(article=assignment.article)
+                    
+                    
                     messages.success(
                         request, 'Se ha enviado la corrección y se ha notificado al autor.')
 
