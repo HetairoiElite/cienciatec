@@ -1,5 +1,13 @@
 {% extends "core/base.html" %}
 
+{% block back %}
+<a href="{% url 'core_dashboard:dashboard' %}" class="button clear">
+    {% block back_button %}
+    {{ block.super }}
+    {% endblock back_button %}
+</a>
+{% endblock back %}
+
 {% block path %}
 {# Path #}
 <li><a href="{% url 'home' %}">Inicio</a></li>
@@ -26,9 +34,6 @@
 
 
 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
-
-
-
     <div class="grid-x grid-margin-x align-center">
         <div class="cell small-9 medium-9 large-9">
 

@@ -2,6 +2,14 @@
 {% load static %}
 {% block title %}Registro{% endblock %}
 
+{% block back %}
+<a href="{% url 'home' %}" class="button clear">
+    {% block back_button %}
+    {{ block.super }}
+    {% endblock back_button %}
+</a>
+{% endblock back %}
+
 {% block path %}
 
 <li>
@@ -51,7 +59,7 @@
                                     {% if field.label == 'Nombre(s)' %}
                                     Debe ser un nombre valido (solo letras). Máximo 2 nombres.
                                     {% elif field.label == 'Nombre de usuario' %}
-                                    
+
                                     {% elif 'Apellido' in field.label %}
                                     Debe ser un apellido valido (solo letras).
                                     {% elif field.label == 'Correo electrónico' %}

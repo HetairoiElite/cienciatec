@@ -4,6 +4,14 @@
 
 {% block title %}Tablero{% endblock title %}
 
+{% block back %}
+<a href="{% url 'home' %}" class="button clear">
+    {% block back_button %}
+    {{ block.super }}
+    {% endblock back_button %}
+</a>
+{% endblock back %}
+
 {% block path %}
 {# Path #}
 <li><a href="{% url 'home' %}">Inicio</a></li>
@@ -62,10 +70,11 @@
 
             <table>
                 <thead>
-                    <th style="width:30%">Titulo</th>
-                    <th class="text-center">Estado</th>
-                    <th class="text-center" style="width:10%">Carta de recepción</th>
-                    <th class="text-center" style="width:40%">Acciones</th>
+                    <th style="width:20%">Titulo</th>
+                    <th class="text-center" style="width:10%">Estado</th>
+                    <th class="text-center" style="width:5%">Carta de recepción</th>
+                    <th class="text-center" style="width:20%">Acciones</th>
+                    <th class="text-center" style="width:10%">Dictamen</th>
                 </thead>
 
 
@@ -82,8 +91,24 @@
                                 {% if article|is_assigned %}
 
                                 {% if article.assignment.completed %}
+
+
+                                {% if article.correction is not None %}
+
+                                {% if not article.correction.correction_file %}
+                                <i class="fi-info" style="color: blue;"></i>
+                                Sin corregir
+                                {% else %}
+                                <i class="fi-check" style="color: green;"></i>
+                                Corregido
+                                {% endif %}
+
+                                {% else %}
+
                                 <i class="fi-check" style="color: green;"></i>
                                 Arbitrado
+                                {% endif %}
+
                                 {% else %}
                                 {# asignado #}
                                 <i class="fi-info" style="color: blue;"></i>
@@ -121,9 +146,20 @@
                             {% if article|is_assigned %}
                             {% if article.assignment.completed %}
 
-                            <a href="" style="text-decoration:none;" class="btn btn-link">
+                            {% if article.correction is not None %}
+
+                            {% if not article.correction.correction_file %}
+
+
+                            <a href="{% url 'correction_reception:correction_form' article.correction.id %}"
+                                style="text-decoration:none;" class="btn btn-link">
                                 <i class="fi-check"></i>
                                 Corregir</a>
+                            {% endif %}
+
+                            {% endif %}
+
+
                             {% else %}
 
                             {% endif %}
@@ -136,6 +172,21 @@
                                 Editar</a>
                             {% endif %}
                         </td>
+
+                        {% if article|is_assigned %}
+                        {% if article.assignment.completed %}
+
+                        {% if article.correction is not None %}
+
+                        {% if not article.correction.correction_file %}
+                        <td class="text-center">
+
+                        </td>
+                        {% endif %}
+
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
                     </tr>
                 </tbody>
 

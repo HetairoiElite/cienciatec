@@ -4,6 +4,13 @@
 {% endblock title %}
 {% load static %}
 
+{% block back %}
+<a href="{% url 'core_dashboard:dashboard' %}" class="button clear">
+    {% block back_button %}
+    {{ block.super }}
+    {% endblock back_button %}
+</a>
+{% endblock back %}
 
 {% block path %}
 <li>
