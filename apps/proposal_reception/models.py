@@ -98,7 +98,7 @@ class ArticleProposal(TimeStampedModel):
                                related_name='article_proposals', verbose_name='Institución de adscripción', null=True, blank=True)
 
     new_school = models.CharField(
-        max_length=100, verbose_name='Credito de escuela', null=True, blank=True)
+        max_length=100, verbose_name='Crédito de escuela', null=True, blank=True)
 
     template = models.FileField(
         verbose_name='Plantilla', upload_to=custom_upload_to_user_template)
@@ -117,6 +117,12 @@ class ArticleProposal(TimeStampedModel):
     STATUS_CHOICES = (
         ('1', 'En espera'),
         ('2', 'Recibido'),
+        ('3', 'Asignado'),
+        ('4', 'En revisión'),
+        ('5', 'Revisado'),
+        ('6', 'Corregido'),
+        ('7', 'Aceptado'),
+        ('8', 'Rechazado'),
     )
 
     status = models.CharField(
