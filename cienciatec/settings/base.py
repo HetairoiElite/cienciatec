@@ -77,6 +77,7 @@ LOCAL_APPS = [
     'apps.proposal_reception',
     'apps.reviewer_assignment',
     'apps.article_review',
+    'apps.correction_reception',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS +  DJANGO_APPS
