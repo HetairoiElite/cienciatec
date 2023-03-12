@@ -20,57 +20,70 @@
             <div class="top-bar-left ">
 
                 <ul class="dropdown menu" data-dropdown-menu style="background-color: #212531;">
-                    {% comment %} <li class="menu-text align-self-middle" style="color: white;">{{home.title}}
-                    </li>
-                    {% endcomment %}
-                    <li class="align-self-middle"><button class="button primary " type="button"
+                    <li class="align-self-middle"><button class="button primary" style="color:white;" type="button"
                             data-toggle="offCanvasLeft">
                             <i class="fi-list"></i>
                             <span id="menuop">Menu</span>
 
                         </button></li>
-
-                    <li><a href="{% url 'home' %}"><img id="brand" src="{{home.brand_image.url}}" width="160px"></a>
+                    <li>
+                        <a href="{% url 'home' %}"><img id="brand" src="{{home.brand_image.url}}" width="160px"></a>
                     </li>
-                    {# menu #}
-
                 </ul>
             </div>
             <div class="top-bar-right hide-for-small-only" id="inicio" style="background-color: #212531;">
-                <ul class="menu">
-                    <li><a class="button primary" href="{% url 'home' %}">
+                <ul class="menu" style="color:white;  background-color: inherit;">
+                    <li><a class="button clear" style="color:white; 
+                        {% if request.user.is_authenticated %}
+                        margin-top:7px;
+                        {% endif %}
+                        " href=" {% url 'home' %}">
                             <i class="fi-home"></i>
                             <span>Inicio</span>
                         </a></li>
                     {% if not request.user.is_authenticated %}
 
-                    <li><a class="button success" style="color:white;" href="{% url 'login' %}">
+                    <li>
+                        <a class="button clear" style="color:white; " href=" {% url 'login' %}">
                             <i class="fi-lock"></i>
-                            Iniciar sesión</a></li>
-                    <li><a class="button primary" href="{% url 'registration:signup' %}">
+                            Iniciar sesión</a>
+                    </li>
+                    <li>
+                        <a class="button clear" style="color:inherit;" href=" {% url 'registration:signup' %}">
                             <i class="fi-burst-new"></i>
-                            Registrarse</a></li>
+                            Registrarse</a>
+                    </li>
 
                     {% endif %}
                     {% if request.user.is_authenticated %}
 
-                    <li><a class="button secondary" href="{% url 'registration:profile' %}?edit">
-                            <i class="fi-torso"></i>
-                            <span id="perfil">Perfil</span>
-                        </a></li>
-                    <li><a class="button alert" href="{% url 'logout' %}">
-                            <i class="fi-power"></i>
-                            <span id="exit">Salir</span>
-                        </a></li>
+                    <li>
+                        <ul class="dropdown menu" data-dropdown-menu
+                            style="background-color: inherit; color: white; border: none;">
+                            <li>
+                                <a href="#" class="button clear" style="color:inherit">
+                                    <img src="{{request.user.profile.avatar.url}}" width="30px" height="30px"
+                                        style="border-radius: 50%; margin-right: 10px; position:relative;">
+                                    {{request.user.get_full_name}}</a>
+                                <ul class="menu" style="color:white;  background-color: #212531">
+                                    <li><a style="color:white;" href="{% url 'registration:profile' %}?edit">
+                                            <i class="fi-torso"></i>
+                                            Perfil</a></li>
+                                    <li><a style="color:white;" href="{% url 'logout' %}">
+                                            <i class="fi-power"></i>
+                                            Salir</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
                     {% endif %}
                 </ul>
             </div>
         </div>
-
-
     </div>
-
 </div>
+
 <div class="absolute-logo">
     <img src="{% static 'core/img/bookmarklogo.png' %}" width="70%">
 </div>
