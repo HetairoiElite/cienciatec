@@ -97,9 +97,45 @@
         #loading-image {
             z-index: 100;
         }
+
+        #myBtn {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Fixed/sticky position */
+            bottom: 20px;
+            /* Place the button at the bottom of the page */
+            right: 30px;
+            /* Place the button 30px from the right */
+            z-index: 99;
+            /* Make sure it does not overlap */
+            border: none;
+            /* Remove borders */
+            outline: none;
+            /* Remove outline */
+            /* Set a background color */
+            color: white;
+            /* Text color */
+            cursor: pointer;
+            /* Add a mouse pointer on hover */
+            padding: 15px;
+            /* Some padding */
+            border-radius: 10px;
+            /* Rounded corners */
+            font-size: 18px;
+            /* Increase font size */
+        }
+
+        #myBtn:hover {
+            background-color: #555;
+            /* Add a dark-grey background on hover */
+        }
     </style>
 
 
+    <button onclick="topFunction()" id="myBtn" title="Go to top" class="button secondary">
+        <i class="fi-arrow-up"></i>
+    </button>
 
     <!-- FIN del primer bloque home -->
     <div class="off-canvas-wrapper" style="margin-bottom: 100px;">
@@ -119,6 +155,12 @@
                         </li>
                     </div>
                     {% if request.user.is_authenticated %}
+                    <div class="cell large-11">
+                        <li><a style="color:white;" href="{% url 'registration:profile' %}?edit">
+                                <i class="fi-torso"></i>
+                                Perfil</a>
+                        </li>
+                    </div>
                     {% if not request.user|has_group:"Administrador" and not request.user.is_superuser %}
 
                     <div class="cell large-11">
@@ -176,15 +218,21 @@
                 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
                     <div class="cell align-left large-10 medium-10 small-10">
+                        {% block back %}
                         <a href="{{request.META.HTTP_REFERER}}" class="button clear
                         {% if request.META.HTTP_REFERER ==  request.build_absolute_uri %}
                         disabled
                         {% endif %}
                         ">
+
+                            {% block back_button %}
                             <i class="fi-arrow-left"></i>
                             Volver
+                            {% endblock back_button %}
 
                         </a>
+                        {% endblock back %}
+
 
                         <nav aria-label="You are here:" role="navigation">
                             <ul class="breadcrumbs">
@@ -245,6 +293,10 @@
             return result;
         };
 
+        $('.disabled').click(function (e) {
+            return false;
+        });
+
         Foundation.Abide.defaults.validators['regex2title'] = function (el) {
             console.log(el.val())
             var title = el.val();
@@ -275,6 +327,33 @@
 
 
         $(document).foundation()
+
+        // Get the button:
+        let mybutton = document.getElementById("myBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+
+            while (document.body.scrollTop > 0 || document.documentElement.scrollTop > 0) {
+                document.body.scrollTop -= 0.1;
+                document.documentElement.scrollTop -= 0.1;
+            }
+
+
+        }
     </script>
 
     {% block scripts %}
