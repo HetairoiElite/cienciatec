@@ -18,6 +18,20 @@ from django.urls import path, re_path
 from django.conf.urls import include
 from django.conf import settings
 
+from jet.dashboard.dashboard_modules import google_analytics_views
+from django.utils.translation import gettext_lazy as _
+from jet.dashboard.dashboard import Dashboard, AppIndexDashboard
+from jet.dashboard.dashboard_modules import google_analytics
+
+
+class CustomIndexDashboard(Dashboard):
+    columns = 3
+
+    def init_with_context(self, context):
+       self.available_children.append(google_analytics.GoogleAnalyticsVisitorsTotals)
+       self.available_children.append(google_analytics.GoogleAnalyticsVisitorsChart)
+       self.available_children.append(google_analytics.GoogleAnalyticsPeriodVisitors)
+
 
 urlpatterns = [
     # path("chat/", include("apps.chat.urls")),
@@ -59,6 +73,7 @@ urlpatterns = [
 admin.site.site_header = "CienciaTec"
 admin.site.index_title = "Panel de administración de CienciaTec"
 admin.site.site_title = "CienciaTec"
+
 
 if settings.DEBUG:
     from django.conf.urls.static import static
