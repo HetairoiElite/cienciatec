@@ -87,46 +87,31 @@
                         <td style="font-size:15px">{{ article.title }}</td>
                         <td class="text-center">
 
-                            <small>
-                                {% if article|is_assigned %}
+                            <small data-tooltip tabindex="1" title="{% with article.status as status %} {% if status == "1" %} Tu artículo será recibo por el comité editorial.
+                                {% elif status == "2" %} Tu artículo ha sido recibido por el comité editorial. En cualquier momento será asignado para su arbitraje.
+                                 {% elif status == "3" %} Tu artículo ha sido asignado para su arbitraje. En cualquier momento será enviado para su corrección.
+                                  {% elif status == "4" %} {% endif %}
+                                {% endwith %}">
 
-                                {% if article.assignment.completed %}
+                                {% with article.status as status %}
+                                {% if status == "1" %}
 
+                                <i class="fi-info" style="color:blue;"></i>
 
-                                {% if article.correction is not None %}
+                                {% elif status == "2" %}
+                                <I class="fi-check" style="color:green"></i>
 
-                                {% if not article.correction.correction_file %}
-                                <i class="fi-info" style="color: blue;"></i>
-                                Sin corregir
-                                {% else %}
-                                <i class="fi-check" style="color: green;"></i>
-                                Corregido
+                                {% elif status == "3" %}
+
+                                <i class="fi-clipboard-pencil" style="color:blue;"></i>
+
+                                {% elif status == "4" %}
+                                <i class="fi-info" style="color:yellow;"></i>
                                 {% endif %}
-
-                                {% else %}
-
-                                <i class="fi-check" style="color: green;"></i>
-                                Arbitrado
-                                {% endif %}
-
-                                {% else %}
-                                {# asignado #}
-                                <i class="fi-info" style="color: blue;"></i>
-                                Asignado
-                                {% endif %}
+                                {% endwith %}
+                                {{article.get_status_display}}
 
 
-                                {% elif article.status == "2" %}
-                                <i class="fi-check" style="color: green;"></i>
-
-                                &nbsp; Recibido
-
-                                {% elif article.status == "1" %}
-                                Sin recibir
-
-
-
-                                {% endif %}
                             </small>
 
 
@@ -250,7 +235,8 @@
                 <thead>
                     <th style="width:20%">
                         Propuesta</th>
-                    <th class="text-center" style="width:10%">Estado</th>
+                    <th class="text-center" style="width:20%">Estado</th>
+                    <th class="text-center" style="width:15%">Revisiones</th>
                     <th class="text-center" style="width:45%">Acciones</th>
                 </thead>
                 {% with assignments=user.profile.assignments.all %}
@@ -259,26 +245,46 @@
                     <tr>
                         <td style="font-size:15px">{{ assignment.article.title }}</td>
                         <td class="text-center">
-                            <small> {% if assignment.completed %}
-                                <i class="fi-check" style="color: green;"></i>
+                            <small class="text-center" data-tooltip tabindex="1" title="
+                            {% if assignment.completed %}
+                            El artículo ha sido arbitrado.
+                            {% else %}
+                            El proceso de arbitraje aún no ha sido completado.
+                            {% endif %}
+                            ">
 
-                                &nbsp; Completado
+                                {% if assignment.completed %}
+                                <i class="fi-check" style="color: green;"></i>
+                                Completado
+                                {% else %}
+
+
+                                <i class="fi-info" style="color: red;"></i>
+                                Sin completar
+
+
+                                {% endif %}
+
                             </small>
 
+                        </td>
+                        <td class="text-center">
+                            {% with  assignment|get_sent_reviews as countr %}
+                            <small data-tooltip tabindex="1" title="{% if countr == 0 %}
+                            No se ha enviado ninguna revisión por parte de usted o de su compañer@
+                            {% elif countr == 1 %}
+                            
+                            {% if assignment|get_is_sent:request.user %}
+                            Tu revisión será enviada cuando tu compañer@ envíe la suya.
                             {% else %}
-
-                            {% for review in assignment.reviews.all %}
-                            {% if review.referee == request.user.profile %}
-                            {% if review.enviado %}
-                            <i class="fi-info" style="color: green;"></i>
-                            &nbsp; Correciones cargadas
+                            Tu compañer@ ha enviado su revisión.
+                            {% endif %}
                             {% else %}
-
-                            Sin completar
-                            {% endif %}
-                            {% endif %}
-                            {% endfor %}
-                            {% endif %}
+                            Se han enviado todas las revisiones
+                            {% endif %}">
+                                {{countr}}/2 Revisiones
+                            </small>
+                            {% endwith %}
                         </td>
                         <td class="text-center">
                             <div class="grid-x  align-center">
@@ -344,12 +350,7 @@
 </div>
 {% endif %}
 </div>
-{% comment %}
-<div class="container">
-    <div draggable="true" class="box">A</div>
-    <div draggable="true" class="box">B</div>
-    <div draggable="true" class="box">C</div>
-</div> {% endcomment %}
+
 {% endblock content %}
 
 {% block scripts %}
