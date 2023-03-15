@@ -1,14 +1,56 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.html import format_html
+from django.db.models import Q
 # Register your models here.
+
+from jet import admin as jet_admin
 
 from .models import *
 from .forms import AssignmentForm
-from apps.article_review.models import Review
+
+from apps.article_review.models import Review, Note
+
+
+class ReviewInline(jet_admin.CompactInline):
+
+    def get_notes(self, obj):
+
+        return format_html('<ul>' + '\n'.join(
+
+            ['<li>Línea\t' + str(nota.line) + ': ' + str(nota) + '</li>'
+             for nota in Note.objects.filter(
+                review=obj
+            )
+            ]) + '</ul>')
+
+    get_notes.short_description = format_html(
+        """<i class="fi-clipboard-notes"
+        style="color:gray"> </i>Notas""")
+
+    # * can't add
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    model = Review
+    fk_name = 'assignment'
+    can_delete = False
+    extra = 0
+    
+
+    readonly_fields = (
+        'referee',
+        'get_notes',
+        'comments',
+        'enviado'
+    )
 
 
 class AssignmentAdmin(admin.ModelAdmin):
+
+    inlines = [
+        ReviewInline
+    ]
 
     form = AssignmentForm
 
@@ -37,13 +79,16 @@ class AssignmentAdmin(admin.ModelAdmin):
 
             if 'referees' in form.changed_data and form.cleaned_data['referees'].count() > 0 or obj.referees.count() > 0:
                 obj = form.save()
+                obj.article.status = '3'
+                obj.article.save()
+                
                 obj.status = 'A'
+                obj.save()
 
                 for referee in obj.referees.all():
-                    Review.objects.get_or_create(assignment=obj, referee=referee)
-                
-                
-                
+                    Review.objects.get_or_create(
+                        assignment=obj, referee=referee)
+
                 # * send email to referees
                 from django.contrib.sites.shortcuts import get_current_site
                 from django.core.mail import EmailMessage
@@ -60,11 +105,13 @@ class AssignmentAdmin(admin.ModelAdmin):
                         from_email='jonathan90090@gmail.com',
                         to=[referee.user.email]
                     )
-                    
+
                     email.send()
 
             else:
                 obj.status = 'P'
+                obj.article.status = '2'
+                obj.save()
                 Review.objects.filter(assignment=obj).delete()
             messages.success(
                 request,
@@ -122,6 +169,7 @@ class ArticleProfileAdmin(admin.ModelAdmin):
                 )
                 obj.status = 'A'
                 obj.save()
+                
             else:
                 obj.status = 'P'
                 obj.save()
