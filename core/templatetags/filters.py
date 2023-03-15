@@ -154,3 +154,17 @@ def get_review_id(assignment, user):
         return review[0].id
     except:
         return False
+
+# * get sent revies
+
+@register.filter(name="get_sent_reviews")
+def get_sent_reviews(assignment):
+    # * count enviado = True reviews
+    return Review.objects.get_sent_reviews(assignment)
+
+# * get is sent
+
+@register.filter(name="get_is_sent")
+def get_is_sent(assignment, user):
+    # * get is sent
+    return Review.objects.get_is_sent(assignment, user)
