@@ -1,5 +1,6 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
+from .managers import ReviewManager
 # Create your models here.
 
 
@@ -27,8 +28,8 @@ class Note(models.Model):
 
 
 class Review(TimeStampedModel):
-    referee = models.OneToOneField(
-        'registration.Profile', on_delete=models.CASCADE, related_name='review', verbose_name='Arbitro'        
+    referee = models.ForeignKey(
+        'registration.Profile', on_delete=models.CASCADE, related_name='review', verbose_name='Arbitro'
     )
     assignment = models.ForeignKey(
         'Asignacion_Arbitros.Assignment', on_delete=models.CASCADE, related_name='reviews', verbose_name='Asignación'
@@ -38,10 +39,15 @@ class Review(TimeStampedModel):
         verbose_name='Comentarios', blank=True, null=True)
 
     enviado = models.BooleanField(verbose_name='Enviado', default=False)
+    
+    objects = ReviewManager()
 
     class Meta:
         verbose_name = 'Revisión'
         verbose_name_plural = 'Revisiones'
 
     def __str__(self):
-        return str(self.assignment.article)
+        if self.id % 2 == 0:
+            return 'Revisión #2'
+        else:
+            return 'Revisión #1'
