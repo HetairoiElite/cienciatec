@@ -116,13 +116,12 @@ class ArticleProposal(TimeStampedModel):
 
     STATUS_CHOICES = (
         ('1', 'En espera'),
-        ('2', 'Recibido'),
-        ('3', 'Asignado'),
-        ('4', 'En revisión'),
-        ('5', 'Revisado'),
-        ('6', 'Corregido'),
-        ('7', 'Aceptado'),
-        ('8', 'Rechazado'),
+        ('2', 'Recibido'), 
+        ('3', 'En revisión'),
+        ('4', 'Sin corrergir'),
+        ('5', 'Corregido'),
+        ('6', 'Aceptado'),
+        ('7', 'Rechazado'),
     )
 
     status = models.CharField(
