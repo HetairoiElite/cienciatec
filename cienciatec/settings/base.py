@@ -185,3 +185,9 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_BACKEND = 'django-db'
 # DEBUG=True
+
+# * JET
+
+JET_MODULE_GOOGLE_ANALYTICS_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, 'client_secrets.json')
+
+JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
