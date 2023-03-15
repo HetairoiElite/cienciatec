@@ -16,3 +16,5 @@ __pycache__/
 /apps/chat
 
 /letters
+
+/client_secrets.json
