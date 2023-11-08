@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from apps.school.models import School
 
-# Create your models here.
+
 
 
 def custom_upload_to(instance, filename):
@@ -16,7 +16,7 @@ def custom_upload_to(instance, filename):
     except:
         return 'avatars/' + filename
 
-# * Choices type user
+
 TYPE_USER = (
     ('1', 'Autor'),
     ('2', 'Arbitro'),
@@ -43,13 +43,9 @@ class Profile(models.Model):
         verbose_name_plural = 'Perfiles'
 
 
-# * Delete avatar when delete user
+
 @receiver(models.signals.pre_delete, sender=Profile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
-    """
-    Deletes file from filesystem
-    when corresponding `MediaFile` object is deleted.
-    """
     if instance.avatar:
         if instance.avatar != 'avatars/default.jpg':
             instance.avatar.delete()
