@@ -7,6 +7,9 @@
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrastyle %}
+{% comment %} icon  {% endcomment %}
+<link rel="shortcut icon" href="{{home.favicon.url}}" type="image/x-icon">
+
 
 <div id="loading" style="display:none;">
     <img id="loading-image" src="{% static 'core/img/loading.gif' %}" alt="Loading..." />
