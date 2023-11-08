@@ -31,7 +31,15 @@
 {% block content %}
 
 
+{# si hay mensaje de error #}
+{% if messages %}
+{% for message in messages %}
+<div class="callout danger">
+    {{ message }}
+</div>
 
+{% endfor %}
+{% endif %}
 
 <!-- primer bloque del home -->
 {% comment %} <div class="gridx-grid-margin-x align-right" style="margin-top: 1em;">
