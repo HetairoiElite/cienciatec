@@ -56,6 +56,15 @@ def custom_upload_to_reception_letter(instance, filename):
         return f'letters/{instance.author.user.username}/{filename}'
 
 
+def custom_upload_to_dictamen_letter(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.dictamen_letter.delete()
+        return f'dictamenes/{instance.author.user.username}/{filename}'
+    except ArticleProposal.DoesNotExist:
+        return f'dictamenes/{instance.author.user.username}/{filename}'
+
+
 def custom_upload_to_template_as_pdf(instance, filename):
     try:
         old_instance = ArticleProposal.objects.get(pk=instance.pk)
@@ -116,19 +125,24 @@ class ArticleProposal(TimeStampedModel):
 
     STATUS_CHOICES = (
         ('1', 'En espera'),
-        ('2', 'Recibido'), 
+        ('2', 'Recibido'),
         ('3', 'En revisión'),
-        ('4', 'Sin corrergir'),
+        ('4', 'Sin corregir'),
         ('5', 'Corregido'),
-        ('6', 'Aceptado'),
-        ('7', 'Rechazado'),
+        ('6', 'En dictamen'),
+        ('7', 'Aceptado'),
+        ('8', 'Rechazado'),
+        ('10', 'Publicado')
     )
 
     status = models.CharField(
-        max_length=1, choices=STATUS_CHOICES, verbose_name='Estatus', db_index=True, default='1')
+        max_length=2, choices=STATUS_CHOICES, verbose_name='Estatus', db_index=True, default='1')
 
     reception_letter = models.FileField(
         verbose_name='Carta de recepción', upload_to=custom_upload_to_reception_letter, null=True, blank=True, max_length=255)
+
+    dictamen_letter = models.FileField(
+        verbose_name='Carta de dictamen', upload_to=custom_upload_to_dictamen_letter, null=True, blank=True, max_length=255)
 
     class Meta:
         verbose_name = 'Propuesta de artículo'
@@ -156,9 +170,9 @@ class ArticleProposal(TimeStampedModel):
             import shutil
 
             pythoncom.CoInitialize()
-            
+
             # * delete old template to downloads folder
-            
+
             try:
                 os.remove(settings.BASE_DIR / 'downloads' / 'template.docx')
             except:
@@ -304,6 +318,89 @@ class ArticleProposal(TimeStampedModel):
 
         reception_letter.current_number += 1
         reception_letter.save()
+
+    def send_arbitration_report(self):
+        report_letter = Home.objects.first().report_letters
+
+        # * si el status es 7 (aceptado) se envía la carta de dictamen aprobación
+
+        if self.status == '7':
+            template_paths = (settings.BASE_DIR /
+                              'downloads/DICTAMEN-APROBADO_edit.docx').__str__()
+        elif self.status == '8':
+            template_paths = (settings.BASE_DIR /
+                              'downloads/DICTAMEN-NO-APROBADO_edit.docx').__str__()
+
+        doc = DocxTemplate(template_paths)
+
+        context = {
+            'fecha': timezone.now().strftime('%d de %B de %Y').replace(
+                'January', 'Enero').replace(
+                'February', 'Febrero').replace(
+                'March', 'Marzo').replace(
+                'April', 'Abril').replace(
+                'May', 'Mayo').replace(
+                'June', 'Junio').replace(
+                'July', 'Julio').replace(
+                'August', 'Agosto').replace(
+                'September', 'Septiembre').replace(
+                'October', 'Octubre').replace(
+                'November', 'Noviembre').replace(
+                'December', 'Diciembre'),
+            'presidente': report_letter.president,
+            'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
+            'titulo': self.title,
+            'numero': Home.objects.first().publications.get_current().numero_publicacion,
+        }
+
+        doc.render(context)
+        template_save = settings.BASE_DIR / f'downloads/Carta_de_dictamen.docx'
+        doc.save(template_save)
+
+        from dotenv import load_dotenv
+        load_dotenv()
+        import os
+
+        DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+
+        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.local':
+
+            from docx2pdf import convert
+            import pythoncom
+
+            pythoncom.CoInitialize()
+
+            convert(settings.BASE_DIR / f'downloads/Carta_de_dictamen.docx',
+                    settings.BASE_DIR / f'downloads/Carta_de_dictamen.pdf')
+
+        else:
+            import subprocess
+            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
+                                             'downloads/Carta_de_dictamen.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
+            print(output)
+
+        with open(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf', 'rb') as file:
+
+            from django.core.files import File
+
+            file = File(file)
+            self.dictamen_letter.save(
+                f'Carta_de_dictamen_{self.title}.pdf', file)
+
+            email = EmailMessage(
+                subject='Carta de dictamen',
+                body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
+                f'Adjunto se encuentra la carta de dictamen de su propuesta de artículo "{self.title}"\n\n'
+                f'Atentamente,\n'
+                f'Comité Editorial de Ciencia y Tecnología',
+            )
+            
+            email.attach_file(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf')
+            
+            email.send()
+        
+        self.save()
+         
 
 
 # * Imagenes de la propuesta
