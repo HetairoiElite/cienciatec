@@ -22,10 +22,14 @@ class Dashboard(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         publicacion = Publication.objects.get_current()
         
-        if not publicacion:
-            # * mensaje
-            messages.error(
-                request, 'No hay un periodo de publicación disponible.')
+        # * si el usuario es un autor o un editor
+        if request.user.profile.type_user == '1' or request.user.profile.type_user == '2':
+            if not publicacion:
+                # * mensaje
+                messages.error(
+                    request, 'No hay un periodo de publicación disponible.')
+                return redirect('home')
+        else:
             return redirect('home')
 
         return super().dispatch(request, *args, **kwargs)
