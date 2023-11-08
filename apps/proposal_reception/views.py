@@ -168,12 +168,12 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
 
         if not publication:
             messages.error(
-                request, 'No se ha definido un periodo de publicación')
+                request, 'No se ha definido un periodo de publicación.')
             return redirect('core_dashboard:dashboard')
 
         if request.user.profile != self.get_object().author:
             messages.error(
-                request, 'No tienes permiso para editar esta propuesta')
+                request, 'No tienes permiso para editar esa propuesta.')
             return redirect('core_dashboard:dashboard')
 
         if self.get_object().status == '2':
@@ -184,7 +184,7 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        messages.success(self.request, 'Propuesta actualizada con éxito')
+        messages.success(self.request, 'Propuesta actualizada con éxito.')
         return reverse('core_dashboard:dashboard')
 
     def get(self, request, *args, **kwargs):
