@@ -23,3 +23,5 @@ __pycache__/
 # * archivos con terminacion drawio
 
 *.drawio
+
+/extra
