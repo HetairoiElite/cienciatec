@@ -65,6 +65,14 @@ class ReceptionLetterAdmin(admin.StackedInline):
     readonly_fields = (
         'seal_preview', 'secretary_firm_preview', 'president_firm_preview')
 
+# * ReportLetterAdmin
+from .models import ReportLetter
+class ReportLetterAdmin(admin.StackedInline):
+    model = ReportLetter
+    
+    can_delete = False
+    
+    
 
 # * home admin
 
@@ -74,7 +82,8 @@ class HomeAdmin(admin.ModelAdmin):
     # * inline
     inlines = [
         ArticleTemplateInline,
-        ReceptionLetterAdmin
+        ReceptionLetterAdmin,
+        ReportLetterAdmin
     ]
 
     # * deactive add button
