@@ -227,10 +227,10 @@
             {% include 'core/includes/header.html' %}
 
 
-            <div class="grid-container">
+            <div class="grid-container" >
                 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
-                    <div class="cell align-left large-10 medium-10 small-10">
+                    <div class="cell align-left large-10 medium-10 small-10" id="paths">
                         {% block back %}
                         <a href="{{request.META.HTTP_REFERER}}" class="button clear
                         {% if request.META.HTTP_REFERER ==  request.build_absolute_uri %}
