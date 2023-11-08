@@ -186,7 +186,9 @@
             {% else %}
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <p>
-                    No ha iniciado ninguna propuesta de artículo para esta publicación.
+                    No ha iniciado ninguna propuesta de artículo para esta publicación{% if current_publication  %}
+                     #{{current_publication}}
+                    {% else %}.{% endif %}
                 </p>
             </div>
             {% endif %}
