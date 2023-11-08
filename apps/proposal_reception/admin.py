@@ -1,3 +1,4 @@
+from .forms import ArticleProposalAdminForm
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.html import format_html
@@ -57,10 +58,10 @@ def mark_as_received(modeladmin, request, queryset):
     for article in queryset:
         # * create assignment and profile for each article
 
-        # Assignment.objects.get_or_create(
-        #     article=article,
-        #     publication=article.publication,
-        # )
+        Assignment.objects.get_or_create(
+            article=article,
+            publication=article.publication,
+        )
 
         ArticleProfile.objects.get_or_create(
             article=article,
@@ -77,19 +78,39 @@ def mark_as_received(modeladmin, request, queryset):
         # messages.success(
             # request, 'Se han enviado las cartas de recepción')
         queryset.update(status='2')
-            
-        messages.success(request, 'Se han marcado como recibidos')  
+
+        messages.success(request, 'Se han marcado como recibidos')
 
     except Exception as e:
         messages.error(request, str(e))
+
+
+@admin.action(description='Enviar dictamen')
+def send_arbitration_report(modeladmin, request, queryset):
+    # * si en el queryset hay artículos que ya tienen documento de dictamen no enviar
+
+    for article in queryset:
+        if article.dictamen_letter:
+            messages.error(request, 'Algunos artículos ya tienen dictamen')
+            return
+
+        if article.status != '7' and article.status != '8':
+            messages.error(
+                request, 'Algunos artículos no están en dictamen o no han sido aceptados o rechazados')
+            return
+
+    for article in queryset:
+        article.send_arbitration_report()
 
 
 class ArticleProposalAdmin(admin.ModelAdmin):
 
     change_list_template = "admin/proposal_reception/change_list.html"
 
+    form = ArticleProposalAdminForm
+
     # actions = [send_arbitration_report]
-    actions = [mark_as_received]
+    actions = [mark_as_received, send_arbitration_report]
 
     def has_add_permission(self, request, obj=None):
         if not request.user.is_superuser:
@@ -109,6 +130,34 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     author_link.short_description = "Autor"
 
+    # * arbitraje link list display
+
+    def assignment_link(self, obj):
+
+        if obj.status != '1':
+
+            # * sin arbitraje
+            if obj.status == '2':
+
+                if obj.profile.status == 'P':
+                    return format_html(f'<a href="/admin/Asignacion_Arbitros/articleprofile/{obj.profile.id}">' +
+                                       '<i class="fi fi-list-bullet"></i> Perfilar</a>'
+                                       + '</a>')
+                else:
+                    return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
+                                       '<i class="fi fi-flag"></i> Asignar</a>'
+                                       + '</a>')
+            else:
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
+                                   '<i class="fi fi-eye"></i> Ver asignación</a>'
+                                   + '</a>')
+
+        # * marcar como recibido
+        print("HOLA")
+        return format_html(f'Necesita ser recibido')
+
+    assignment_link.short_description = "Seguimiento"
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         if not request.user.is_superuser:
 
@@ -122,11 +171,15 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     def download_template(self, obj):
         return format_html(f'<a href="{obj.template.url}"><i class="fi fi-download"></i> Descargar</a>')
-    
-    
+
     download_template.short_description = "Plantilla"
 
-    list_display = ('title', 'author_link', 'download_template', 'new_school', 'status')
+    list_display = ('title',
+                    'assignment_link',
+                    'author_link',
+                    'download_template',
+                    # 'new_school',
+                    'status')
     search_fields = ('title', 'author__user__username',
                      'author__user__first_name', 'author__user__last_name')
 
@@ -151,6 +204,16 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     readonly_fields = ('publication', 'title',
                        'author_link', 'modality', 'school', 'new_school', 'template', )
+
+    def get_readonly_fields(self, request, obj=None):
+        # * si el estado es "en dictamen" (6) agregar retirar status de readonly
+        if obj is not None:
+            if obj.status != '6':
+                return ('publication', 'title',
+                        'author_link', 'modality', 'school', 'new_school', 'template', 'status')
+            else:
+                return ('publication', 'title',
+                        'author_link', 'modality', 'school', 'new_school', 'template',)
 
     def message_user(self, request, message, level):
         pass
