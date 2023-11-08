@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from apps.events.models import Publication
 
-class NotAdminCheckPublicationMixin(LoginRequiredMixin):
+class OnlyAuthorMixin(LoginRequiredMixin):
     
     def dispatch(self, request, *args, **kwargs):
         publicacion = Publication.objects.get_current()
@@ -16,6 +16,9 @@ class NotAdminCheckPublicationMixin(LoginRequiredMixin):
                 messages.error(
                     request, 'No hay un periodo de publicación disponible.')
                 return redirect('home')
+            else:
+                if request.user.profile.type_user == '2':
+                    return redirect('core_dashboard:dashboard')
         else:
             return redirect('home')
         

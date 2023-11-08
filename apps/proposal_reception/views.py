@@ -30,14 +30,14 @@ from apps.events.models import Publication
 
 # *¨login required mixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from core.mixins import OnlyAuthorMixin
 
 # Create your views here.
 
 # * article proposal form view
 
 
-class ProposalFormView(LoginRequiredMixin, TemplateView):
+class ProposalFormView(OnlyAuthorMixin, TemplateView):
     template_name = 'proposal_reception/article_proposal_form.html'
 
     def get(self, request, *args, **kwargs):
@@ -137,20 +137,20 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
 
     # * if artiproposal date is over, add error message
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
+    # @method_decorator(login_required)
+    # def dispatch(self, request, *args, **kwargs):
 
-        publication = Publication.objects.get_current()
+    #     publication = Publication.objects.get_current()
 
-        if not publication:
-            messages.error(
-                request, 'No se ha definido un periodo de publicación')
-            return redirect('home')
+    #     if not publication:
+    #         messages.error(
+    #             request, 'No se ha definido un periodo de publicación')
+    #         return redirect('home')
 
-        return super().dispatch(request, *args, **kwargs)
+    #     return super().dispatch(request, *args, **kwargs)
 
 
-class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
+class ArticleProposalUpdateView(OnlyAuthorMixin, UpdateView):
     template_name = 'proposal_reception/article_proposal_update.html'
 
     model = ArticleProposal
@@ -161,22 +161,18 @@ class ArticleProposalUpdateView(LoginRequiredMixin, UpdateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        # * login required
-        publication = Publication.objects.get_current()
+        response = super().dispatch(request, *args, **kwargs)
 
-        # * if not publication
-
-        if not publication:
-            messages.error(
-                request, 'No se ha definido un periodo de publicación.')
-            return redirect('core_dashboard:dashboard')
+        if response.status_code == 302:
+            return response
+        
 
         if request.user.profile != self.get_object().author:
             messages.error(
                 request, 'No tienes permiso para editar esa propuesta.')
             return redirect('core_dashboard:dashboard')
 
-        if self.get_object().status == '2':
+        if self.get_object().status >= '2':
             messages.error(
                 request, 'No puedes editar esta propuesta porque ya fue recibida')
             return redirect('core_dashboard:dashboard')
