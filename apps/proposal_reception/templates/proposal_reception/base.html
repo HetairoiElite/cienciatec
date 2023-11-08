@@ -137,7 +137,7 @@
                         <div class="callout primary">
                             <h6>Si tu articulo tiene imágenes por favor proporcionelas para solucionar
                                 futuras
-                                correciones.</h6>
+                                observaciones.</h6>
                         </div>
 
                         <div id="formset-image">
@@ -181,8 +181,10 @@
 
                         </div>
 
+                        {% block save %}
+                        <button type="submit" class="button primary">Enviar</button>
 
-                        <button type="submit" class="button hollow primary">Enviar</button>
+                        {% endblock save %}
 
 
                     </form>
@@ -228,8 +230,8 @@
                             {# if can delete #}
                             {% if coauthor_formset.can_delete %}
                             <div class="cell small-12">
-                                {{ coauthor_formset.empty_form.DELETE.label_tag }}
-                                {{ coauthor_formset.empty_form.DELETE }}
+                                {% comment %} {{ coauthor_formset.empty_form.DELETE.label_tag }}
+                                {{ coauthor_formset.empty_form.DELETE }} {% endcomment %}
                             </div>
                             {% endif %}
                             {# end if can delete #}
@@ -244,8 +246,8 @@
                             {% if article_image_formset.can_delete %}
 
                             <div class="cell small-12">
-                                {{ article_image_formset.empty_form.DELETE.label_tag }}
-                                {{ article_image_formset.empty_form.DELETE }}
+                                {% comment %} {{ article_image_formset.empty_form.DELETE.label_tag }} {% endcomment %}
+                                {% comment %} {{ article_image_formset.empty_form.DELETE }} {% endcomment %}
                             </div>
                             {% endif %}
 
@@ -318,6 +320,8 @@
         if (form_idx == init_form_idx_coauthors) {
             $('#remove-form_coautor').hide();
         }
+        Foundation.reInit($('#form_article'));
+
     });
 
     // * article_image_formset
@@ -336,6 +340,8 @@
         if (form_idx == init_form_idx_images) {
             $('#remove-form_image').hide();
         }
+        Foundation.reInit($('#form_article'));
+
     });
 
     $('#add-form_image').click(function () {
@@ -343,6 +349,9 @@
         // add hr 
         $('#formset-image').append($('#empty_form_image').html().replace(/__prefix__/g, form_idx));
         $('#id_proposal_images-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+        // * male required
+        $('#id_proposal_images-' + form_idx + '-image').prop('required', true);
+        Foundation.reInit($('#form_article'));
 
         // show remove button 
         $('#remove-form_image').show();
