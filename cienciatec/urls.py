@@ -65,7 +65,7 @@ urlpatterns = [
     
     
     # * correction sending
-    path('tablero/envio-correcciones/', include('apps.correction_sending.urls')),
+    path('tablero/envio-correcciones/', include('apps.observation_sending.urls')),
     
     # * correction reception
     path('tablero/recepcion-correcciones/', include('apps.correction_reception.urls')),
