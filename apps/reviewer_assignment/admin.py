@@ -16,13 +16,27 @@ class ReviewInline(jet_admin.CompactInline):
 
     def get_notes(self, obj):
 
-        return format_html('<ul>' + '\n'.join(
+        # return format_html('<ul>' + '\n'.join(
 
-            ['<li>Línea\t' + str(nota.line) + ': ' + str(nota) + '</li>'
-             for nota in Note.objects.filter(
-                review=obj
-            )
-            ]) + '</ul>')
+        #     ['<li>Línea\t' + str(nota.line) + ': ' + str(nota) + '</li>'
+        #      for nota in Note.objects.filter(
+        #         review=obj
+        #     )
+        #     ]) + '</ul>')
+        # * table foundation zurb
+
+        return format_html(
+            '<table class="hover"><thead><tr><th>Línea</th><th>Nota</th><th>¿Corrigió?</th></tr></thead>'
+            + '\n'.join(
+                ['<tr><td>\t' + str(nota.line) + '</td><td>' + str(nota) + '</td><td>\t' +
+                 ('<img src="/static/admin/img/icon-yes.svg" alt="True">' if nota.value
+                  else '<img src="/static/admin/img/icon-no.svg" alt="False">')
+                 + '</td></tr>'
+                 for nota in Note.objects.filter(
+                    review=obj
+                )
+                ]
+            ) + '</table>')
 
     get_notes.short_description = format_html(
         """<i class="fi-clipboard-notes"
@@ -36,13 +50,21 @@ class ReviewInline(jet_admin.CompactInline):
     fk_name = 'assignment'
     can_delete = False
     extra = 0
-    
+
+    fields = (
+        'referee',
+        'get_notes',
+        'comments',
+        'enviado',
+        'dictamen',
+    )
 
     readonly_fields = (
         'referee',
         'get_notes',
         'comments',
-        'enviado'
+        # 'enviado',
+        'dictamen',
     )
 
 
@@ -57,8 +79,8 @@ class AssignmentAdmin(admin.ModelAdmin):
     def get_referees(self, obj):
         return format_html('\n'.join(
 
-            ['<a href="/admin/auth/user/' + str(p.id) + '/change/#/tab/inline_0/">' +
-             p.user.get_full_name() + '</a>' for p in obj.referees.all()]))
+            ['<a href="/admin/auth/user/' + str(p.id) + '/change/#/tab/inline_0/"><i class="fi-torso"></i> ' +
+             p.user.get_full_name() + '</a><br>' for p in obj.referees.all()]))
     get_referees.short_description = 'Árbitros'
 
     def get_profiles(self, obj):
@@ -71,18 +93,41 @@ class AssignmentAdmin(admin.ModelAdmin):
 
     readonly_fields = ('article', 'publication', 'get_profiles')
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj is None:
+            return self.readonly_fields
+        else:
+            if obj.status != '1':
+                return ('article', 'publication', 'get_profiles', 'get_referees',
+                        # 'completed'
+                        )
+            else:
+                return self.readonly_fields
+
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            return self.fields
+        else:
+            if obj.status != '1':
+                return ('article', 'publication', 'get_profiles', 'get_referees', 'completed')
+
+        return super().get_fields(request, obj)
+
+    list_filter = ('status',)
+
+    search_fields = ('article__title',)
+
     def message_user(self, *args, **kwargs):
         pass
 
     def save_model(self, request, obj, form, change):
         if change:
-
-            if 'referees' in form.changed_data and form.cleaned_data['referees'].count() > 0 or obj.referees.count() > 0:
+            if obj.status == '1':
                 obj = form.save()
                 obj.article.status = '3'
                 obj.article.save()
-                
-                obj.status = 'A'
+
+                obj.status = '2'
                 obj.save()
 
                 for referee in obj.referees.all():
@@ -107,29 +152,18 @@ class AssignmentAdmin(admin.ModelAdmin):
                     )
 
                     email.send()
-
-            else:
-                obj.status = 'P'
-                obj.article.status = '2'
-                obj.save()
-                Review.objects.filter(assignment=obj).delete()
-            messages.success(
-                request,
-                format_html(
-                    'La asignación del artículo <a>' + obj.article.title + '</a> se ha actualizado correctamente'))
-
-            if 'referees' in form.changed_data and form.cleaned_data['referees'].count() == 0:
-                obj.status = 'P'
-                messages.warning(
+                messages.success(
                     request,
                     format_html(
-                        'La asignación del artículo <a>' + obj.article.title + '</a> no tiene árbitros asignados'))
-        else:
-            messages.success(request,
-                             format_html(
-                                 'La asignación del artículo <a>' + obj.article.title + '</a> se ha creado correctamente'))
-
-        obj.save()
+                        'La asignación del artículo <a>' + obj.article.title + '</a> se ha actualizado correctamente'))
+                obj.save()
+            else:
+                messages.success(
+                    request,
+                    format_html(
+                        'La asignación del artículo <a>' + obj.article.title + '</a> se ha actualizado correctamente'))
+                
+        return super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         messages.success(request,
@@ -148,7 +182,15 @@ class ArticleProfileAdmin(admin.ModelAdmin):
 
     get_perfiles_article.short_description = 'Perfiles'
 
-    list_display = ('article', 'get_perfiles_article', 'status')
+    def assignment_link(self, obj):
+
+        if obj.status == 'A':
+            return format_html('<a href="/admin/Asignacion_Arbitros/assignment/' + str(obj.article.assignment.id) + '/change/">' + ('Asignar' if obj.article.status == '2' else 'Ver') + '</a>')
+
+    assignment_link.short_description = 'Asignación'
+
+    list_display = ('article', 'get_perfiles_article',
+                    'status', 'assignment_link')
 
     list_filter = ('status', 'profiles')
 
@@ -161,7 +203,8 @@ class ArticleProfileAdmin(admin.ModelAdmin):
     # * create assigment for each article when update and status is 2
     def save_model(self, request, obj, form, change):
         if change:
-            if 'profiles' in form.changed_data and form.cleaned_data['profiles'].count() > 0 or obj.profiles.count() > 0:
+            print(form.cleaned_data['profiles'].count())
+            if 'profiles' in form.changed_data and (form.cleaned_data['profiles'].count() != 0 or len(form.initial['profiles']) != 0):
 
                 Assignment.objects.get_or_create(
                     article=obj.article,
@@ -169,7 +212,7 @@ class ArticleProfileAdmin(admin.ModelAdmin):
                 )
                 obj.status = 'A'
                 obj.save()
-                
+
             else:
                 obj.status = 'P'
                 obj.save()
@@ -184,7 +227,14 @@ class ArticleProfileAdmin(admin.ModelAdmin):
 admin.site.register(Assignment, AssignmentAdmin)
 
 admin.site.register(ArticleProfile, ArticleProfileAdmin)
-admin.site.register(Profile)
+
+
+class ProfileAdmin(admin.ModelAdmin):
+
+    pass
+
+
+admin.site.register(Profile, ProfileAdmin)
 # * expresión regular para dos nombres máximo
 
 reg = r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,50}$'
