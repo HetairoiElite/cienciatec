@@ -168,3 +168,33 @@ def get_sent_reviews(assignment):
 def get_is_sent(assignment, user):
     # * get is sent
     return Review.objects.get_is_sent(assignment, user)
+
+# * has notes
+
+@register.filter(name="has_notes")
+def has_notes(assignment, user):
+    # * get is sent
+    return Review.objects.has_notes(assignment, user)
+
+# * get reported reviews
+
+@register.filter(name="get_reported_reviews")
+def get_reported_reviews(assignment):
+    # * count enviado = True reviews
+    return Review.objects.get_reported_reviews(assignment)
+
+# * get is reported
+
+@register.filter(name="get_is_reported")
+def get_is_reported(assignment, user):
+    # * get is sent
+    return Review.objects.get_is_reported(assignment, user)
+
+# * ordeanar por fecha
+
+@register.filter(name="order_by_date")
+def order_by_date(queryset):
+    # * order by date
+    print(queryset)
+    print(queryset.order_by('modified'))
+    return queryset.order_by('modified').reverse()
