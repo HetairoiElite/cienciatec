@@ -244,3 +244,45 @@ class ReceptionLetter(TimeStampedModel):
     class Meta:
         verbose_name = 'Carta de recepción'
         verbose_name_plural = 'Cartas de recepción'
+        
+def custom_upload_template_accepted(instance, filename):
+    try:
+        old_instance = ReportLetter.objects.get(pk=instance.pk)
+        old_instance.template_accepted.delete()
+        return 'home/'+filename
+    except ReportLetter.DoesNotExist:
+        return 'home/'+filename
+
+def custom_upload_template_rejected(instance, filename):
+    try:
+        old_instance = ReportLetter.objects.get(pk=instance.pk)
+        old_instance.template_rejected.delete()
+        return 'home/'+filename
+    except ReportLetter.DoesNotExist:
+        return 'home/'+filename
+    
+class ReportLetter(TimeStampedModel):
+    
+    home = models.OneToOneField(Home, on_delete=models.CASCADE,
+                                verbose_name='Página principal', default=1, related_name='report_letters')
+    # name = models.CharField(max_length=100, verbose_name='Nombre')
+    # * plantilla aceptado 
+    template_accepted = models.FileField(
+        verbose_name='Plantilla de aceptación', upload_to=custom_upload_template_accepted, null=True, blank=True)
+    
+    # * plantilla rechazado
+    template_rejected = models.FileField(
+        verbose_name='Plantilla de rechazo', upload_to=custom_upload_template_rejected, null=True, blank=True)
+
+    # * presidente del comité de arbitraje
+
+    president = models.CharField(
+        max_length=100, verbose_name='Presidente del comité de arbitraje')
+
+
+    def __str__(self):
+        return self.home.title
+
+    class Meta:
+        verbose_name = 'Carta de dictamen'
+        verbose_name_plural = 'Cartas de dictamenes'
