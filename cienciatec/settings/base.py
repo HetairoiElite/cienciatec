@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'articles.het-air-oi.studio']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',os.getenv('IP_HOST')]
 
 # Daphne
 # ASGI_APPLICATION = "cienciatec.asgi.application"
@@ -190,4 +190,4 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 JET_MODULE_GOOGLE_ANALYTICS_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, 'client_secrets.json')
 
-JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
+# JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
