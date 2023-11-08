@@ -13,10 +13,10 @@ from .managers import ReviewManager
 class Note(models.Model):
     review = models.ForeignKey(
         'Review', on_delete=models.CASCADE, related_name='notes',
-        verbose_name='Revisión'
+        verbose_name='Arbitraje'
     )
     line = models.PositiveIntegerField(verbose_name='Línea')
-    description = models.CharField(max_length=100, verbose_name='Descripción')
+    description = models.CharField(max_length=255, verbose_name='Descripción')
     value = models.BooleanField(verbose_name='Corregido', default=False)
 
     class Meta:
@@ -39,15 +39,24 @@ class Review(TimeStampedModel):
         verbose_name='Comentarios', blank=True, null=True)
 
     enviado = models.BooleanField(verbose_name='Enviado', default=False)
-    
+
+    DICTAMENTO_CHOICES = (
+        ('1', 'Aceptado'),
+        ('2', 'Rechazado'),
+    )
+
+    dictamen = models.CharField(
+        verbose_name='Dictamen', max_length=1, choices=DICTAMENTO_CHOICES, null=True, blank=True)
+
     objects = ReviewManager()
 
     class Meta:
-        verbose_name = 'Revisión'
-        verbose_name_plural = 'Revisiones'
+        verbose_name = 'Arbitraje'
+        verbose_name_plural = 'Arbitrajes'
 
     def __str__(self):
         if self.id % 2 == 0:
-            return 'Revisión #2'
+            return 'Arbitraje #2'
         else:
-            return 'Revisión #1'
+            return 'Arbitraje #1'
+        
