@@ -90,6 +90,28 @@ class ArticleProposalUpdateForm(ArticleProposalForm):
         self.fields['template'].required = False
 
 
+class ArticleProposalAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = ArticleProposal
+        fields = '__all__'
+
+    # * sólo incluir opciones de aceptado o rechazo en status (7 y 8)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # * si el estado es "en dictamen" (6) mostrar opciones de aceptado o rechazo
+        
+        if self.instance.status == '6':
+            self.fields['status'].choices = [
+                ('6', 'En dictamen'),
+                ('7', 'Aceptado'),
+                ('8', 'Rechazado'),
+            ]
+        
+
+
 class CoauthorForm(forms.ModelForm):
 
     class Meta:
@@ -156,10 +178,18 @@ class ArticleImageForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={
                 'class': 'form-control mb-2 ',
                 'accept': '.jpg, .jpeg, .png',
-                'required': 'true'
+                # 'required': 'true',
             }),
         }
 
         labels = {
             'image': 'Imagen',
         }
+
+    # # * si tiene un valor hacer que no sea requerido
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.fields['image'].initial:
+            self.fields['image'].required = False
+        else:
+            self.fields['image'].required = True
