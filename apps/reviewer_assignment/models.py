@@ -1,13 +1,10 @@
 from django.db import models
 from django.contrib.sites.shortcuts import get_current_site
-
-# Create your models here.
-
-
-# * modelo asignación de arbitros
+# * TimeStampedModel
+from model_utils.models import TimeStampedModel
 
 
-class Assignment(models.Model):
+class Assignment(TimeStampedModel):
     publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='assignments',
         verbose_name='Publicación')
@@ -20,14 +17,21 @@ class Assignment(models.Model):
         on_delete=models.CASCADE, related_name='assignment')
 
     STATUS_CHOICES = (
-        ('P', 'Pendiente'),
-        ('A', 'Asignado'),
+        ('1', 'Pendiente'),
+        ('2', 'Asignado'),
+        ('3', 'En revisión'),
+        
+        ('4', 'Enviado'),
+        
+        ('5', 'En recepción'),
+        ('6', 'En Dictamen'),
+        ('7', 'Completado')
     )
 
     status = models.CharField(verbose_name='Estatus',
-                              max_length=1, choices=STATUS_CHOICES, default='P')
+                              max_length=1, choices=STATUS_CHOICES, default='1')
 
-    # * completado
+    
 
     completed = models.BooleanField(verbose_name='Completado', default=False)
 
@@ -37,46 +41,46 @@ class Assignment(models.Model):
 
     def __str__(self):
         return str(self.article)
+    
 
 
 
-# * perfil de articulo
 
 
 class Profile(models.Model):
-    profile=models.CharField(
+    profile = models.CharField(
         max_length=100, unique=True, verbose_name='Perfil')
 
     class Meta:
-        verbose_name='Perfil'
-        verbose_name_plural='Perfiles'
+        verbose_name = 'Perfil'
+        verbose_name_plural = 'Perfiles'
 
     def __str__(self):
         return self.profile
 
 
 class ArticleProfile(models.Model):
-    publication=models.ForeignKey(
+    publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='article_profiles',
         verbose_name='Publicación')
 
-    article=models.OneToOneField(
+    article = models.OneToOneField(
         'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
 
-    profiles=models.ManyToManyField(
+    profiles = models.ManyToManyField(
         'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles', blank=True)
 
-    STATUS_CHOICES=(
+    STATUS_CHOICES = (
         ('P', 'Pendiente'),
         ('A', 'Perfiles asignados'),
     )
 
-    status=models.CharField(verbose_name='Estatus',
-                            max_length=1, choices=STATUS_CHOICES, default='P')
+    status = models.CharField(verbose_name='Estatus',
+                              max_length=1, choices=STATUS_CHOICES, default='P')
 
     class Meta:
-        verbose_name='Perfil de artículo'
-        verbose_name_plural='Perfiles de artículo'
+        verbose_name = 'Perfil de artículo'
+        verbose_name_plural = 'Perfiles de artículo'
 
     def __str__(self):
         return str(self.article)
