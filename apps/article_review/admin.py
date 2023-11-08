@@ -19,4 +19,4 @@ class ArticleReviewAdmin(admin.ModelAdmin):
     readonly_fields = ('assignment',)
 
 
-admin.site.register(Review, ArticleReviewAdmin)
+# admin.site.register(Review, ArticleReviewAdmin)
