@@ -14,7 +14,7 @@ class ReviewForm(forms.ModelForm):
         labels = {
             'comments': 'Comentarios',
         }
-        
+
         widgets = {
             'comments': forms.Textarea(
                 attrs=({
@@ -23,7 +23,6 @@ class ReviewForm(forms.ModelForm):
                 })
             )
         }
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -36,6 +35,8 @@ class ReviewForm(forms.ModelForm):
 
     def save(self, commit=True):
         review = super().save(commit=False)
+        review.assignment.status = '3'
+        review.assignment.save()
         review.save()
         return review
 
@@ -66,6 +67,42 @@ class NotesForm(forms.ModelForm):
                     'placeholder': 'Nota',
                     'rows': 2,
                     'required': 'true'
+                })
+            )
+        }
+
+
+class NotesReceptionForm(NotesForm):
+
+    class Meta:
+        model = Note
+        fields = [
+            'value',
+            'description',
+            'line'
+        ]
+
+        labels = {
+            'value': '¿Corrigió la nota?',
+            'description': 'Nota',
+            'line': 'Línea',
+        }
+
+        widgets = {
+            'value': forms.CheckboxInput(),
+            'line': forms.NumberInput(
+                attrs=({
+                    'placeholder': 'Línea',
+                    'required': 'true',
+                    'readonly': 'true'
+                })
+            ),
+            'description': forms.Textarea(
+                attrs=({
+                    'placeholder': 'Nota',
+                    'rows': 2,
+                    'required': 'true',
+                    'readonly': 'true'
                 })
             )
         }
