@@ -78,19 +78,26 @@
                 </thead>
 
 
-
-                {% for article in articles %}
-                {% if article.publication == current_publication %}
-
                 <tbody>
+                    {% for article in articles|order_by_date %}
+                    {% if article.publication == current_publication %}
+
+                    {% comment %}
+                <tbody> {% endcomment %}
                     <tr>
                         <td style="font-size:15px">{{ article.title }}</td>
                         <td class="text-center">
 
-                            <small data-tooltip tabindex="1" title="{% with article.status as status %} {% if status == "1" %} Tu artículo será recibo por el comité editorial.
+                            <small data-tooltip tabindex="1" title="{% with article.status as status %} {% if status == "1" %} Tu artículo será recibido por el comité editorial en cualquier momento.
                                 {% elif status == "2" %} Tu artículo ha sido recibido por el comité editorial. En cualquier momento será asignado para su arbitraje.
                                  {% elif status == "3" %} Tu artículo ha sido asignado para su arbitraje. En cualquier momento será enviado para su corrección.
-                                  {% elif status == "4" %} {% endif %}
+                                  {% elif status == "4" %}
+                                  Tú artículo está a la espera de tus correcciones.
+                                    {% elif status == "5" %}
+                                    Tú artículo ha sido enviado para la recepción de correciones.
+                                {% elif status == "6" %}
+                                Su propuesta se encuentra en dictamen. Debe esperar a que el artículo sea aceptado o rechazado.
+                                  {% endif %}
                                 {% endwith %}">
 
                                 {% with article.status as status %}
@@ -99,7 +106,7 @@
                                 <i class="fi-info" style="color:blue;"></i>
 
                                 {% elif status == "2" %}
-                                <I class="fi-check" style="color:green"></i>
+                                <I class="fi-check" style="color:green;"></i>
 
                                 {% elif status == "3" %}
 
@@ -107,6 +114,14 @@
 
                                 {% elif status == "4" %}
                                 <i class="fi-info" style="color:yellow;"></i>
+
+                                {% elif status == "5" %}
+
+                                <i class="fi-check" style="color:green;"></i>
+
+                                {% elif status == "6" %}
+                                <i class="fi-flag" style="color:blue;"></i>
+
                                 {% endif %}
                                 {% endwith %}
                                 {{article.get_status_display}}
@@ -127,23 +142,15 @@
                             {% endif %}
                         </td>
 
-                        <td class="text-center">
+                        <td class="text-center acciones">
                             {% if article|is_assigned %}
-                            {% if article.assignment.completed %}
 
-                            {% if article.correction is not None %}
-
-                            {% if not article.correction.correction_file %}
-
+                            {% if article.status == "4" %}
 
                             <a href="{% url 'correction_reception:correction_form' article.correction.id %}"
                                 style="text-decoration:none;" class="btn btn-link">
                                 <i class="fi-check"></i>
                                 Corregir</a>
-                            {% endif %}
-
-                            {% endif %}
-
 
                             {% else %}
 
@@ -151,35 +158,45 @@
 
                             {% elif article.status != "2" %}
 
+                            <small data-tooltip tabindex="1" title="Puedes editar tu propuesta hasta que sea recibida.">
                             <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
                                 style="text-decoration: none;" class="btn btn-link">
                                 <i class="fi-pencil"></i>
                                 Editar</a>
+                            </small>
                             {% endif %}
                         </td>
-
+                        <td class="text-center">
                         {% if article|is_assigned %}
                         {% if article.assignment.completed %}
 
                         {% if article.correction is not None %}
 
                         {% if not article.correction.correction_file %}
-                        <td class="text-center">
+                        
 
-                        </td>
+                        
+
                         {% endif %}
 
                         {% endif %}
+                        {% else %}
+
+                        
                         {% endif %}
+
+                        
                         {% endif %}
+                    </td>
                     </tr>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% endwith %}
                 </tbody>
 
-                {% endif %}
-
-                {% endfor %}
-
-                {% endwith %}
 
             </table>
 
@@ -202,7 +219,7 @@
     </div>
 </div>
 {% else %}
-<div class="cell small-10 medium-10 large-10 align-self-middle" style="height:500px">
+<div class="cell small-10 medium-10 large-10 align-self-middle" style="height:1000px">
     <div class="card" style="width: 100%;">
         <div class="card-divider">
 
@@ -236,12 +253,15 @@
                     <th style="width:20%">
                         Propuesta</th>
                     <th class="text-center" style="width:20%">Estado</th>
-                    <th class="text-center" style="width:15%">Revisiones</th>
+                    <th class="text-center" style="width:15%">Arbitrajes</th>
+                    <th class="text-center" style="width:20%">Dictamenes</th>
                     <th class="text-center" style="width:45%">Acciones</th>
                 </thead>
-                {% with assignments=user.profile.assignments.all %}
-                {% for assignment in assignments %}
                 <tbody>
+
+                    {% with assignments=user.profile.assignments.all %}
+                    {% for assignment in assignments|order_by_date %}
+                    {% if assignment.publication == current_publication %}
                     <tr>
                         <td style="font-size:15px">{{ assignment.article.title }}</td>
                         <td class="text-center">
@@ -249,7 +269,25 @@
                             {% if assignment.completed %}
                             El artículo ha sido arbitrado.
                             {% else %}
-                            El proceso de arbitraje aún no ha sido completado.
+
+                            {% if assignment.status == '2' %}
+
+                            El proceso de arbitraje aún no ha sido iniciado.
+                            Empiece a arbitrar el artículo.
+
+                            {% elif assignment.status == '3' %}
+                            El proceso de arbitraje ha comenzado.
+                            {% elif assignment.status == '4' %}
+                            Las observaciones han sido enviadas a su autor/a. Debes esperar a que el/la autor/a las corrija.
+
+                            {% elif assignment.status == '5' %}
+                            El/la autor/a ha corregido el artículo. Debes revisar las correcciones y enviar el dictamen.
+
+                            {% elif assignment.status == '6' %}
+                            El proceso de dictmen ha comenzado.
+
+                            {% endif %}
+
                             {% endif %}
                             ">
 
@@ -258,10 +296,21 @@
                                 Completado
                                 {% else %}
 
+                                {% if assignment.status == '2' %}
+                                <i class="fi-info" style="color: yellow;"></i>
+                                {% elif assignment.status == '3' %}
+                                <i class="fi-clipboard-pencil" style="color: blue;"></i>
+                                {% elif assignment.status == '4' %}
+                                <i class="fi-mail" style="color: blue;"></i>
 
-                                <i class="fi-info" style="color: red;"></i>
-                                Sin completar
+                                {% elif assignment.status == '5' %}
+                                <i class="fi-info" style="color: yellow;"></i>
 
+                                {% elif assignment.status == '6' %}
+                                <i class="fi-flag" style="color: blue;"></i>
+
+                                {% endif %}
+                                {{assignment.get_status_display}}
 
                                 {% endif %}
 
@@ -271,18 +320,37 @@
                         <td class="text-center">
                             {% with  assignment|get_sent_reviews as countr %}
                             <small data-tooltip tabindex="1" title="{% if countr == 0 %}
-                            No se ha enviado ninguna revisión por parte de usted o de su compañer@
+                            No se ha enviado ningún arbitraje por parte de usted o de su compañer@.
                             {% elif countr == 1 %}
-                            
+
                             {% if assignment|get_is_sent:request.user %}
-                            Tu revisión será enviada cuando tu compañer@ envíe la suya.
+                            Tu arbitraje se enviará cuando tu compañer@ envíe la suya.
                             {% else %}
-                            Tu compañer@ ha enviado su revisión.
+                            Tu compañer@ ha enviado su arbitraje.
                             {% endif %}
                             {% else %}
-                            Se han enviado todas las revisiones
+                            Se han enviado todos los arbitrajes.
                             {% endif %}">
-                                {{countr}}/2 Revisiones
+                                {{countr}}/2 Arbitrajes
+                            </small>
+                            {% endwith %}
+                        </td>
+                        <td class="text-center">
+
+                            {% with assignment|get_reported_reviews as countr %}
+                            <small data-tooltip tabindex="1" title="{% if countr == 0 %}
+                            No se ha realizado ningún dictamen por parte de usted o de su compañer@
+                            {% elif countr == 1 %}
+
+                            {% if assignment|get_is_reported:request.user %}
+                            Has realizado tu dictamen.
+                            {% else %}
+                            Tu compañer@ ha realizado su dictamen.
+                            {% endif %}
+                            {% else %}
+                            Se han realizado todos los dictamenes.
+                            {% endif %}">
+                                {{countr}}/2 Dictamenes
                             </small>
                             {% endwith %}
                         </td>
@@ -290,30 +358,48 @@
                             <div class="grid-x  align-center">
                                 <div class="cell">
 
-                                    <a class="button"
-                                        href="{% url 'article_review:review_detail' assignment|get_review_id:request.user %}">
-                                        <i class="fi fi-torso-business"></i> Arbitrar</a>
+
+                                    {% if not assignment|get_is_sent:request.user %}
+                                    <a class="button clear"
+                                        href="{% url 'article_review:review_detail' assignment|get_review_id:request.user %}?recepcion=false">
+                                        <i class="fi fi-torso-business"></i> Arbitrar
+                                    </a>
+
+                                    {% else %}
+                                    {% if assignment.status == '5' or assignment.status == '6' %}
+
+                                    {% if not assignment|get_is_reported:request.user %}
+
+                                    <a class="button clear"
+                                        href="{% url 'article_review:review_detail' assignment|get_review_id:request.user %}?recepcion=true">
+                                        <i class="fi fi-torso-business"></i> Dictaminar
+                                    </a>
+                                    {% endif %}
+
+                                    {% endif %}
+
+                                    {% endif %}
                                     &nbsp;
-                                    {% if assignment.review.notes.all.count != 0 %}
-                                    <button class="button" data-open="reveal_{{assignment.article.slug}}">
-                                        {# enviar correciones #}
-                                        <i class="fi fi-mail"></i> Enviar correciones</button>
+                                    {% if assignment|has_notes:request.user and not assignment|get_is_sent:request.user %}
+                                    <button class="button clear" data-open="reveal_{{assignment.article.slug}}">
+                                        {# enviar observaciones #}
+                                        <i class="fi fi-mail"></i> Enviar observaciones</button>
 
                                     <div class="reveal" id="reveal_{{assignment.article.slug}}"
                                         aria-labelledby="header-{{assignment.article.slug}}" data-reveal>
-                                        <h5 id="header-{{assignment.article.slug}}">Enviar correciones
+                                        <h5 id="header-{{assignment.article.slug}}">Enviar observaciones
                                             del artículo {{ assignment.article.title }}
                                         </h5>
                                         <div class="callout primary">
-                                            <p class="lead">Una vez que aceptes enviar las correciones con las notas
+                                            <p class="lead">Una vez que aceptes enviar las observaciones con las notas
                                                 agregadas, no podrás modificarlas.</p>
                                         </div>
 
                                         <div class="callout alert">
-                                            <p>¿Estás seguro de que deseas enviar las correcciones?</p>
+                                            <p>¿Estás seguro de que deseas enviar las observaciones?</p>
                                         </div>
                                         <form method="POST" class="text-center"
-                                            action="{% url 'correction_sending:correction_sending' assignment|get_review_id:request.user %}">
+                                            action="{% url 'observation_sending:observation_sending' assignment|get_review_id:request.user %}">
                                             {% csrf_token %}
                                             <input class="button success" style="color:white;" type="submit" name="btn"
                                                 value="Si">
@@ -326,14 +412,18 @@
                                         </button>
                                     </div>
                                     {% endif %}
+
+
                                 </div>
                             </div>
                         </td>
 
                     </tr>
-                </tbody>
+                    {% comment %} </tbody> {% endcomment %}
+                {% endif %}
                 {% endfor %}
                 {% endwith %}
+                </tbody>
             </table>
 
             {% else %}
