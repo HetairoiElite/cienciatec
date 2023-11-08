@@ -1,6 +1,6 @@
 from django import forms
 from .models import ArticleCorrection
-from apps.article_review.models import Note
+from apps.article_review.models import Note, Review
 
 
 class CorrectionReceptionForm(forms.ModelForm):
@@ -43,3 +43,9 @@ class CorrectionReceptionForm(forms.ModelForm):
             },
             choices=self.fields['corrections'].choices
         )
+
+class ReportForm(forms.Form):
+    
+    
+    dictamen = forms.CharField()
+         
