@@ -145,7 +145,7 @@ class ProposalFormView(LoginRequiredMixin, TemplateView):
         if not publication:
             messages.error(
                 request, 'No se ha definido un periodo de publicación')
-            return redirect('core_dashboard:dashboard')
+            return redirect('home')
 
         return super().dispatch(request, *args, **kwargs)
 
