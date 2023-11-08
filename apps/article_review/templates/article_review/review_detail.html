@@ -27,32 +27,61 @@
 
 {% block content %}
 
-<div class="grid-x grid-margin-x">
-    <div class="grid-x cell align-center">
-        <div class="grid-x cell large-4 medium-9 ">
-            <canvas id="the-canvas"></canvas>
+<style>
+    /* Estilos para el div que se mantendrá fijo */
+    .fixed-div {
+        position: fixed;
+        width: 100%;
+        'C'
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<script>
+    window.addEventListener('scroll', function () {
+        var fixedDiv = document.getElementById('fixedDiv');
+        var topBarHeight = document.querySelector('.top-bar-container').offsetHeight;
+        var pathsHeight = document.getElementById('paths').offsetHeight;
+
+        if (window.scrollY >= topBarHeight) {
+            var top = topBarHeight
+            fixedDiv.style.top = top + 'px';
+            fixedDiv.style.position = 'fixed';
+        } else {
+            console.log('pathsHeight: ' + pathsHeight);
+            var top = topBarHeight + pathsHeight + .13 * topBarHeight;
+            fixedDiv.style.top = top + 'px';
+            fixedDiv.style.position = 'absolute';
+        }
+    });
+</script>
+
+<div class="grid-x grid-margin-x align-center">
+    <div class="grid-x cell align-center fixed-div" id="fixedDiv">
+
+
+        <div class="grid-x cell medium-4 large-8 small-4 align-center" style="background-color:white;">
+            <div>
+                <button id="prev" class="button secondary">
+                    <i class="fi-arrow-left"></i>
+                </button>
+                <button id="next" class="button secondary">
+                    <i class="fi-arrow-right"></i>
+                </button>
+                &nbsp; &nbsp;
+                <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
+            </div>
         </div>
-        <div class="grid-x cell large-4 medium-9 small-9 align-center">
+        <div class="grid-x cell medium-4 large-2 small-4 align-center" style="background-color:white;">
+            <div class="cell large-1">
+                <p><button class="button" data-open="exampleModal11">Notas</button></p>
 
-
-            <div class="grid-x cell medium-4 large-8 small-4 align-center">
-                <div>
-                    <button id="prev" class="button secondary">
-                        <i class="fi-arrow-left"></i>
-                    </button>
-                    <button id="next" class="button secondary">
-                        <i class="fi-arrow-right"></i>
-                    </button>
-                    &nbsp; &nbsp;
-                    <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
-                </div>
             </div>
-            <div class="grid-x cell medium-4 large-2 small-4 align-center">
-                <div class="cell large-1">
-                    <p><button class="button" data-open="exampleModal11">Notas</button></p>
-
-                </div>
-            </div>
+        </div>
+    </div>
+    <div class="grid-x cell align-center" style="margin-top:100px">
+        <div class="grid-x cell large-4 medium-9 align-center">
+            <canvas id="the-canvas"></canvas>
         </div>
     </div>
 
@@ -75,15 +104,33 @@
                 {% endfor %}
 
                 <div class="grid-x grid-padding-x">
+                    {% if note_form.value %}
+                    <div class="cell large-3 medium-3 small-3 text-center">
+                        <label>
+                            {% if forloop.first %}
+                            <p>
+
+                                {{note_form.value.label}}
+                            </p>
+                            {% endif %}
+                            {{note_form.value}}
+                        </label>
+                    </div>
+                    {% endif %}
                     <div class="cell large-3 medium-3 small-3">
                         <label>
+                            {% if forloop.first %}
                             {{note_form.line.label}}
+                            {% endif %}
                             {{note_form.line}}
                         </label>
                     </div>
                     <div class="cell auto">
                         <label>
+                            {% if forloop.first %}
+
                             {{note_form.description.label}}
+                            {% endif %}
                             {{note_form.description}}
                         </label>
                     </div>
@@ -100,6 +147,7 @@
 
                 {% endfor %}
             </div>
+            {% if not review.enviado %}
             <span>
                 <button style="text-decoration:none" class="button clear success" id="add-form_notes" type="button">
                     <i class="fi-plus"></i>
@@ -108,6 +156,8 @@
                     <i class="fi-minus-circle"></i>
                     Eliminar nota</button>
             </span>
+            {% endif %}
+
 
             <div class="cell">
                 <label>
@@ -118,11 +168,19 @@
             </div>
 
             {# submmit #}
-
+            {% if not review.enviado %}
             <div class="cell">
                 <button id="save" class="button" type="submit">Guardar</button>
             </div>
+
+            {% endif %}
         </form>
+        {% if review.enviado %}
+        <div class="cell">
+            <button id="calculate" class="button" data-open="exampleModal3">Calcular</button>
+        </div>
+        {% endif %}
+
         <div id="empty_form_note" style="display:none">
             {# empty form #}
             <div class="grid-x grid-padding-x">
@@ -148,15 +206,97 @@
     </div>
 </div>
 
+<div class="reveal" id="exampleModal3" data-reveal>
+    <h3 class="text-center">Porcentaje de correcciones hechas</h3>
+    <h4 class="text-center" id="puntaje">
+    </h4>
+
+    <br>
+    <h5 class="text-center">
+        Dictaminar
+    </h5>
+    <form action="{% url 'correction_reception:dictamen' review.id %}" class="text-center" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Aceptar" name="dictamen" class="button success" style="color:white;">
+        <input type="submit" value="Rechazar" name="dictamen" class="button alert">
+    </form>
+    <button class="close-button" data-close aria-label="Close reveal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
 {% endblock content %}
 
 {% block scripts %}
+
+<script>
+    // * calcular el porcentaje de correcciones del articulo
+
+    $('#calculate').on('click', function () {
+
+        event.preventDefault();
+
+        // * subimit form to save data ajax
+
+        var form = $('#form_notes');
+
+        var url = form.attr('action');
+
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            success: function (data) {
+                console.log(data)
+            },
+            error: function (data) {
+                console.log(data)
+            }
+        });
+
+        var correcciones = []
+
+
+        var cantidad_notas = $('#id_notes-TOTAL_FORMS').val();
+
+        for (var i = 0; i < cantidad_notas; i++) {
+            var nota = $('#id_notes-' + i + '-value').is(':checked');
+            console.log(nota)
+            correcciones.push(nota);
+        }
+
+        console.log(correcciones)
+
+        var suma = 0;
+        for (var i = 0; i < correcciones.length; i++) {
+            // * if value is not empty
+            if (correcciones[i]) {
+                suma += 1;
+            }
+
+        }
+
+        var porcentaje = suma / correcciones.length;
+
+        $('#puntaje').text(porcentaje * 100 + '% correcciones realizadas.');
+
+    });
+</script>
+
 <script>
     init_form_idx_notes = $('#id_notes-TOTAL_FORMS').val();
 
     $(document).ready(function () {
         $('#remove-form_notes').hide();
-        $('#save').hide();
+        // * if there content in the formset, show the save button
+        if (init_form_idx_notes > 0) {
+            $('#save').show();
+        } else {
+            $('#save').hide();
+
+        }
 
     });
 
@@ -165,7 +305,7 @@
         $('#formset_notes').append($('#empty_form_note').html().replace(/__prefix__/g, form_idx));
         $('#id_notes-TOTAL_FORMS').val(parseInt(form_idx) + 1);
         Foundation.reInit($('#form_notes'));
-
+        
         $('#remove-form_notes').show();
         $('#save').show();
 
@@ -190,14 +330,15 @@
 <script src="{% static 'core/pdfjs-3.4.120-dist/build/pdf.js' %}"></script>
 
 <script>
-    url = '{{review.assignment.article.template_as_pdf.url}}'
+    url =
+        '{% if not review.enviado %}{{review.assignment.article.template_as_pdf.url}}{% else %}{{review.assignment.article.correction.correction_file_as_pdf.url}}{% endif %}'
 
     {
         var pdfDoc = null,
             pageNum = 1,
             pageRendering = false,
             pageNumPending = null,
-            scale = 0.8,
+            scale = 1.2,
             canvas = document.getElementById('the-canvas'),
             ctx = canvas.getContext('2d');
 
@@ -208,7 +349,40 @@
         function renderPage(num) {
             pageRendering = true;
             // Using promise to fetch the page
+
             pdfDoc.getPage(num).then(function (page) {
+
+                // get content 
+
+                var content = page.getTextContent();
+
+                content.then(function (text) {
+                    console.log(text);
+                    items = text.items;
+                    cleanItems = [];
+
+                    console.log(items);
+                    contadorLineas = 1;
+                    for (i = 0; i < items.length; i++) {
+                        if (items[i].str != contadorLineas) {
+                            cleanItems.push(items[i]);
+                        } else {
+                            contadorLineas++;
+
+                        }
+                    }
+
+                    // create a new page with the clean items
+
+                    newPage = new Page(page.pageIndex, page.view, cleanItems, page.rotate);
+
+
+                });
+
+
+
+
+
                 var viewport = page.getViewport({
                     scale: scale
                 });
@@ -220,7 +394,10 @@
                     canvasContext: ctx,
                     viewport: viewport
                 };
+
                 var renderTask = page.render(renderContext);
+
+
 
                 // Wait for rendering to finish
                 renderTask.promise.then(function () {
