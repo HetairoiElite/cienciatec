@@ -289,16 +289,20 @@ class ArticleProposal(TimeStampedModel):
             output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
                                              'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
             print(output)
+        
+        # * abrir el archivo y evitando backend no support absolute paths
+         
+        from django.core.files.storage import default_storage
+        
+        file = default_storage.open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb')
+        
+        self.reception_letter.save(
+            f'Carta_de_recepcion_{self.title}.pdf', file)
+         
+        # * enviar el correo electrónico
+         
 
-        with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
-
-            from django.core.files import File
-
-            file = File(file)
-            self.reception_letter.save(
-                f'Carta_de_recepcion_{self.title}.pdf', file)
-
-            email = EmailMessage(
+        email = EmailMessage(
                 subject='Carta de recepción',
                 body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
                 f'Adjunto se encuentra la carta de recepción de su propuesta de artículo "{self.title}"\n\n'
@@ -309,10 +313,10 @@ class ArticleProposal(TimeStampedModel):
                 reply_to=['jonathan90090@gmail.com'],
             )
 
-            email.attach_file(settings.BASE_DIR /
+        email.attach_file(settings.BASE_DIR /
                               'downloads/Carta_de_recepcion.pdf')
 
-            email.send()
+        email.send()
 
         self.save()
 
