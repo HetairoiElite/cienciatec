@@ -150,7 +150,8 @@ class ProposalFormView(OnlyAuthorMixin, TemplateView):
     #     return super().dispatch(request, *args, **kwargs)
 
 
-class ArticleProposalUpdateView(OnlyAuthorMixin, UpdateView):
+class ArticleProposalUpdateView(OnlyAuthorMixin
+                                , UpdateView):
     template_name = 'proposal_reception/article_proposal_update.html'
 
     model = ArticleProposal
