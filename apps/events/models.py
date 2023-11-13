@@ -41,7 +41,7 @@ class Publication(Event):
     )
     # try:
     home = models.ForeignKey(Home, on_delete=models.CASCADE, null=True, blank=True, related_name='publications',
-                             default='1')
+                             default='2')
     # except:
     #     pass
 
