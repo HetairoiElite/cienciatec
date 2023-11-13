@@ -7,6 +7,12 @@ from apps.events.models import Publication
 class OnlyAuthorMixin(LoginRequiredMixin):
     
     def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        
+        if response.status_code == 302:
+            return response
+        
+        
         publicacion = Publication.objects.get_current()
         
         # * si el usuario es un autor o un editor
