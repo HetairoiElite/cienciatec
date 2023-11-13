@@ -6,7 +6,8 @@ from django.views.generic import TemplateView
 
 # * login required mixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 # * apps
 # from apps.chat.models import Thread
@@ -19,6 +20,7 @@ class Dashboard(LoginRequiredMixin, TemplateView):
     template_name = 'core_dashboard/index.html'
     
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         publicacion = Publication.objects.get_current()
         
