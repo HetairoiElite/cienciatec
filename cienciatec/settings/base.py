@@ -190,3 +190,5 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 JET_MODULE_GOOGLE_ANALYTICS_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, 'client_secrets.json')
 
 # JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
+
+JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
