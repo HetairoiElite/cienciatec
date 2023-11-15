@@ -45,7 +45,11 @@ class SignUp(FormView):
     
     def form_valid(self, form):
         user = form.save()
-        activateEmailSendLink(self.request, user, user.email)
+        profile = Profile.objects.get(user=user)
+        if profile.type_user == '2':
+            return redirect(reverse('registration:sent_email') + '?status=success2')
+        else:
+            activateEmailSendLink(self.request, user, user.email)
         return super().form_valid(form)
     
     # * redireccionar al usuario a la página de inicio si ya está autenticado
@@ -94,10 +98,10 @@ class UpdateProfile(FormView):
         form.save()
         return super().form_valid(form)
     
-    
+  
     
 def SentEmailView(request):
-    if not request.GET.get('status'):
+    if not request.GET.get('status'):   
         return redirect('home')
     return render(request, 'registration/sent_email.html', {'status': request.GET.get('status')})
 
