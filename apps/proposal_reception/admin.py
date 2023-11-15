@@ -51,9 +51,52 @@ class CoauthorInline(admin.TabularInline):
 
 @admin.action(description='Marcar como recibido')
 def mark_as_received(modeladmin, request, queryset):
-    # from .tasks import go_to_sleep
-    # go_to_sleep.delay(10)
-    # * add context to view
+    from dotenv import load_dotenv
+    import os
+    from django.conf import settings
+    from tempfile import NamedTemporaryFile  # Asegúrate de importar NamedTemporaryFile desde tempfile
+
+    load_dotenv()
+
+    DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+
+    if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
+        from core.models import Home  # Asegúrate de importar el modelo Home desde tu aplicación
+        from core.storage_backends import PublicMediaStorage
+
+        home = Home.objects.first()
+        template = home.reception_letters.template.path
+        secretary_firm = home.reception_letters.secretary_firm.path
+        president_firm = home.reception_letters.president_firm.path
+        seal = home.reception_letters.seal.path
+
+        custom_storage = PublicMediaStorage()
+
+        # Crear archivos temporales para cada archivo
+        temp_template = NamedTemporaryFile(delete=False)
+        temp_secretary_firm = NamedTemporaryFile(delete=False)
+        temp_president_firm = NamedTemporaryFile(delete=False)
+        temp_seal = NamedTemporaryFile(delete=False)
+
+        # Guardar cada archivo en su respectivo archivo temporal
+        with custom_storage.open(template) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(template)), 'wb') as d:
+                d.write(f.read())
+
+        with custom_storage.open(secretary_firm) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(secretary_firm)), 'wb') as d:
+                d.write(f.read())
+
+        with custom_storage.open(president_firm) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(president_firm)), 'wb') as d:
+                d.write(f.read())
+
+        with custom_storage.open(seal) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(seal)), 'wb') as d:
+                d.write(f.read())
+        # from .tasks import go_to_sleep
+        # go_to_sleep.delay(10)
+        # * add context to view
 
     for article in queryset:
         # * create assignment and profile for each article
@@ -71,7 +114,7 @@ def mark_as_received(modeladmin, request, queryset):
     try:
         # * check if queryset has none approved articles
         for article in queryset:
-            if article.status != '2':
+            if article.status < '2':
                 article.send_reception_letter()
                 article.generate_template_as_pdf()
 
