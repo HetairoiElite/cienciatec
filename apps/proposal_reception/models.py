@@ -132,7 +132,7 @@ class ArticleProposal(TimeStampedModel):
         ('6', 'En dictamen'),
         ('7', 'Aceptado'),
         ('8', 'Rechazado'),
-        ('10', 'Publicado')
+        ('9', 'Publicado')
     )
 
     status = models.CharField(
