@@ -32,55 +32,37 @@ class AssignmentForm(forms.ModelForm):
         # * máximo 4 asignaciones por arbitro y máximo 2 arbitros por artículo
         if self.instance.article.assignment.status == '1':
 
-            # profiles = self.instance.article.profile.profiles.all()
+            from django.db.models import Count, OuterRef, Subquery, IntegerField
+            from django.db.models.functions import Coalesce
 
-            # print(profiles)
-            # query = models.Q(type_user="2")
+            # Subconsulta interna para contar las asignaciones no completadas por cada árbitro
+            count_assignments_subquery = Assignment.objects.filter(
+                referees=OuterRef('pk'),
+                completed=False
+            ).values('referees').annotate(count_assignments=Count('referees')).values('count_assignments')
 
-            # for profile in profiles:
-            #     print(profile)
-            #     query |= models.Q(profiles__in=[profile])
-
-            # print(query, query)
-
-            # * filtrar los arbitros que no tengan más de 4 asignaciones pendientes de manera individual
-            self.fields['referees'].queryset = Profile.objects.filter(
+            # Subconsulta externa para obtener perfiles con la subconsulta interna calculada
+            referees = Profile.objects.filter(
                 type_user="2",
                 profiles__in=self.instance.article.profile.profiles.all()
-            ).annotate(
-                count_assignments=models.Subquery(
-                    Assignment.objects.filter(
-                        referees=models.OuterRef('pk'),
-                        completed=False
-                    ).values('referees').annotate(count_assignments=models.Count('referees')).values('count_assignments')
+            ).annotate(count_assignments=Coalesce(Subquery(count_assignments_subquery, output_field=IntegerField()), 0))
+
+            # Aplicar el filtro y mostrar los resultados
+            filtered_referees = referees.filter(count_assignments__lt=4).distinct()
+
+    
+            if filtered_referees.count() >= 2:
+                self.fields['referees'].queryset = filtered_referees
+            else:
+                all_referees = Profile.objects.filter(type_user="2").annotate(
+                    count_assignments=Coalesce(Subquery(count_assignments_subquery, output_field=IntegerField()), 0)
                 )
-            ).filter(
-                count_assignments__lt=4
-            ).distinct()
+                
+                all_referees_filtered = all_referees.filter(count_assignments__lt=4).distinct()
+                
+                self.fields['referees'].queryset = all_referees_filtered
+
             
-            # print(Profile.objects.filter(
-            #     query
-            # ).annotate(
-            #     count_assignments=models.Subquery(
-            #         Assignment.objects.filter(
-            #             referees=models.OuterRef('pk'),
-            #             completed=False
-            #         ).values('referees').annotate(count_assignments=models.Count('referees')).values('count_assignments')
-            #     )
-            # ).filter(
-            #     count_assignments__lt=4
-            # ).distinct().query)
-
-            # .distinct().annotate(
-            #     count_assignments=models.Count(
-            #         'assignments', filter=models.Q(assignments__completed=False))
-            # ).filter(
-            #     count_assignments__lte=6
-            # )
-
-
-        a = 1
-
     def clean(self):
         cleaned_data = super().clean()
         if self.instance.referees.count() == 0:
