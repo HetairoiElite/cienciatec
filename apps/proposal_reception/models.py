@@ -187,14 +187,13 @@ class ArticleProposal(TimeStampedModel):
 
         else:
             import subprocess
-            import boto3
-            # * download template from s3
-            s3 = boto3.resource('s3')
+            from django.core.files.storage import default_storage
+            
             path = self.template.path
-
-            bucket = s3.Bucket(os.getenv('AWS_STORAGE_BUCKET_NAME'))
-            bucket.download_file(path, settings.BASE_DIR /
-                                 'downloads' / 'template.docx')
+            
+            with default_storage.open(path) as f:
+                with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename('template.docx')), 'wb') as d:
+                    d.write(f.read())
 
             output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
                                               settings.BASE_DIR / 'downloads' / 'template.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
@@ -208,20 +207,115 @@ class ArticleProposal(TimeStampedModel):
 
     def send_reception_letter(self):
         
-        # * si esta en producción descargar la carta de recepción de s3 
+        reception_letter = Home.objects.first().reception_letters
+
+        # * str basedir
+        template_paths = (settings.BASE_DIR /
+                          'downloads/Recepcion_de_articulo_EDIT.docx').__str__()
+
+        print(template_paths)
+        print(template_paths.__str__())
+
+        doc = DocxTemplate(template_paths)
+
+        seal = (settings.BASE_DIR / 'downloads/sello.jpg').__str__()
+
+        firma_presidente = (settings.BASE_DIR /
+                            'downloads/firma_presidente.png').__str__()
+        firma_secretario = (settings.BASE_DIR /
+                            'downloads/firma_secretary.png').__str__()
+
+        sello = InlineImage(doc, image_descriptor=seal,
+                            width=Cm(5.7), height=Cm(6.3))
+
+        firma_presidente = InlineImage(
+            doc, image_descriptor=firma_presidente, width=Cm(1.58), height=Cm(2.97)
+        )
+
+        firma_secretario = InlineImage(
+            doc, image_descriptor=firma_secretario, width=Cm(3.63), height=Cm(2.58))
+
+        context = {
+            'fecha': timezone.now().strftime('%d de %B de %Y').replace(
+                'January', 'Enero').replace(
+                'February', 'Febrero').replace(
+                'March', 'Marzo').replace(
+                'April', 'Abril').replace(
+                'May', 'Mayo').replace(
+                'June', 'Junio').replace(
+                'July', 'Julio').replace(
+                'August', 'Agosto').replace(
+                'September', 'Septiembre').replace(
+                'October', 'Octubre').replace(
+                'November', 'Noviembre').replace(
+                'December', 'Diciembre'),
+            'numero_oficio': reception_letter.current_number,
+            'anio': timezone.now().year,
+            'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
+            'titulo': self.title,
+            'email': self.author.user.email,
+            'coautores': self.coauthors.all(),
+            'numero': Home.objects.first().publications.get_current().numero_publicacion,
+            'firma_presidente': firma_presidente,
+            'firma_secretary': firma_secretario,
+            'PRESIDENT': reception_letter.president,
+            'SECRETARY': reception_letter.secretary,
+            'SEAL': sello,
+        }
+
+        doc.render(context)
+        template_save = settings.BASE_DIR / f'downloads/Carta_de_recepcion.docx'
+        doc.save(template_save)
+
         from dotenv import load_dotenv
-        import os
-         
         load_dotenv()
-        
+        import os
+
         DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
-        
-        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
-            from django.core.files.storage import default_storage as storage
-            template = Home.objects.first().reception_letters.template
-            fh = storage.open(template.name, 'rb')
-            format = template.name.split('.')[-1]
-            # * download template from s3
+
+        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.local':
+
+            from docx2pdf import convert
+            import pythoncom
+
+            pythoncom.CoInitialize()
+
+            convert(settings.BASE_DIR / f'downloads/Carta_de_recepcion.docx',
+                    settings.BASE_DIR / f'downloads/Carta_de_recepcion.pdf')
+
+        else:
+            import subprocess
+            output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
+                                             'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
+            print(output)
+
+        with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
+            from django.core.files import File
+
+            file = File(file)
+            self.reception_letter.save(
+                f'Carta_de_recepcion_{self.title}.pdf', file, save=True)
+
+            email = EmailMessage(
+                subject='Carta de recepción',
+                body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
+                f'Adjunto se encuentra la carta de recepción de su propuesta de artículo "{self.title}"\n\n'
+                f'Atentamente,\n'
+                f'Comité Editorial de Ciencia y Tecnología',
+                from_email='Jonathan90090@gmail.com',
+                to=[self.author.user.email],
+                reply_to=['jonathan90090@gmail.com'],
+            )
+
+            email.attach_file(settings.BASE_DIR /
+                              'downloads/Carta_de_recepcion.pdf')
+
+            email.send()
+
+        self.save()
+
+        reception_letter.current_number += 1
+        reception_letter.save()
             
         
 
