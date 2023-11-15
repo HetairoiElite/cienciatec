@@ -207,6 +207,28 @@ class ArticleProposal(TimeStampedModel):
         self.save()
 
     def send_reception_letter(self):
+        
+        # * si esta en producción descargar la carta de recepción de s3 
+        from dotenv import load_dotenv
+        import os
+         
+        load_dotenv()
+        
+        DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+        
+        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
+            import boto3
+            s3 = boto3.resource('s3')
+            from core.models import Home
+            
+            path = Home.objects.first().reception_letters.template.path
+            bucket = s3.Bucket(os.getenv('AWS_STORAGE_BUCKET_NAME'))
+            bucket.download_file(path, settings.BASE_DIR / 'downloads' / 'Recepcion_de_articulo_EDIT.docx')
+            
+        # * si esta en local descargar la carta de recepción de local
+        else:
+            import shutil
+            shutil.copy(settings.BASE_DIR / 'media' / 'home' / 'Recepcion_de_articulo_EDIT.docx', settings.BASE_DIR / 'downloads' / 'Recepcion_de_articulo_EDIT.docx')
 
         reception_letter = Home.objects.first().reception_letters
 
