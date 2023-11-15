@@ -1,4 +1,6 @@
+from typing import Any
 from django.contrib import admin
+from django.http.request import HttpRequest
 from .models import Profile
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -37,8 +39,12 @@ class InlineProfile(admin.StackedInline):
             return ('avatar', 'type_user', )
         else:
             return ('avatar', 'type_user', 'profiles')
+        
+    def get_readonly_fields(self, request, obj=None):
+        if obj.profile.user.email:
+            return ('type_user',)
+        return ()
 
-    readonly_fields = ('type_user', )
 
     # def get_readonly_fields(self, request, obj=None):
     #     if obj.profile.type_user != '2':
