@@ -38,6 +38,7 @@ class InlineProfile(admin.StackedInline):
         else:
             return ('avatar', 'type_user', 'profiles')
 
+    readonly_fields = ('type_user', )
 
     # def get_readonly_fields(self, request, obj=None):
     #     if obj.profile.type_user != '2':
