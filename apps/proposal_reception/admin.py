@@ -62,7 +62,7 @@ def mark_as_received(modeladmin, request, queryset):
 
     if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
         from core.models import Home  # Asegúrate de importar el modelo Home desde tu aplicación
-        from core.storage_backends import PublicMediaStorage
+        from django.core.files.storage import default_storage
 
         home = Home.objects.first()
         template = home.reception_letters.template.path
@@ -70,7 +70,6 @@ def mark_as_received(modeladmin, request, queryset):
         president_firm = home.reception_letters.president_firm.path
         seal = home.reception_letters.seal.path
 
-        custom_storage = PublicMediaStorage()
 
         # Crear archivos temporales para cada archivo
         temp_template = NamedTemporaryFile(delete=False)
@@ -79,19 +78,19 @@ def mark_as_received(modeladmin, request, queryset):
         temp_seal = NamedTemporaryFile(delete=False)
 
         # Guardar cada archivo en su respectivo archivo temporal
-        with custom_storage.open(template) as f:
+        with default_storage.open(template) as f:
             with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(template)), 'wb') as d:
                 d.write(f.read())
 
-        with custom_storage.open(secretary_firm) as f:
+        with default_storage.open(secretary_firm) as f:
             with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(secretary_firm)), 'wb') as d:
                 d.write(f.read())
 
-        with custom_storage.open(president_firm) as f:
+        with default_storage.open(president_firm) as f:
             with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(president_firm)), 'wb') as d:
                 d.write(f.read())
 
-        with custom_storage.open(seal) as f:
+        with default_storage.open(seal) as f:
             with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(seal)), 'wb') as d:
                 d.write(f.read())
         # from .tasks import go_to_sleep
