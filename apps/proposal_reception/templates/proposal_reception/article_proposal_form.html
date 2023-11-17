@@ -63,6 +63,20 @@ Crear propuesta de articulo
         {% endif %}
     </div>
 </div>
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12 large-6">
+        {{ form.profiles.label_tag }}
+        {{ form.profiles }}
+        {% if form.profiles.errors %}
+        <div class="callout alert">
+            {% for error in form.profiles.errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
 {% comment "template" %}{% endcomment %}
 <div class="grid-x grid-padding-x">
     <div class="cell small-12 large-6">
@@ -149,4 +163,3 @@ Crear propuesta de articulo
     <i class="fi-minus-circle"></i>
     Eliminar imagen</button>
 {% endblock buttons_image %}
-
