@@ -59,28 +59,3 @@ class Profile(models.Model):
         return self.profile
 
 
-class ArticleProfile(models.Model):
-    publication = models.ForeignKey(
-        'Eventos.Publication', on_delete=models.CASCADE, related_name='article_profiles',
-        verbose_name='Publicación')
-
-    article = models.OneToOneField(
-        'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='profile', verbose_name="Artículo")
-
-    profiles = models.ManyToManyField(
-        'Asignacion_Arbitros.Profile', related_name='articles', verbose_name='Perfiles', blank=True)
-
-    STATUS_CHOICES = (
-        ('P', 'Pendiente'),
-        ('A', 'Perfiles asignados'),
-    )
-
-    status = models.CharField(verbose_name='Estatus',
-                              max_length=1, choices=STATUS_CHOICES, default='P')
-
-    class Meta:
-        verbose_name = 'Perfil de artículo'
-        verbose_name_plural = 'Perfiles de artículo'
-
-    def __str__(self):
-        return str(self.article)
