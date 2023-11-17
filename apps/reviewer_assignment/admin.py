@@ -85,7 +85,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 
     def get_profiles(self, obj):
         return format_html('<br>'.join(
-            ['<a href="/admin/Asignacion_Arbitros/profile/' + str(p.id) + '/change/">' + str(p) + '</a>' for p in obj.article.profile.profiles.all()]))
+            ['<a href="/admin/Asignacion_Arbitros/profile/' + str(p.id) + '/change/">' + str(p) + '</a>' for p in obj.article.profiles.all()]))
 
     get_profiles.short_description = 'Perfiles'
 
@@ -172,61 +172,10 @@ class AssignmentAdmin(admin.ModelAdmin):
         obj.delete()
 
 
-class ArticleProfileAdmin(admin.ModelAdmin):
-
-    readonly_fields = ('article', 'publication', 'status')
-
-    def get_perfiles_article(self, obj):
-        return format_html('<br>'.join(
-            ['<a href="/admin/Asignacion_Arbitros/profile/' + str(p.id) + '/change/">' + str(p) + '</a>' for p in obj.profiles.all()]))
-
-    get_perfiles_article.short_description = 'Perfiles'
-
-    def assignment_link(self, obj):
-
-        if obj.status == 'A':
-            return format_html('<a href="/admin/Asignacion_Arbitros/assignment/' + str(obj.article.assignment.id) + '/change/">' + ('Asignar' if obj.article.status == '2' else 'Ver') + '</a>')
-
-    assignment_link.short_description = 'Asignación'
-
-    list_display = ('article', 'get_perfiles_article',
-                    'status', 'assignment_link')
-
-    list_filter = ('status', 'profiles')
-
-    search_fields = ('article__title',
-                     'profiles__user__first_name', 'profiles__user__last_name')
-
-    def message_user(self, *args, **kwargs):
-        pass
-
-    # * create assigment for each article when update and status is 2
-    def save_model(self, request, obj, form, change):
-        if change:
-            print(form.cleaned_data['profiles'].count())
-            if 'profiles' in form.changed_data and (form.cleaned_data['profiles'].count() != 0 or len(form.initial['profiles']) != 0):
-
-                Assignment.objects.get_or_create(
-                    article=obj.article,
-                    publication=obj.publication,
-                )
-                obj.status = 'A'
-                obj.save()
-
-            else:
-                obj.status = 'P'
-                obj.save()
-            messages.success(request, format_html(
-                'El artículo <a>' + obj.article.title + '</a> se ha actualizado correctamente'))
-        else:
-
-            messages.success(request, format_html(
-                'El artículo <a>' + obj.article.title + '</a> se ha creado correctamente'))
 
 
 admin.site.register(Assignment, AssignmentAdmin)
 
-admin.site.register(ArticleProfile, ArticleProfileAdmin)
 
 
 class ProfileAdmin(admin.ModelAdmin):
