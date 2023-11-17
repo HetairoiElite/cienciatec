@@ -44,7 +44,7 @@ class AssignmentForm(forms.ModelForm):
             # Subconsulta externa para obtener perfiles con la subconsulta interna calculada
             referees = Profile.objects.filter(
                 type_user="2",
-                profiles__in=self.instance.article.profile.profiles.all()
+                profiles__in=self.instance.article.profiles.all()
             ).annotate(count_assignments=Coalesce(Subquery(count_assignments_subquery, output_field=IntegerField()), 0))
 
             # Aplicar el filtro y mostrar los resultados
@@ -61,7 +61,13 @@ class AssignmentForm(forms.ModelForm):
                 all_referees_filtered = all_referees.filter(count_assignments__lt=4).distinct()
                 
                 self.fields['referees'].queryset = all_referees_filtered
-
+                
+                if all_referees_filtered.count() < 2:
+                    # * agregar un error en el text_help color rojo
+                    from django.utils.safestring import mark_safe
+                    self.fields['referees'].help_text += mark_safe(
+                        '<br><span style="color:red">No hay suficientes arbitros disponibles</span>')
+                    self.fields['referees'].widget.attrs['disabled'] = True
             
     def clean(self):
         cleaned_data = super().clean()
