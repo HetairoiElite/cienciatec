@@ -53,7 +53,7 @@ class ObservationSendingView(View):
                 for review in reviews:
                     if review.enviado == False:
                         messages.success(
-                            request, 'Se ha cargado la corrección. Se notificará al autor cuando se hayan cargado todas las correcciones pendientes por los otros arbitros.')
+                            request, 'Se han cargado las observaciones. Se notificará al autor cuando se hayan cargado todas las observaciones pendientes por el otro árbitro.')
                         return redirect('core_dashboard:dashboard')
                 else:
                     # assignment.completed = True
@@ -66,7 +66,7 @@ class ObservationSendingView(View):
                     
                     
                     messages.success(
-                        request, 'Se ha enviado la corrección y se ha notificado al autor.')
+                        request, 'Se han enviado las observaciones y se ha notificado al autor.')
 
                     from django.contrib.sites.shortcuts import get_current_site
                     from django.core.mail import EmailMessage
