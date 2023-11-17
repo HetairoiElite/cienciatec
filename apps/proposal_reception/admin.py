@@ -241,14 +241,16 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         # * si el estado es "en dictamen" (6) agregar retirar status de readonly
+        readonly_fields = ('publication', 'title',
+                       'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
         if obj is not None:
+            if obj.status >= '3':
+                readonly_fields += ('profiles',)
             if obj.status != '6':
-                return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter', 'status')
+                return readonly_fields + ('status',)
             else:
-                return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
-
+                return readonly_fields 
+            
     def message_user(self, request, message, level):
         pass
 
