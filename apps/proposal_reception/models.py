@@ -20,9 +20,9 @@ from model_utils.models import TimeStampedModel
 
 from apps.events.events import Event
 from core.models import Home
-from apps.reviewer_assignment.models import Assignment, ArticleProfile
 
 from .managers import ArticleProposalManager
+from apps.reviewer_assignment.models import Profile
 
 # Create your models here.
 
@@ -74,6 +74,15 @@ def custom_upload_to_template_as_pdf(instance, filename):
         return f'templates/{instance.author.user.username}/{filename}'
 
 
+def custom_upload_to_rights_transfer_letter(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.rights_transfer_letter.delete()
+        return f'letters/{instance.author.user.username}/{filename}'
+    except ArticleProposal.DoesNotExist:
+        return f'letters/{instance.author.user.username}/{filename}'
+
+
 class ArticleProposal(TimeStampedModel):
 
     objects = ArticleProposalManager.as_manager()
@@ -84,6 +93,9 @@ class ArticleProposal(TimeStampedModel):
 
     title = models.CharField(
         max_length=100, verbose_name='Titulo', unique=True)
+
+    profiles = models.ManyToManyField(
+        Profile, related_name='article_proposals', verbose_name='Perfiles')
 
     slug = models.SlugField(
         max_length=200, verbose_name='Slug', unique=True, null=True, blank=True)
@@ -144,6 +156,10 @@ class ArticleProposal(TimeStampedModel):
     dictamen_letter = models.FileField(
         verbose_name='Carta de dictamen', upload_to=custom_upload_to_dictamen_letter, null=True, blank=True, max_length=255)
 
+    # * cesion de derechos
+    rights_transfer_letter = models.FileField(
+        verbose_name='Carta de cesión de derechos', upload_to=custom_upload_to_rights_transfer_letter, null=True)
+
     class Meta:
         verbose_name = 'Propuesta de artículo'
         verbose_name_plural = 'Propuestas de artículos'
@@ -188,9 +204,7 @@ class ArticleProposal(TimeStampedModel):
         else:
             import subprocess
             from django.core.files.storage import default_storage
-            
             path = self.template.path
-            
             with default_storage.open(path) as f:
                 with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename('template.docx')), 'wb') as d:
                     d.write(f.read())
@@ -206,7 +220,7 @@ class ArticleProposal(TimeStampedModel):
         self.save()
 
     def send_reception_letter(self):
-        
+
         reception_letter = Home.objects.first().reception_letters
 
         # * str basedir
@@ -316,8 +330,6 @@ class ArticleProposal(TimeStampedModel):
 
         reception_letter.current_number += 1
         reception_letter.save()
-            
-        
 
     def send_arbitration_report(self):
         report_letter = Home.objects.first().report_letters
@@ -394,13 +406,13 @@ class ArticleProposal(TimeStampedModel):
                 f'Atentamente,\n'
                 f'Comité Editorial de Ciencia y Tecnología',
             )
-            
-            email.attach_file(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf')
-            
+
+            email.attach_file(settings.BASE_DIR /
+                              'downloads/Carta_de_dictamen.pdf')
+
             email.send()
-        
+
         self.save()
-         
 
 
 # * Imagenes de la propuesta
