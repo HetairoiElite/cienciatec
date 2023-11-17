@@ -181,6 +181,23 @@
 
                         </div>
 
+                        <h5>Carta de cesión de derechos</h5>
+                        <div class="callout primary">
+                            <h6>Debes subir la carta de cesión de derechos firmada por todos los autores.</h6>
+                        </div>
+
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12">
+                                {% block cesion %}
+                                {{article_proposal_form.rights_transfer_letter.label_tag }}
+                                {{article_proposal_form.rights_transfer_letter}}
+                                {% endblock cesion %}
+                                <span class="form-error">
+                                    Debes subir la carta de cesión de derechos firmada por todos los autores.
+                                </span>
+                            </div>
+                        </div>
+
                         {% block save %}
                         <button type="submit" class="button primary">Enviar</button>
 
