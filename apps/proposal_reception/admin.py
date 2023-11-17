@@ -54,14 +54,16 @@ def mark_as_received(modeladmin, request, queryset):
     from dotenv import load_dotenv
     import os
     from django.conf import settings
-    from tempfile import NamedTemporaryFile  # Asegúrate de importar NamedTemporaryFile desde tempfile
+    # Asegúrate de importar NamedTemporaryFile desde tempfile
+    from tempfile import NamedTemporaryFile
 
     load_dotenv()
 
     DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
 
     if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
-        from core.models import Home  # Asegúrate de importar el modelo Home desde tu aplicación
+        # Asegúrate de importar el modelo Home desde tu aplicación
+        from core.models import Home
         from django.core.files.storage import default_storage
 
         home = Home.objects.first()
@@ -69,7 +71,6 @@ def mark_as_received(modeladmin, request, queryset):
         secretary_firm = home.reception_letters.secretary_firm.path
         president_firm = home.reception_letters.president_firm.path
         seal = home.reception_letters.seal.path
-
 
         # Crear archivos temporales para cada archivo
         temp_template = NamedTemporaryFile(delete=False)
@@ -101,11 +102,6 @@ def mark_as_received(modeladmin, request, queryset):
         # * create assignment and profile for each article
 
         Assignment.objects.get_or_create(
-            article=article,
-            publication=article.publication,
-        )
-
-        ArticleProfile.objects.get_or_create(
             article=article,
             publication=article.publication,
         )
@@ -181,14 +177,9 @@ class ArticleProposalAdmin(admin.ModelAdmin):
             # * sin arbitraje
             if obj.status == '2':
 
-                if obj.profile.status == 'P':
-                    return format_html(f'<a href="/admin/Asignacion_Arbitros/articleprofile/{obj.profile.id}">' +
-                                       '<i class="fi fi-list-bullet"></i> Perfilar</a>'
-                                       + '</a>')
-                else:
-                    return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
-                                       '<i class="fi fi-flag"></i> Asignar</a>'
-                                       + '</a>')
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
+                                   '<i class="fi fi-flag"></i> Asignar</a>'
+                                   + '</a>')
             else:
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
@@ -241,21 +232,22 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {'fields': ('publication', 'title',
-         'author_link', 'modality', 'school', 'new_school', 'template', 'status')},),
+         'author_link', 'modality', 'school', 'new_school', 'template', 'status', 'profiles',
+                           'rights_transfer_letter')},),
     )
 
     readonly_fields = ('publication', 'title',
-                       'author_link', 'modality', 'school', 'new_school', 'template', )
+                       'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
 
     def get_readonly_fields(self, request, obj=None):
         # * si el estado es "en dictamen" (6) agregar retirar status de readonly
         if obj is not None:
             if obj.status != '6':
                 return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template', 'status')
+                        'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter', 'status')
             else:
                 return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template',)
+                        'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
 
     def message_user(self, request, message, level):
         pass
@@ -267,11 +259,6 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 # * create assignment and profile for each article
 
                 Assignment.objects.get_or_create(
-                    article=obj,
-                    publication=obj.publication,
-                )
-
-                ArticleProfile.objects.get_or_create(
                     article=obj,
                     publication=obj.publication,
                 )
