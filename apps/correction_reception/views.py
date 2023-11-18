@@ -27,7 +27,7 @@ class CorrectionFormView(UpdateView):
             return redirect('core_dashboard:dashboard')
 
         if self.get_object().article.status != '4':
-            messages.error(request, 'Ya has enviado tus observaciones.')
+            messages.error(request, 'Ya has enviado tus correcciones.')
             return redirect('core_dashboard:dashboard')
 
         return super().dispatch(request, *args, **kwargs)
