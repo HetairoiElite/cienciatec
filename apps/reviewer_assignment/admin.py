@@ -63,12 +63,20 @@ class ReviewInline(jet_admin.CompactInline):
         'referee',
         'get_notes',
         'comments',
-        # 'enviado',
+        'enviado',
         'dictamen',
     )
 
 
 class AssignmentAdmin(admin.ModelAdmin):
+    
+    change_form_template = 'admin/reviewer_assignment/change_form.html'
+    
+    # * cargar contexto 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['propuesta'] = Assignment.objects.get(id=object_id).article
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     inlines = [
         ReviewInline
@@ -91,7 +99,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 
     list_display = ('article', 'get_referees', 'status')
 
-    readonly_fields = ('article', 'publication', 'get_profiles')
+    readonly_fields = ('article', 'publication', 'get_profiles', )
 
     def get_readonly_fields(self, request, obj=None):
         if obj is None:
@@ -99,7 +107,7 @@ class AssignmentAdmin(admin.ModelAdmin):
         else:
             if obj.status != '1':
                 return ('article', 'publication', 'get_profiles', 'get_referees',
-                        # 'completed'
+                        'completed'
                         )
             else:
                 return self.readonly_fields
