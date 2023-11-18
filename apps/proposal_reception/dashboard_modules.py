@@ -16,9 +16,10 @@ class RecentArticleProposals(DashboardModule):
         en_dictamen = ArticleProposal.objects.filter(status='6').count()
         from django.db.models import Q
         aceptados = ArticleProposal.objects.filter(
-            Q(status='7') | Q(status='9')).distinct().count()
+            Q(status='7') | Q(status='9') | Q(status='10')).distinct().count()
         rechazados = ArticleProposal.objects.filter(status='8').count()
-        por_publicar = ArticleProposal.objects.filter(status='9').count()
+        pendientes = ArticleProposal.objects.filter(status='9').count()
+        por_publicar = ArticleProposal.objects.filter(status='10').count()
 
         self.children.append({
             'title': 'Por recibir',
@@ -59,6 +60,11 @@ class RecentArticleProposals(DashboardModule):
         self.children.append({
             'title': 'Rechazados',
             'value': f'{rechazados} - {rechazados * 100 / ArticleProposal.objects.count():.2f}%',
+        })
+        
+        self.children.append({
+            'title': 'Pendientes',
+            'value': f'{pendientes} - {pendientes * 100 / ArticleProposal.objects.count():.2f}%',
         })
         
         self.children.append({ 
