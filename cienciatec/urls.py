@@ -24,7 +24,6 @@ from jet.dashboard.dashboard import DefaultIndexDashboard
 from jet.dashboard.dashboard_modules import google_analytics
 from apps.proposal_reception.dashboard_modules import RecentArticleProposals
 
-
 class CustomIndexDashboard(DefaultIndexDashboard):
     columns = 3
 
@@ -33,47 +32,56 @@ class CustomIndexDashboard(DefaultIndexDashboard):
         self.available_children.append(RecentArticleProposals)
         self.children.append(RecentArticleProposals)
 
+from apps.final_report_sending.views import FinalReportAdminView
 
 urlpatterns = [
     # path("chat/", include("apps.chat.urls")),
-    
+
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
+    
+    # path('admin/dictamen-final/', include('apps.final_report_sending.urls',
+    #      namespace='final_report_sending')),
+
+    path('admin/dictamen-final/', include('apps.final_report_sending.urls')),
     path('admin/', admin.site.urls),
 
-    
+
+
     path('', include('core.urls')),
 
     path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    
+
     path('eventos/', include('apps.events.urls')),
 
 
     path('tablero/', include('apps.core_dashboard.urls')),
-    
+
     # * celery_progress
     # path('celery-progress/', include('celery_progress.urls')),
-    
+
     # * proposal reception
-    path('tablero/recepcion-propuestas/', include('apps.proposal_reception.urls')),
+    path('tablero/recepcion-propuestas/',
+         include('apps.proposal_reception.urls')),
 
 
     # * article review
     path('tablero/revision-articulos/', include('apps.article_review.urls')),
-    
-    
+
+
     # * correction sending
     path('tablero/envio-correcciones/', include('apps.observation_sending.urls')),
-    
+
     # * correction reception
-    path('tablero/recepcion-correcciones/', include('apps.correction_reception.urls')),
+    path('tablero/recepcion-correcciones/',
+         include('apps.correction_reception.urls')),
 ]
 
 # * Custom titles for admin site
-admin.site.site_header = "CienciaTec"
+admin.site.site_header = "100CIATEC"
 admin.site.index_title = "Panel de administración de CienciaTec"
-admin.site.site_title = "CienciaTec"
+admin.site.site_title = "100CIATEC"
 
 
 if settings.DEBUG:
