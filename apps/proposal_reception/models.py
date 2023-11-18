@@ -144,7 +144,8 @@ class ArticleProposal(TimeStampedModel):
         ('6', 'En dictamen'),
         ('7', 'Aceptado'),
         ('8', 'Rechazado'),
-        ('9', 'Publicado')
+        ('9', 'Pendiente'),
+        ('10', 'Publicado')
     )
 
     status = models.CharField(
@@ -227,8 +228,8 @@ class ArticleProposal(TimeStampedModel):
         template_paths = (settings.BASE_DIR /
                           'downloads/Recepcion_de_articulo_EDIT.docx').__str__()
 
-        print(template_paths)
-        print(template_paths.__str__())
+        # print(template_paths)
+        # print(template_paths.__str__())
 
         doc = DocxTemplate(template_paths)
 
@@ -301,7 +302,7 @@ class ArticleProposal(TimeStampedModel):
             import subprocess
             output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
                                              'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
-            print(output)
+            # print(output)
 
         with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
             from django.core.files import File
@@ -389,7 +390,7 @@ class ArticleProposal(TimeStampedModel):
             import subprocess
             output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
                                              'downloads/Carta_de_dictamen.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
-            print(output)
+            # print(output)
 
         with open(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf', 'rb') as file:
 
@@ -405,6 +406,9 @@ class ArticleProposal(TimeStampedModel):
                 f'Adjunto se encuentra la carta de dictamen de su propuesta de artículo "{self.title}"\n\n'
                 f'Atentamente,\n'
                 f'Comité Editorial de Ciencia y Tecnología',
+                from_email='Jonathan90090@gmail.com',
+                to=[self.author.user.email],
+                reply_to=['jonathan90090@gmail.com'],
             )
 
             email.attach_file(settings.BASE_DIR /
