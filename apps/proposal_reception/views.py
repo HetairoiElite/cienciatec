@@ -118,7 +118,7 @@ class ProposalFormView(OnlyAuthorMixin, TemplateView):
             article_proposal.save()
             article_proposal.profiles.set(article_proposal_form.cleaned_data['profiles'])
             article_proposal.save()
-            print(article_proposal.profiles.all())
+            # print(article_proposal.profiles.all())
 
             coauthor_formset.instance = article_proposal
             coauthor_formset.save()
@@ -266,7 +266,7 @@ class CheckTitleView(View):
 
         title = title.strip()
 
-        print('hola')
+        # print('hola')
         id = request.GET.get('id', None)
         try:
             data = {
