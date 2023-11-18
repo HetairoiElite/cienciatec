@@ -180,14 +180,19 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-flag"></i> Asignar</a>'
                                    + '</a>')
-            else:
+            elif obj.status < '5':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
                                    + '</a>')
+            elif obj.status == '6':
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
+                                   '<i class="fi fi-results"></i> Dictaminar</a>'
+                                   + '</a>')
+        else:
 
-        # * marcar como recibido
-        print("HOLA")
-        return format_html(f'Necesita ser recibido')
+            # * marcar como recibido
+            # print("HOLA")
+            return format_html(f'Necesita ser recibido')
 
     assignment_link.short_description = "Seguimiento"
 
@@ -209,8 +214,8 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     list_display = ('title',
                     'assignment_link',
-                    'author_link',
-                    'download_template',
+                    # 'author_link',
+                    # 'download_template',
                     # 'new_school',
                     'status')
     search_fields = ('title', 'author__user__username',
