@@ -49,11 +49,11 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.avatar:
         if instance.avatar != 'avatars/default.jpg':
             instance.avatar.delete()
-            print('delete avatar')
+            # print('delete avatar')
 
 
 @receiver(models.signals.post_save, sender=User)
 def ensure_profile_exists(sender, instance, **kwargs):
     if kwargs.get('created', False):
         profile = Profile.objects.get_or_create(user=instance)
-        print("Profile created!")
+        # print("Profile created!")
