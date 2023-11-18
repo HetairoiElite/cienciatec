@@ -32,7 +32,7 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             return redirect('core_dashboard:dashboard')
 
         if request.GET['recepcion'] != 'true':
-            print(request.GET['recepcion'])
+           
             if review.enviado:
                 messages.error(
                     request, 'El arbitraje ya fue enviado. No se puede modificar.')
