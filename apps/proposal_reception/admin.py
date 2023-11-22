@@ -51,9 +51,52 @@ class CoauthorInline(admin.TabularInline):
 
 @admin.action(description='Marcar como recibido')
 def mark_as_received(modeladmin, request, queryset):
-    # from .tasks import go_to_sleep
-    # go_to_sleep.delay(10)
-    # * add context to view
+    from dotenv import load_dotenv
+    import os
+    from django.conf import settings
+    # Asegúrate de importar NamedTemporaryFile desde tempfile
+    from tempfile import NamedTemporaryFile
+
+    load_dotenv()
+
+    DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+
+    if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.prod':
+        # Asegúrate de importar el modelo Home desde tu aplicación
+        from core.models import Home
+        from django.core.files.storage import default_storage
+
+        home = Home.objects.first()
+        template = home.reception_letters.template.path
+        secretary_firm = home.reception_letters.secretary_firm.path
+        president_firm = home.reception_letters.president_firm.path
+        seal = home.reception_letters.seal.path
+
+        # Crear archivos temporales para cada archivo
+        temp_template = NamedTemporaryFile(delete=False)
+        temp_secretary_firm = NamedTemporaryFile(delete=False)
+        temp_president_firm = NamedTemporaryFile(delete=False)
+        temp_seal = NamedTemporaryFile(delete=False)
+
+        # Guardar cada archivo en su respectivo archivo temporal
+        with default_storage.open(template) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(template)), 'wb') as d:
+                d.write(f.read())
+
+        with default_storage.open(secretary_firm) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(secretary_firm)), 'wb') as d:
+                d.write(f.read())
+
+        with default_storage.open(president_firm) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(president_firm)), 'wb') as d:
+                d.write(f.read())
+
+        with default_storage.open(seal) as f:
+            with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename(seal)), 'wb') as d:
+                d.write(f.read())
+        # from .tasks import go_to_sleep
+        # go_to_sleep.delay(10)
+        # * add context to view
 
     for article in queryset:
         # * create assignment and profile for each article
@@ -63,15 +106,10 @@ def mark_as_received(modeladmin, request, queryset):
             publication=article.publication,
         )
 
-        ArticleProfile.objects.get_or_create(
-            article=article,
-            publication=article.publication,
-        )
-
     try:
         # * check if queryset has none approved articles
         for article in queryset:
-            if article.status != '2':
+            if article.status < '2':
                 article.send_reception_letter()
                 article.generate_template_as_pdf()
 
@@ -139,22 +177,22 @@ class ArticleProposalAdmin(admin.ModelAdmin):
             # * sin arbitraje
             if obj.status == '2':
 
-                if obj.profile.status == 'P':
-                    return format_html(f'<a href="/admin/Asignacion_Arbitros/articleprofile/{obj.profile.id}">' +
-                                       '<i class="fi fi-list-bullet"></i> Perfilar</a>'
-                                       + '</a>')
-                else:
-                    return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
-                                       '<i class="fi fi-flag"></i> Asignar</a>'
-                                       + '</a>')
-            else:
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
+                                   '<i class="fi fi-flag"></i> Asignar</a>'
+                                   + '</a>')
+            elif obj.status < '5':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
                                    + '</a>')
+            elif obj.status == '6':
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
+                                   '<i class="fi fi-results"></i> Dictaminar</a>'
+                                   + '</a>')
+        else:
 
-        # * marcar como recibido
-        print("HOLA")
-        return format_html(f'Necesita ser recibido')
+            # * marcar como recibido
+            # print("HOLA")
+            return format_html(f'Necesita ser recibido')
 
     assignment_link.short_description = "Seguimiento"
 
@@ -176,8 +214,8 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     list_display = ('title',
                     'assignment_link',
-                    'author_link',
-                    'download_template',
+                    # 'author_link',
+                    # 'download_template',
                     # 'new_school',
                     'status')
     search_fields = ('title', 'author__user__username',
@@ -199,22 +237,25 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {'fields': ('publication', 'title',
-         'author_link', 'modality', 'school', 'new_school', 'template', 'status')},),
+         'author_link', 'modality', 'school', 'new_school', 'template', 'status', 'profiles',
+                           'rights_transfer_letter')},),
     )
 
     readonly_fields = ('publication', 'title',
-                       'author_link', 'modality', 'school', 'new_school', 'template', )
+                       'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
 
     def get_readonly_fields(self, request, obj=None):
         # * si el estado es "en dictamen" (6) agregar retirar status de readonly
+        readonly_fields = ('publication', 'title',
+                       'author_link', 'modality', 'school', 'new_school', 'template', 'rights_transfer_letter')
         if obj is not None:
+            if obj.status >= '3':
+                readonly_fields += ('profiles',)
             if obj.status != '6':
-                return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template', 'status')
+                return readonly_fields + ('status',)
             else:
-                return ('publication', 'title',
-                        'author_link', 'modality', 'school', 'new_school', 'template',)
-
+                return readonly_fields 
+            
     def message_user(self, request, message, level):
         pass
 
@@ -225,11 +266,6 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 # * create assignment and profile for each article
 
                 Assignment.objects.get_or_create(
-                    article=obj,
-                    publication=obj.publication,
-                )
-
-                ArticleProfile.objects.get_or_create(
                     article=obj,
                     publication=obj.publication,
                 )

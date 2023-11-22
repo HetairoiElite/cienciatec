@@ -96,13 +96,6 @@ class Home(TimeStampedModel):
         verbose_name='Convocatoria', upload_to=custom_upload_to_convocatoria,
         null=True, blank=True)
 
-    acept_template = models.FileField(
-        verbose_name='Plantilla de aceptación', upload_to=custom_upload_to_acept_template,
-        null=True, blank=True)
-
-    reject_template = models.FileField(
-        verbose_name='Plantilla de no aceptación', upload_to=custom_upload_to_reject_template,
-        null=True, blank=True)
 
     objects = HomeManager()
 

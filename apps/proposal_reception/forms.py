@@ -17,6 +17,8 @@ class ArticleProposalForm(forms.ModelForm):
             'school',
             'new_school',
             'template',
+            'rights_transfer_letter',
+            'profiles'
         ]
 
         widgets = {
@@ -40,7 +42,14 @@ class ArticleProposalForm(forms.ModelForm):
             'template': forms.ClearableFileInput(attrs={
                 'class': 'form-control mb-2 ',
                 'accept': '.docx',
-            })
+            }),
+            'rights_transfer_letter': forms.ClearableFileInput(attrs={
+                'class': 'form-control mb-2 ',
+                'accept': '.pdf',
+            }),
+            'profiles': forms.CheckboxSelectMultiple(attrs={
+                'class': 'form-control mb-2 ',
+            }),
 
         }
 
@@ -54,6 +63,8 @@ class ArticleProposalForm(forms.ModelForm):
             'school': 'Escuela',
             'new_school': '',
             'template': 'Plantilla',
+            'rights_transfer_letter': 'Carta de cesión de derechos',
+            'profiles': 'Perfiles del artículo',
         }
 
     def __init__(self, *args, **kwargs):
@@ -73,6 +84,19 @@ class ArticleProposalForm(forms.ModelForm):
             raise forms.ValidationError(
                 'El archivo no es un documento de Word')
         return template
+    
+    def clean_profiles(self):
+        profiles = self.cleaned_data['profiles']
+        print(profiles)
+        return profiles
+
+    def clean_rights_transfer_letter(self):
+        rights_transfer_letter = self.cleaned_data['rights_transfer_letter']
+        # * if not pdf
+        if rights_transfer_letter.name.split('.')[-1] != 'pdf':
+            raise forms.ValidationError(
+                'El archivo no es un documento PDF')
+        return rights_transfer_letter
 
     def clean_title(self):
         title = self.cleaned_data['title']
@@ -88,6 +112,7 @@ class ArticleProposalUpdateForm(ArticleProposalForm):
         super().__init__(*args, **kwargs)
         # * if not school exclude school field
         self.fields['template'].required = False
+        self.fields['rights_transfer_letter'].required = False
 
 
 class ArticleProposalAdminForm(forms.ModelForm):
@@ -100,16 +125,15 @@ class ArticleProposalAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # * si el estado es "en dictamen" (6) mostrar opciones de aceptado o rechazo
-        
+
         if self.instance.status == '6':
             self.fields['status'].choices = [
                 ('6', 'En dictamen'),
                 ('7', 'Aceptado'),
                 ('8', 'Rechazado'),
             ]
-        
 
 
 class CoauthorForm(forms.ModelForm):

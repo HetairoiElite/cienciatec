@@ -77,6 +77,7 @@ LOCAL_APPS = [
     'apps.reviewer_assignment',
     'apps.article_review',
     'apps.correction_reception',
+    'apps.final_report_sending',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS +  DJANGO_APPS
@@ -190,3 +191,5 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 JET_MODULE_GOOGLE_ANALYTICS_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, 'client_secrets.json')
 
 # JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'
+
+JET_INDEX_DASHBOARD = 'cienciatec.urls.CustomIndexDashboard'

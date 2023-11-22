@@ -163,11 +163,11 @@ class HomeAdmin(admin.ModelAdmin):
     def current_publication(self, obj):
         try:
             publication = obj.publications.filter(current=True).first()
-            print(publication)
+            # print(publication)
             # * get current publication change url
             change_url = reverse(
                 'admin:Eventos_publication_change', args=[publication.id])
-            print(change_url)
+            # print(change_url)
 
             return format_html(
                 '<a href="{}">{}</a>'.format(change_url, publication)

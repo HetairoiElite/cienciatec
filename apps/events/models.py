@@ -17,7 +17,6 @@ from django.dispatch import receiver
 
 # * apps
 from core.models import Home
-from apps.reviewer_assignment.models import Assignment, ArticleProfile
 from .events import Event
 from .managers import PublicationManager
 # * abstract class event

@@ -1,5 +1,5 @@
 from django.db.models import QuerySet
-from apps.reviewer_assignment.models import Assignment, ArticleProfile
+from apps.reviewer_assignment.models import Assignment
 
 
 class ArticleProposalManager(QuerySet):
@@ -15,12 +15,7 @@ class ArticleProposalManager(QuerySet):
                 publication=article_proposal.publication
             )
             # * create article profile
-            article_profile = ArticleProfile.objects.create(
-                article=article_proposal,
-                publication=article_proposal.publication,
-            )
-            # * save article profile
-            article_profile.save()
+           
             # * save assignment
             assignment.save()
             # * save article proposal

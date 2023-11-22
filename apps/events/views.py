@@ -107,6 +107,6 @@ class CalendarView(ListView):
 
         context['calendar'] = mark_safe(html_calendar)
 
-        print(html_calendar)
+        # print(html_calendar)
 
         return context

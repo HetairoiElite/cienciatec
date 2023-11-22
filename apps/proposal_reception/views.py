@@ -113,8 +113,12 @@ class ProposalFormView(OnlyAuthorMixin, TemplateView):
             article_proposal.author = request.user.profile
 
             article_proposal.publication = publication
-
+            
+            
             article_proposal.save()
+            article_proposal.profiles.set(article_proposal_form.cleaned_data['profiles'])
+            article_proposal.save()
+            # print(article_proposal.profiles.all())
 
             coauthor_formset.instance = article_proposal
             coauthor_formset.save()
@@ -150,8 +154,7 @@ class ProposalFormView(OnlyAuthorMixin, TemplateView):
     #     return super().dispatch(request, *args, **kwargs)
 
 
-class ArticleProposalUpdateView(OnlyAuthorMixin
-                                , UpdateView):
+class ArticleProposalUpdateView(OnlyAuthorMixin, UpdateView):
     template_name = 'proposal_reception/article_proposal_update.html'
 
     model = ArticleProposal
@@ -166,7 +169,6 @@ class ArticleProposalUpdateView(OnlyAuthorMixin
 
         if response.status_code == 302:
             return response
-        
 
         if request.user.profile != self.get_object().author:
             messages.error(
@@ -264,7 +266,7 @@ class CheckTitleView(View):
 
         title = title.strip()
 
-        print('hola')
+        # print('hola')
         id = request.GET.get('id', None)
         try:
             data = {

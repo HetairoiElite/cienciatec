@@ -11,3 +11,6 @@ class PublicMediaStorage(S3Boto3Storage):
     location = 'media'
     default_acl = 'public-read'
     file_overwrite = True
+ 
+    def path(self, name):
+        return settings.MEDIA_ROOT + name

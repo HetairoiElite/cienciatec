@@ -31,7 +31,11 @@
                 de
                 entrada y sigue las instrucciones para activar tu cuenta.</p>
         </div>
-
+        {% elif status ==  "success2" %}
+        <div class="callout success">
+            <h4>¡Gracias por registrarte!</h4>
+            <p>Su cuenta será activada por un administrador. Hasta entonces, no podrá iniciar sesión en el sistema.</p>
+        </div>
         {% elif status == "warning"%}
 
         <div class="callout warning">

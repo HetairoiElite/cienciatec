@@ -20,9 +20,9 @@ from model_utils.models import TimeStampedModel
 
 from apps.events.events import Event
 from core.models import Home
-from apps.reviewer_assignment.models import Assignment, ArticleProfile
 
 from .managers import ArticleProposalManager
+from apps.reviewer_assignment.models import Profile
 
 # Create your models here.
 
@@ -74,6 +74,15 @@ def custom_upload_to_template_as_pdf(instance, filename):
         return f'templates/{instance.author.user.username}/{filename}'
 
 
+def custom_upload_to_rights_transfer_letter(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.rights_transfer_letter.delete()
+        return f'letters/{instance.author.user.username}/{filename}'
+    except ArticleProposal.DoesNotExist:
+        return f'letters/{instance.author.user.username}/{filename}'
+
+
 class ArticleProposal(TimeStampedModel):
 
     objects = ArticleProposalManager.as_manager()
@@ -84,6 +93,9 @@ class ArticleProposal(TimeStampedModel):
 
     title = models.CharField(
         max_length=100, verbose_name='Titulo', unique=True)
+
+    profiles = models.ManyToManyField(
+        Profile, related_name='article_proposals', verbose_name='Perfiles')
 
     slug = models.SlugField(
         max_length=200, verbose_name='Slug', unique=True, null=True, blank=True)
@@ -132,6 +144,7 @@ class ArticleProposal(TimeStampedModel):
         ('6', 'En dictamen'),
         ('7', 'Aceptado'),
         ('8', 'Rechazado'),
+        ('9', 'Pendiente'),
         ('10', 'Publicado')
     )
 
@@ -143,6 +156,10 @@ class ArticleProposal(TimeStampedModel):
 
     dictamen_letter = models.FileField(
         verbose_name='Carta de dictamen', upload_to=custom_upload_to_dictamen_letter, null=True, blank=True, max_length=255)
+
+    # * cesion de derechos
+    rights_transfer_letter = models.FileField(
+        verbose_name='Carta de cesión de derechos', upload_to=custom_upload_to_rights_transfer_letter, null=True)
 
     class Meta:
         verbose_name = 'Propuesta de artículo'
@@ -187,14 +204,11 @@ class ArticleProposal(TimeStampedModel):
 
         else:
             import subprocess
-            import boto3
-            # * download template from s3
-            s3 = boto3.resource('s3')
+            from django.core.files.storage import default_storage
             path = self.template.path
-
-            bucket = s3.Bucket(os.getenv('AWS_STORAGE_BUCKET_NAME'))
-            bucket.download_file(path, settings.BASE_DIR /
-                                 'downloads' / 'template.docx')
+            with default_storage.open(path) as f:
+                with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename('template.docx')), 'wb') as d:
+                    d.write(f.read())
 
             output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
                                               settings.BASE_DIR / 'downloads' / 'template.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
@@ -214,8 +228,8 @@ class ArticleProposal(TimeStampedModel):
         template_paths = (settings.BASE_DIR /
                           'downloads/Recepcion_de_articulo_EDIT.docx').__str__()
 
-        print(template_paths)
-        print(template_paths.__str__())
+        # print(template_paths)
+        # print(template_paths.__str__())
 
         doc = DocxTemplate(template_paths)
 
@@ -288,21 +302,16 @@ class ArticleProposal(TimeStampedModel):
             import subprocess
             output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
                                              'downloads/Carta_de_recepcion.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
-            print(output)
-        
-        # * abrir el archivo y evitando backend no support absolute paths
-         
-        from django.core.files.storage import default_storage
-        
-        file = default_storage.open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb')
-        
-        self.reception_letter.save(
-            f'Carta_de_recepcion_{self.title}.pdf', file)
-         
-        # * enviar el correo electrónico
-         
+            # print(output)
 
-        email = EmailMessage(
+        with open(settings.BASE_DIR / 'downloads/Carta_de_recepcion.pdf', 'rb') as file:
+            from django.core.files import File
+
+            file = File(file)
+            self.reception_letter.save(
+                f'Carta_de_recepcion_{self.title}.pdf', file, save=True)
+
+            email = EmailMessage(
                 subject='Carta de recepción',
                 body=f'Estimado {self.author.user.first_name} {self.author.user.last_name},\n\n'
                 f'Adjunto se encuentra la carta de recepción de su propuesta de artículo "{self.title}"\n\n'
@@ -313,10 +322,10 @@ class ArticleProposal(TimeStampedModel):
                 reply_to=['jonathan90090@gmail.com'],
             )
 
-        email.attach_file(settings.BASE_DIR /
+            email.attach_file(settings.BASE_DIR /
                               'downloads/Carta_de_recepcion.pdf')
 
-        email.send()
+            email.send()
 
         self.save()
 
@@ -381,7 +390,7 @@ class ArticleProposal(TimeStampedModel):
             import subprocess
             output = subprocess.check_output(['libreoffice', '--convert-to', 'pdf', settings.BASE_DIR /
                                              'downloads/Carta_de_dictamen.docx', '--outdir', settings.BASE_DIR / 'downloads/'])
-            print(output)
+            # print(output)
 
         with open(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf', 'rb') as file:
 
@@ -397,14 +406,17 @@ class ArticleProposal(TimeStampedModel):
                 f'Adjunto se encuentra la carta de dictamen de su propuesta de artículo "{self.title}"\n\n'
                 f'Atentamente,\n'
                 f'Comité Editorial de Ciencia y Tecnología',
+                from_email='Jonathan90090@gmail.com',
+                to=[self.author.user.email],
+                reply_to=['jonathan90090@gmail.com'],
             )
-            
-            email.attach_file(settings.BASE_DIR / 'downloads/Carta_de_dictamen.pdf')
-            
+
+            email.attach_file(settings.BASE_DIR /
+                              'downloads/Carta_de_dictamen.pdf')
+
             email.send()
-        
+
         self.save()
-         
 
 
 # * Imagenes de la propuesta

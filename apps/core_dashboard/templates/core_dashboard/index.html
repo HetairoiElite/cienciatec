@@ -90,13 +90,20 @@
 
                             <small data-tooltip tabindex="1" title="{% with article.status as status %} {% if status == "1" %} Tu artículo será recibido por el comité editorial en cualquier momento.
                                 {% elif status == "2" %} Tu artículo ha sido recibido por el comité editorial. En cualquier momento será asignado para su arbitraje.
-                                 {% elif status == "3" %} Tu artículo ha sido asignado para su arbitraje. En cualquier momento será enviado para su corrección.
+                                 {% elif status == "3" %} Tu artículo ha sido asignado para su arbitraje. En cualquier momento será enviado para su revisión.
                                   {% elif status == "4" %}
                                   Tú artículo está a la espera de tus correcciones.
                                     {% elif status == "5" %}
                                     Tú artículo ha sido enviado para la recepción de correciones.
                                 {% elif status == "6" %}
                                 Su propuesta se encuentra en dictamen. Debe esperar a que el artículo sea aceptado o rechazado.
+                                {% elif status == "7" %}
+                                Su artículo ha sido aceptado.
+                                {% elif status == "8" %}
+                                Su artículo ha sido rechazado.
+                                {% elif status == "9" %}
+                                Su artículo ha sido publicado.
+                                 
                                   {% endif %}
                                 {% endwith %}">
 
@@ -121,7 +128,12 @@
 
                                 {% elif status == "6" %}
                                 <i class="fi-flag" style="color:blue;"></i>
-
+                                {% elif status == "7" %}
+                                <i class="fi-check" style="color:green;"></i>
+                                {% elif status == "8" %}
+                                <i class="fi-x" style="color:red;"></i>
+                                {% elif status == "9" %}
+                                <i class="fi-check" style="color:green;"></i>
                                 {% endif %}
                                 {% endwith %}
                                 {{article.get_status_display}}
@@ -159,35 +171,22 @@
                             {% elif article.status != "2" %}
 
                             <small data-tooltip tabindex="1" title="Puedes editar tu propuesta hasta que sea recibida.">
-                            <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
-                                style="text-decoration: none;" class="btn btn-link">
-                                <i class="fi-pencil"></i>
-                                Editar</a>
+                                <a href="{% url 'proposal_reception:article_proposal_update' article.id %}"
+                                    style="text-decoration: none;" class="btn btn-link">
+                                    <i class="fi-pencil"></i>
+                                    Editar</a>
                             </small>
                             {% endif %}
                         </td>
                         <td class="text-center">
-                        {% if article|is_assigned %}
-                        {% if article.assignment.completed %}
+                            {% if article.status > "6" %}
 
-                        {% if article.correction is not None %}
-
-                        {% if not article.correction.correction_file %}
-                        
-
-                        
-
-                        {% endif %}
-
-                        {% endif %}
-                        {% else %}
-
-                        
-                        {% endif %}
-
-                        
-                        {% endif %}
-                    </td>
+                            <a href="{{ article.dictamen_letter.url }}" class="btn btn-link text-primary"
+                                style="text-decoration: none;" target="_blank">
+                                <i class="fi-eye"></i>
+                                Ver</a>
+                            {% endif %}
+                        </td>
                     </tr>
 
                     {% endif %}
@@ -204,7 +203,7 @@
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <p>
                     No ha iniciado ninguna propuesta de artículo para esta publicación{% if current_publication  %}
-                     #{{current_publication}}
+                    #{{current_publication}}
                     {% else %}.{% endif %}
                 </p>
             </div>

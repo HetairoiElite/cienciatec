@@ -22,4 +22,8 @@ DATABASES = {
     }
 }
 
+MIDDLEWARE += [
+    # "kolo.middleware.KoloMiddleware",
+]
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

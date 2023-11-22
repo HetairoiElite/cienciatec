@@ -11,9 +11,9 @@ class CorrectionReceptionForm(forms.ModelForm):
     corrections = forms.ModelMultipleChoiceField(
         queryset=Note.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
-        label='Correcciones',
+        label='Observaciones',
         required=True,
-        help_text='Todas las correcciones deben ser seleccionadas'
+        help_text='Todas las observaciones deben ser seleccionadas'
     )
 
     class Meta:
