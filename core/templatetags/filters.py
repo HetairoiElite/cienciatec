@@ -183,6 +183,9 @@ def get_reported_reviews(assignment):
     # * count enviado = True reviews
     return Review.objects.get_reported_reviews(assignment)
 
+@register.filter(name="get_assignments_by_pub")
+def get_assignments_by_pub(referee, publication):
+    return Assignment.objects.get_assignments_by_pub(referee.profile, publication)
 # * get is reported
 
 @register.filter(name="get_is_reported")
