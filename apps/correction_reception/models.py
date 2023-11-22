@@ -56,38 +56,38 @@ class ArticleCorrection(TimeStampedModel):
 
             pythoncom.CoInitialize()
             
-            # * delete old correction_file to downloads folder
-            
+            # Eliminar el antiguo correction_file en la carpeta de descargas
             try:
                 os.remove(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
-            except:
+            except FileNotFoundError:
                 pass
 
-            # * copy correction_file to downloads folder
-            shutil.copy(self.correction_file.path, settings.BASE_DIR /
-                        'downloads' / 'correction_file.docx')
+            # Copiar correction_file a la carpeta de descargas
+            shutil.copy(self.correction_file.path, settings.BASE_DIR / 'downloads' / 'correction_file.docx')
 
+            # Convertir el correction_file a PDF
             convert(settings.BASE_DIR / 'downloads' / 'correction_file.docx',
                     settings.BASE_DIR / 'downloads' / 'correction_file.pdf')
 
         else:
             import subprocess
-            import boto3
-            # * download template from s3
-            s3 = boto3.resource('s3')
+            from django.core.files.storage import default_storage
+
+            # Descargar el correction_file desde el almacenamiento predeterminado
             path = self.correction_file.path
+            with default_storage.open(path) as f:
+                with open(os.path.join(settings.BASE_DIR, 'downloads', 'correction_file.docx'), 'wb') as d:
+                    d.write(f.read())
 
-            bucket = s3.Bucket(os.getenv('AWS_STORAGE_BUCKET_NAME'))
-            bucket.download_file(path, settings.BASE_DIR /
-                                 'downloads' / 'correction_file.docx')
-
+            # Convertir el correction_file a PDF utilizando LibreOffice
             output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
-                                              settings.BASE_DIR / 'downloads' / 'correction_file.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
+                                            settings.BASE_DIR / 'downloads' / 'correction_file.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
 
+        # Guardar el PDF resultante en el modelo
         with open(settings.BASE_DIR / 'downloads' / 'correction_file.pdf', 'rb') as f:
             from django.core.files import File
             self.correction_file_as_pdf.save(f'{self.article.title}-corregido.pdf',
-                                      File(f))
+                                    File(f))
 
-        self.save()   
-        
+        # Guardar el modelo
+        self.save()
