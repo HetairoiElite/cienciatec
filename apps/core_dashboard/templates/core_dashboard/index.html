@@ -243,7 +243,11 @@
             {% endfor %}
             {% endif %}
 
-            {% if user.profile.assignments.all.count != 0 %}
+            {% with assignments_by_pub=request.user|get_assignments_by_pub:current_publication %}
+            
+
+            {% if assignments_by_pub.count != 0 %}
+            
             <div class="grid-x grid-padding-x cell align-center ">
                 <div class="callout primary cell">
                     <p>
@@ -424,9 +428,11 @@
                         </td>
 
                     </tr>
+                    
                     {% comment %} </tbody> {% endcomment %}
                 {% endif %}
                 {% endfor %}
+                
                 {% endwith %}
                 </tbody>
             </table>
@@ -440,6 +446,8 @@
                 </div>
             </div>
             {% endif %}
+            {% endwith %}
+
         </div>
     </div>
 </div>
