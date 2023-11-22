@@ -22,3 +22,6 @@ class ArticleProposalManager(QuerySet):
             article_proposal.save()
 
         return queryset
+
+    def get_articles_by_pub(self, publication):
+        return self.filter(publication=publication)
