@@ -141,11 +141,12 @@ class ArticleProposal(TimeStampedModel):
         ('3', 'En revisión'),
         ('4', 'Sin corregir'),
         ('5', 'Corregido'),
-        ('6', 'En dictamen'),
-        ('7', 'Aceptado'),
-        ('8', 'Rechazado'),
-        ('9', 'Pendiente'),
-        ('10', 'Publicado')
+        ('6', 'En recepción'),
+        ('7', 'En dictamen'),
+        ('8', 'Aceptado'),
+        ('9', 'Rechazado'),
+        ('10', 'Pendiente'),
+        ('11', 'Publicado')
     )
 
     status = models.CharField(
@@ -335,12 +336,10 @@ class ArticleProposal(TimeStampedModel):
     def send_arbitration_report(self):
         report_letter = Home.objects.first().report_letters
 
-        # * si el status es 7 (aceptado) se envía la carta de dictamen aprobación
-
-        if self.status == '7':
+        if self.status == '8':
             template_paths = (settings.BASE_DIR /
                               'downloads/DICTAMEN-APROBADO_edit.docx').__str__()
-        elif self.status == '8':
+        elif self.status == '9':
             template_paths = (settings.BASE_DIR /
                               'downloads/DICTAMEN-NO-APROBADO_edit.docx').__str__()
 
