@@ -1,0 +1,31 @@
+{% extends "admin/change_list.html" %}
+
+{% block info %}
+<div class="callout primary">
+    <p><i class="fi-info"></i> 
+        Instrucciones para asignar árbitros:
+        <ul>
+            <li>
+                Acceda al detalle de alguna asignación haciendo clic en ella.
+            </li>
+            <li>
+                Haga clic en el campo 'Árbitros'.
+            </li>
+            <li>
+                Seleccione dos árbitros. Al guardar la asignación, se enviará un correo a los árbitros seleccionados.
+            </li>
+        </ul>
+    </p>
+
+    <p>
+        <i class="fi-info"></i>
+        Los árbitros que aparezcan en el campo serán aquellos que coincidan con los perfiles del artículo. Si existen árbitros con perfiles similares y el árbitro ya tiene cuatro asignaciones, no aparecerá como sugerencia. El máximo de asignaciones que puede manejar un árbitro son cuatro. Si no hay árbitros que coincidan con los perfiles o con la carga de asignaciones disponibles, aparecerán todos los árbitros aunque no coincidan con los perfiles. En caso de que no haya árbitros disponibles en ninguno de los casos descritos, el sistema informará que no es posible asignar hasta que se desocupen al menos dos árbitros.
+    </p>
+
+    <p>
+        <i class="fi-info"></i>
+        Una vez realizada la asignación, no es posible cambiar los árbitros.
+    </p>
+    
+</div>
+{% endblock info %}
