@@ -280,7 +280,7 @@
 
         var porcentaje = suma / correcciones.length;
 
-        $('#puntaje').text(porcentaje * 100 + '% correcciones realizadas.');
+        $('#puntaje').text((porcentaje * 100).toFixed(2) + '% correcciones realizadas.');
 
     });
 </script>
