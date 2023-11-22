@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',os.getenv('IP_HOST')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',os.getenv('IP_HOST'), os.getenv('LOCAL_IP')]
 
 # Daphne
 # ASGI_APPLICATION = "cienciatec.asgi.application"
