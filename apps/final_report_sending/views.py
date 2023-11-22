@@ -52,7 +52,6 @@ class FinalReportAdminView(TemplateView):
             else:
                 template = home.report_letters.template_rejected.path
 
-            template = home.reception_letters.template.path
 
             # Crear archivos temporales para cada archivo
             temp_template = NamedTemporaryFile(delete=False)
@@ -80,9 +79,9 @@ class FinalReportAdminView(TemplateView):
                     d.write(f.read())
 
         if action == 'aceptar':
-            article.status = '7'
-        else:
             article.status = '8'
+        else:
+            article.status = '9'
 
         article.save()
 
