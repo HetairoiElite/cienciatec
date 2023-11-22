@@ -2,9 +2,13 @@ from django.db import models
 from django.contrib.sites.shortcuts import get_current_site
 # * TimeStampedModel
 from model_utils.models import TimeStampedModel
+from apps.reviewer_assignment.managers import AssignmentManager
 
 
 class Assignment(TimeStampedModel):
+    
+    objects = AssignmentManager()
+    
     publication = models.ForeignKey(
         'Eventos.Publication', on_delete=models.CASCADE, related_name='assignments',
         verbose_name='Publicación')
