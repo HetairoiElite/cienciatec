@@ -12,14 +12,15 @@ class RecentArticleProposals(DashboardModule):
         por_asignar = ArticleProposal.objects.filter(status='2').count()
         en_revision = ArticleProposal.objects.filter(status='3').count()
         por_corregir = ArticleProposal.objects.filter(status='4').count()
-        por_dictaminar = ArticleProposal.objects.filter(status='5').count()
-        en_dictamen = ArticleProposal.objects.filter(status='6').count()
+        por_recibir_correcciones = ArticleProposal.objects.filter(status='5').count()
+        por_dictaminar = ArticleProposal.objects.filter(status='6').count()
+        en_dictamen = ArticleProposal.objects.filter(status='7').count()
         from django.db.models import Q
         aceptados = ArticleProposal.objects.filter(
-            Q(status='7') | Q(status='9') | Q(status='10')).distinct().count()
-        rechazados = ArticleProposal.objects.filter(status='8').count()
-        pendientes = ArticleProposal.objects.filter(status='9').count()
-        por_publicar = ArticleProposal.objects.filter(status='10').count()
+            Q(status='8') | Q(status='10') | Q(status='11')).distinct().count()
+        rechazados = ArticleProposal.objects.filter(status='9').count()
+        pendientes = ArticleProposal.objects.filter(status='10').count()
+        por_publicar = ArticleProposal.objects.filter(status='11').count()
 
         self.children.append({
             'title': 'Por recibir',
@@ -40,6 +41,12 @@ class RecentArticleProposals(DashboardModule):
             
             'title': 'Por corregir',
             'value': f'{por_corregir} - {por_corregir * 100 / ArticleProposal.objects.count():.2f}%',
+        })
+        
+        self.children.append({
+            
+            'title': 'Por recibir correcciones',
+            'value': f'{por_recibir_correcciones} - {por_recibir_correcciones * 100 / ArticleProposal.objects.count():.2f}%',
         })
         
         self.children.append({
