@@ -1,14 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="en">
+
 {% load static %}
 {% load filters %}
+
 <style>
     .rounded-circle {
         border-radius: 50%;
     }
 
-    /* FILE INPUT STYLE Foundatipn 6.5.3 */
-
+    /* Estilo de entrada de archivo Foundation 6.5.3 */
 
     ::-webkit-file-upload-button {
         background: #d7ecfa;
@@ -39,11 +40,9 @@
 </style>
 
 {% block styles %}
-
 {% endblock %}
 
 <head>
-
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -66,18 +65,6 @@
         }
     </style>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T0X5Z6H26"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'G-7T0X5Z6H26');
-</script>
 
 <body>
     <div id="loading" style="display:none;">
@@ -113,47 +100,31 @@
 
         #myBtn {
             display: none;
-            /* Hidden by default */
             position: fixed;
-            /* Fixed/sticky position */
             bottom: 20px;
-            /* Place the button at the bottom of the page */
             right: 30px;
-            /* Place the button 30px from the right */
             z-index: 99;
-            /* Make sure it does not overlap */
             border: none;
-            /* Remove borders */
             outline: none;
-            /* Remove outline */
-            /* Set a background color */
             color: white;
-            /* Text color */
             cursor: pointer;
-            /* Add a mouse pointer on hover */
             padding: 15px;
-            /* Some padding */
             border-radius: 10px;
-            /* Rounded corners */
             font-size: 18px;
-            /* Increase font size */
         }
 
         #myBtn:hover {
             background-color: #555;
-            /* Add a dark-grey background on hover */
         }
     </style>
 
-
-    <button onclick="topFunction()" id="myBtn" title="Go to top" class="button secondary">
+    <button onclick="topFunction()" id="myBtn" title="Ir arriba" class="button secondary">
         <i class="fi-arrow-up"></i>
     </button>
 
-    <!-- FIN del primer bloque home -->
     <div class="off-canvas-wrapper" style="margin-bottom: 100px;">
         <div class="off-canvas position-left" style="background-color: #212531;" id="offCanvasLeft" data-off-canvas>
-            <button class="close-button" style="color:white;" aria-label="Close menu" type="button" data-close>
+            <button class="close-button" style="color:white;" aria-label="Cerrar menú" type="button" data-close>
                 <span aria-hidden="true">&times;</span>
             </button>
 
@@ -175,7 +146,6 @@
                         </li>
                     </div>
                     {% if not request.user|has_group:"Administrador" and not request.user.is_superuser %}
-
                     <div class="cell large-11">
                         <li><a style="color:white;" href="{% url 'core_dashboard:dashboard' %}">
                                 <i class="fi-graph-bar"></i>
@@ -184,7 +154,6 @@
                         </li>
                     </div>
                     {% endif %}
-
                     <div class="cell large-11">
                         <li><a style="color:white;" href="{% url 'events:calendar' %}">
                                 <i class="fi-calendar"></i>
@@ -204,8 +173,6 @@
                                 <i class="fi-power"></i>
                                 Salir</a></li>
                     </div>
-
-
                     {% else %}
                     <div class="cell large-11">
                         <li><a style="color:white;" href="{% url 'login' %}">
@@ -217,8 +184,6 @@
                                 <i class="fi-torso"></i>
                                 Registrarse</a></li>
                     </div>
-
-
                     {% endif %}
                 </div>
             </ul>
@@ -226,10 +191,8 @@
         <div class="off-canvas-content" data-off-canvas-content>
             {% include 'core/includes/header.html' %}
 
-
             <div class="grid-container" >
                 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
-
                     <div class="cell align-left large-10 medium-10 small-10" id="paths">
                         {% block back %}
                         <a href="{{request.META.HTTP_REFERER}}" class="button clear
@@ -237,47 +200,33 @@
                         disabled
                         {% endif %}
                         ">
-
                             {% block back_button %}
                             <i class="fi-arrow-left"></i>
                             Volver
                             {% endblock back_button %}
-
                         </a>
                         {% endblock back %}
 
-
-                        <nav aria-label="You are here:" role="navigation">
+                        <nav aria-label="Estás aquí:" role="navigation">
                             <ul class="breadcrumbs">
                                 {% block path %}
-
                                 {% endblock path %}
-                                <li>
-
-                                </li>
+                                <li></li>
                             </ul>
                         </nav>
-
                     </div>
                 </div>
 
                 {% block content %}
-
                 {% endblock content %}
-
             </div>
         </div>
     </div>
 
-
-
     {% include "core/includes/footer.html" %}
 
-
-    <script src="{% static 'core/node_modules/jquery/dist/jquery.min.js' %}">
-        < /scrip> <
-        script src = "{% static 'core/node_modules/what-input/dist/what-input.js' %}" >
-    </script>
+    <script src="{% static 'core/node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'core/node_modules/what-input/dist/what-input.js' %}"></script>
     <script src="{% static 'core/node_modules/foundation-sites/dist/js/foundation.min.js' %}"></script>
     <script>
         Foundation.Abide.defaults.patterns['regex2name'] = /^([A-ZÑÁÉÍÓÚ]{1}[a-zñáéíóú]+\s*){1,2}$/;
@@ -295,8 +244,8 @@
                 },
                 async: false,
                 success: function (data) {
-                    console.log(data)
-                    console.log(data.is_valid)
+                    console.log(data);
+                    console.log(data.is_valid);
                     if (data.is_valid == true) {
                         result = true;
                     } else {
@@ -304,7 +253,7 @@
                     }
                 }
             });
-            console.log('result' + result)
+            console.log('result' + result);
             return result;
         };
 
@@ -313,7 +262,7 @@
         });
 
         Foundation.Abide.defaults.validators['regex2title'] = function (el) {
-            console.log(el.val())
+            console.log(el.val());
             var title = el.val();
             var url = "{% url 'proposal_reception:check_title' %}";
             var result = false;
@@ -326,8 +275,8 @@
                 },
                 async: false,
                 success: function (data) {
-                    console.log(data)
-                    console.log(data.is_taken)
+                    console.log(data);
+                    console.log(data.is_taken);
                     if (data.is_taken == true) {
                         result = false;
                     } else {
@@ -335,18 +284,14 @@
                     }
                 }
             });
-            console.log('result' + result)
+            console.log('result' + result);
             return result;
         };
 
+        $(document).foundation();
 
-
-        $(document).foundation()
-
-        // Get the button:
         let mybutton = document.getElementById("myBtn");
 
-        // When the user scrolls down 20px from the top of the document, show the button
         window.onscroll = function () {
             scrollFunction()
         };
@@ -359,15 +304,11 @@
             }
         }
 
-        // When the user clicks on the button, scroll to the top of the document
         function topFunction() {
-
             while (document.body.scrollTop > 0 || document.documentElement.scrollTop > 0) {
                 document.body.scrollTop -= 0.1;
                 document.documentElement.scrollTop -= 0.1;
             }
-
-
         }
     </script>
 

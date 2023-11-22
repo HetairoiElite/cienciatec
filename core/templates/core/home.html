@@ -1,41 +1,35 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}Inicio{% endblock title %}
 
 {% block back %}
 <a href="" class="button clear disabled">
     {% block back_button %}
     {{ block.super }}
     {% endblock back_button %}
-
-
 </a>
 {% endblock back %}
 
 {% block path %}
-
 <nav aria-label="You are here:" role="navigation">
     <ul class="breadcrumbs">
         <li>
-            <span class="show-for-sr">Current: </span>inicio
+            <span class="show-for-sr">Actual: </span>inicio
         </li>
         <li>
-
+            <!-- Aquí puedes agregar información adicional si es necesario -->
         </li>
     </ul>
 </nav>
-
 {% endblock path %}
 
 {% block content %}
-
-
 {# si hay mensaje de error #}
 
-
-<!-- primer bloque del home -->
-{% comment %} <div class="gridx-grid-margin-x align-right" style="margin-top: 1em;">
+<!-- Primer bloque del home -->
+{% comment %}
+<div class="gridx-grid-margin-x align-right" style="margin-top: 1em;">
     <div class="cell small-11 large-5 align-self-middle">
         <div class="card">
             <img src="{% static 'core/img/python.jpg' %}">
@@ -45,148 +39,155 @@
             </div>
         </div>
     </div>
-</div> {% endcomment %}
+</div>
+{% endcomment %}
 
 {% if request.user.is_authenticated %}
-{% if request.user.profile.type_user == "1" %}
-<div class="grid-x grid-margin-x align-center" style=" margin-bottom: 5em;">
+    {% if request.user.profile.type_user == "1" %}
+        <div class="grid-x grid-margin-x align-center" style="margin-bottom: 5em;">
 
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell ">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="callout alert">
-                {{ message }}
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="callout alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¡Hola {{request.user.first_name}}!</h5>
+                        <p>
+                            Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
+                            podrás
+                            crear tus propios artículos y publicarlos en la revista.
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell ">
-            <div class="callout primary">
-                <h5>¡Hola {{request.user.first_name}}!</h5>
-                <p>
-                    Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
-                    podrás
-                    crear tus propios artículos y publicarlos en la revista.
-                </p>
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¿Qué es lo que puedes hacer?</h5>
+                        <p>
+                            Puedes crear tus propias propuestas de artículos e iniciar el proceso de arbitraje a doble ciego,
+                            después de ser aceptados podrás ver tu artículo publicado, así como los artículos que participan en
+                            nuestra revista publicados por otros autores.
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¿Cómo puedo crear un artículo?</h5>
+                        <p>
+                            Para redactar un artículo debes:
+                        </p>
+                        <ol>
+                            <li><a href="{% url 'proposal_reception:article_proposal_form' %}">Iniciar con una propuesta de
+                                    artículo.</a></li>
+                            <li>Enviada la propuesta, debes esperar a que sea recibida por el comité de arbitraje de
+                                {{home.title}}.</li>
+                            <li>Se iniciará un proceso de revisión</li>
+                            <li>Una vez aprobada la propuesta, será notificada tu aceptación</li>
+                            <li>Se publica tu artículo en la edición participante</li>
+                        </ol>
+                        <p>
+                            Este proceso podrás darle seguimiento en el
+                            <a href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de actividades, donde verás el estado en
+                            el que se encuentra tu propuesta hasta ser publicada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell text-center">
+                    <div class="button primary">
+                        <a href="{% url 'proposal_reception:article_proposal_form' %}" style="color: white;">Iniciar
+                            propuesta de
+                            artículo</a>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
             </div>
         </div>
+    {% elif request.user.profile.type_user == "2" %}
+        {# Arbitro #}
+        <div class="grid-x grid-margin-x align-center" style="margin-bottom: 5em;">
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="callout alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¡Hola {{request.user.first_name}}!</h5>
+                        <p>
+                            Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
+                            podrás realizar el proceso de arbitraje de artículos que se te han asignado para su seguimiento.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    </div>
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¿Qué es lo que puedes hacer?</h5>
+                        <p>
+                            De los artículos asignados podrás agregar notas para observaciones y/o sugerencias derivadas de la
+                            revisión de los artículos.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-
-        <div class="cell">
-            <div class="callout primary">
-                <h5>¿Qué es lo que puedes hacer?</h5>
-                <p>
-                    Puedes crear tus propias propuestas de artículos e iniciar el proceso de arbitraje a doble ciego,
-                    después de ser aceptados podrás ver tu artículo publicado, así como los artículos que partcipan en
-                    nuestra revista publicados por otros autores.
+            <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
+                <div class="cell">
+                    <div class="callout primary">
+                        <h5>¿Cómo puedo arbitrar un artículo?</h5>
+                        <p>
+                            Sigue los siguientes pasos:
+                        </p>
+                        <ol>
+                            <li>Actualizar tu perfil de arbitraje en tu <a
+                                    href="{% url 'registration:profile' %}?edit#id_profiles">perfil de usuario</a>. </li>
+                            <li>Una vez actualizado, espera las asignaciones de artículos que se te han realizado.</li>
+                            <li>Asignados los artículos, podrás verlos en el <a
+                                    href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de actividades.</li>
+                            <li>Al finalizar el arbitraje, podrás enviarlo al autor/a para su revisión a través del botón
+                                "Enviar observaciones".</li>
+                            <li>Una vez corregido, se le notificará al autor/a para que realice las correcciones.</li>
+                            <li>Espera a que el/la autor/a realice las correcciones. Se te notificará cuando se hayan
+                                realizado.</li>
+                            <li>Verifica si se han realizado las correcciones.</li>
+                            <li>Finaliza el proceso con la aceptación o rechazo del artículo.</li>
+                        </ol>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell">
-            <div class="callout primary">
-                <h5>¿Cómo puedo crear un artículo?</h5>
-                <p>
-                    Para redactar un artículo debes:
-
-
-                </p>
-                <ol>
-                    <li><a href="{% url 'proposal_reception:article_proposal_form' %}">Iniciar con una propuesta de
-                            artículo.</a></li>
-                    <li>Enviada la propuest, debes esperar a que sea recibida por el comité de arbitraje de
-                        {{home.title}}.</li>
-                    <li>Se iniciará un proceso de revisión</li>
-                    <li>Una vez aprobada la propuesta, será notificada tu aceptación</li>
-                    <li>Se publica tu artículo en la edición participante</li>
-                </ol>
-                <p>
-                    Este proceso podrás dar seguimiento en el
-                    <a href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de actividades, donde verás el status en
-                    el que se encuentra tu propuesta hasta ser publicada.
-
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell text-center">
-            <div class="button primary">
-                <a href="{% url 'proposal_reception:article_proposal_form' %}" style="color: white;">Iniciar
-                    propuesta de
-                    artículo</a>
-                <i class="fas fa-plus"></i>
-            </div>
-        </div>
-    </div>
-</div>
-{% elif request.user.profile.type_user == "2" %}
-{# Arbirto #}
-<div class="grid-x grid-margin-x align-center" style=" margin-bottom: 5em;">
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell ">
-            <div class="callout primary">
-                <h5>¡Hola {{request.user.first_name}}!</h5>
-                <p>
-                    Bienvenido {{request.user.first_name}} a la plataforma de la revista {{home.title}} donde
-                    podrás realizar el proceso de arbitraje de artículos que se te han asignado para su seguimiento.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell">
-            <div class="callout primary">
-                <h5>¿Qué es lo que puedes hacer?</h5>
-                <p>
-                    De los artículos asignados podrás agregar notas para observaciones y/o sugerencias derivadas de la
-                    revisión de los artículos.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-x grid-padding-x cell align-center medium-8 small-8">
-        <div class="cell">
-            <div class="callout primary">
-                <h5>¿Cómo puedo arbitrar un artículo?</h5>
-                <p>
-                    Seguir los siguientes pasos:
-                </p>
-                <ol>
-                    <li>Actualizar tu perfil de arbitraje en tu <a
-                            href="{% url 'registration:profile' %}?edit#id_profiles">perfil de usuario</a>. </li>
-                    <li>Una vez actualizado, esperar las asignaciones de artículos que se te han realizado.</li>
-                    <li>Asignados los artículos, podrás verlo en el <a
-                            href="{% url 'core_dashboard:dashboard' %}">Tablero</a> de actividades.</li>
-                    <li>Al finalizar el arbitraje podrás enviarlo al autor/a para su revisión a través del botón
-                        "Enviar observaciones".</li>
-                    <li>Una vez corregido, se le notificará al autor/a para que realice las correcciones.</li>
-                    <li>Esperar a que el/la autor/a realice las correcciones. Se te notificará cuando se hayan
-                        realizado.</li>
-                    <li>Verificar si se han realizado las correcciones.</li>
-                    <li>Se finaliza el proceso con la aceptación o rechazo del artículo.</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
+    {% endif %}
 {% endif %}
 
 <div class="grid-x grid-margin-x align-right" style="margin-top: 1em;">
 
-    <!-- bloque de blog principal -->
+    <!-- Bloque de blog principal -->
     <div class="cell small-11 large-5 align-self-middle">
         <div class="card" style="width: 100%;">
             <img src="{% static 'core/img/python.jpg' %}">
@@ -196,14 +197,14 @@
             </div>
         </div>
     </div>
-    <!-- FIN bloque de blog principal -->
+    <!-- FIN Bloque de blog principal -->
 
-    <!-- bloque de blog principal -->
+    <!-- Bloque de blog principal -->
     <div class="cell small-12 large-6 grid-x grid-margin-x">
 
         <div class="cell small-6 large-6">
             <div class="card" style="width: 100%;">
-                <img src="{% static 'core/img/cpp.jpeg' %}" style="height:150px">
+                <img src="{% static 'core/img/cpp.jpeg' %}" style="height: 150px">
                 <div class="card-section">
                     <a href="/entradas/5/">
                         <h5>Cómo programar en C++</h5>
@@ -214,7 +215,7 @@
 
         <div class="cell small-6 large-6">
             <div class="card" style="width: 100%;">
-                <img src="{% static 'core/img/python.jpg' %}" style="height:150px">
+                <img src="{% static 'core/img/python.jpg' %}" style="height: 150px">
                 <div class="card-section">
                     <a href="/entradas/4/">
                         <h5>Arte con IA</h5>
@@ -225,7 +226,7 @@
 
         <div class="cell small-6 large-6">
             <div class="card" style="width: 100%;">
-                <img src="{% static 'core/img/testcode_mail_from_django.png' %}" style="height:150px">
+                <img src="{% static 'core/img/testcode_mail_from_django.png' %}" style="height: 150px">
                 <div class="card-section">
                     <a href="/entradas/3/">
                         <h5>Funciones para todos los lenguajes</h5>
@@ -236,95 +237,82 @@
 
         <div class="cell small-6 large-6">
             <div class="card" style="width: 100%;">
-                <img src="{% static 'core/img/java.jpg' %}" style="height:150px">
+                <img src="{% static 'core/img/java.jpg' %}" style="height: 150px">
                 <div class="card-section">
                     <a href="/entradas/2/">
-                        <h5>Como programar en Java</h5>
+                        <h5>Cómo programar en Java</h5>
                     </a>
                 </div>
             </div>
         </div>
 
     </div>
-    <!-- FIN bloque de blog principal -->
+    <!-- FIN Bloque de blog principal -->
 </div>
 
-<!-- Imagen cnetrada -->
+<!-- Imagen centrada -->
 <div class="container text-center mb-3">
-    <img src="{{home.image.url}}" class="img-fluid" alt="Responsive image">
+    <img src="{{home.image.url}}" class="img-fluid" alt="Imagen responsive">
 </div>
-
-
-
 
 {% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}
+    <!-- Propuesta de artículo -->
 
-<!-- Prpopuesta de articulo -->
+    <h4 class="text-center">Recursos</h4>
 
-<h4 class="text-center">Recursos</h4>
+    <!-- Convocatoria -->
 
-<!-- Convocatoria -->
-
-<div class="container text-center mb-3">
-    <div class="row">
-        <div class="col-md-12">
-            <a class="btn btn-danger btn-lg btn-block" href="{{home.convocatoria.url}}"><i
-                    class="fas fa-file-pdf"></i>&nbsp;
-                Convocatoria</a>
-        </div>
-    </div>
-</div>
-
-<!-- Plantillas -->
-<div class="container text-center mb-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h4>Plantillas</h4>
-            {% for plantilla in home.article_templates.all %}
-            {% if plantilla.template.url is not none %}
-
-            <p><a class="btn btn-primary btn-lg btn-block" href="{{plantilla.template.url}}"><i
-                        class="fas fa-file-word"></i>&nbsp;
-                    {{plantilla.name}}</a></p>
-            {% endif %}
-
-            {% endfor %}
-
-        </div>
-    </div>
-</div>
-
-{% if not user.is_staff and not user.profile.type_user == "2    " %}
-
-<div class="container text-center mb-5">
-    <div class="row">
-        <div class="col-md-12">
-            {% comment "" %}if message {% endcomment %}
-            {% if messages %}
-            {% for message in messages %}
-            <div id="over"
-                class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
-                role="alert">
-                {{ message }}
+    <div class="container text-center mb-3">
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-danger btn-lg btn-block" href="{{home.convocatoria.url}}"><i
+                        class="fas fa-file-pdf"></i>&nbsp;
+                    Convocatoria</a>
             </div>
-
-            {% endfor %}
-            {% endif %}
-            <h4>Inicia tu propuesta</h4>
-            <a class="btn btn-primary btn-lg btn-block" href="{% url 'proposal_reception:article_proposal_form' %}"><i
-                    class="fas fa-file-pdf"></i>&nbsp;
-                Comenzar propuesta de articulo</a>
         </div>
     </div>
-</div>
+
+    <!-- Plantillas -->
+    <div class="container text-center mb-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Plantillas</h4>
+                {% for plantilla in home.article_templates.all %}
+                    {% if plantilla.template.url is not none %}
+                        <p><a class="btn btn-primary btn-lg btn-block" href="{{plantilla.template.url}}"><i
+                                    class="fas fa-file-word"></i>&nbsp;
+                                {{plantilla.name}}</a></p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if not user.is_staff and not user.profile.type_user == "2" %}
+        <div class="container text-center mb-5">
+            <div class="row">
+                <div class="col-md-12">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div id="over"
+                                class="alert alert-{% if message.tags == 'success' %}success {% elif message.tags == 'error' %}danger {% endif %}"
+                                role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <h4>Inicia tu propuesta</h4>
+                    <a class="btn btn-primary btn-lg btn-block" href="{% url 'proposal_reception:article_proposal_form' %}"><i
+                            class="fas fa-file-pdf"></i>&nbsp;
+                        Comenzar propuesta de artículo</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <br>
+    <br>
+
 {% endif %}
-
-<br>
-<br>
-
-
-
-{% endif %}
-
 
 {% endblock content %}
