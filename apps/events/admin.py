@@ -16,7 +16,7 @@ class PublicationAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return ['numero_publicacion', 'home']
+            return ['numero_publicacion', 'home', 'numero_folio']
         else:
             return ['home']
 

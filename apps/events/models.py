@@ -38,6 +38,9 @@ class Publication(Event):
         help_text='Numero de publicación',
         unique=True,
     )
+    
+    numero_folio = models.PositiveIntegerField(
+        verbose_name='Número de oficio actual', default=1)
     # try:
     home = models.ForeignKey(Home, on_delete=models.CASCADE, null=True, blank=True, related_name='publications',
                              default='2')
