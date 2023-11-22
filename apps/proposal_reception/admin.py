@@ -180,11 +180,11 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-flag"></i> Asignar</a>'
                                    + '</a>')
-            elif obj.status < '5':
+            elif obj.status <= '6':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
                                    + '</a>')
-            elif obj.status == '6':
+            elif obj.status == '7':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
                                    '<i class="fi fi-results"></i> Dictaminar</a>'
                                    + '</a>')
