@@ -38,18 +38,11 @@ class CustomLoginForm(AuthenticationForm):
         password = self.cleaned_data.get("password")
 
         if username is not None and password:
-            self.user_cache = authenticate(
+            user = authenticate(
                 self.request, username=username, password=password
             )
-            if self.user_cache is None:
-                try:
-                    user = User.objects.get(
-                        username=username, password=make_password(password))
-                    if not user.is_active:
-                        raise forms.ValidationError(
-                            "Esta cuenta no está activa, revisa tu correo electrónico para activarla o contacta al administrador.")
-                except User.DoesNotExist:
-                    raise self.get_invalid_login_error()
+            if user is None:
+                raise forms.ValidationError("El usuario y la contraseña son incorrectos o puede ser que la cuenta aún no ha sido activada.")
             else:
                 self.confirm_login_allowed(self.user_cache)
 
