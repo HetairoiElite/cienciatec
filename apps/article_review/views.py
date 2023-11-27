@@ -136,3 +136,13 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             'form': form, 'review': self.get_object(),
             'inline_notes_form': inline_notes_form,
         })
+    def inline_form_invalid (self, inline_notes_form):
+        return render(self.request, self.template_name, {
+            'review': self.get_object(),
+            'inline_notes_form': inline_notes_form,
+        })
+    
+    def inline_form_valid (self, inline_notes_form):
+        inline_notes_form.save()
+        messages.success(self.request, '¡Arbitraje guardado exitosamente!')
+        return redirect('core_dashboard:dashboard')
