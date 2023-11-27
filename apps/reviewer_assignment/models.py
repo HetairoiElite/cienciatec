@@ -47,7 +47,7 @@ class Assignment(TimeStampedModel):
 
 
 
-class Profile(models.Model):
+class Profile(TimeStampedModel):
     profile = models.CharField(
         max_length=100, unique=True, verbose_name='Perfil')
 
