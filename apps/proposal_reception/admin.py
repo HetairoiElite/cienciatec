@@ -188,6 +188,10 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
                                    '<i class="fi fi-results"></i> Dictaminar</a>'
                                    + '</a>')
+            elif obj.status == '7':
+                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
+                                   '<i class="fi fi-results"></i></a>'
+                                   + '</a>')
         else:
 
             # * marcar como recibido
@@ -277,6 +281,8 @@ class ArticleProposalAdmin(admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
     # * change_list_context
+    
+    
 
 
 admin.site.register(ArticleProposal, ArticleProposalAdmin)
