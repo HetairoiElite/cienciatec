@@ -161,6 +161,10 @@ class ArticleProposal(TimeStampedModel):
     rights_transfer_letter = models.FileField(
         verbose_name='Carta de cesión de derechos', upload_to=custom_upload_to_rights_transfer_letter, null=True)
 
+    DOI = models.CharField(
+        max_length=100, verbose_name='DOI', null=True, blank=True)
+    
+
     class Meta:
         verbose_name = 'Propuesta de artículo'
         verbose_name_plural = 'Propuestas de artículos'
@@ -172,6 +176,9 @@ class ArticleProposal(TimeStampedModel):
         self.slug = slugify(self.title)
 
         super().save(*args, **kwargs)
+
+    def generate_fake_doi(self):
+        pass
 
     def generate_template_as_pdf(self):
         from dotenv import load_dotenv
