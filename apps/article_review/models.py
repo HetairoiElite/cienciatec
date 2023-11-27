@@ -10,7 +10,7 @@ from .managers import ReviewManager
 # * Las notas son booleanas y los comentarios son de texto libre.
 
 
-class Note(models.Model):
+class Note(TimeStampedModel):
     review = models.ForeignKey(
         'Review', on_delete=models.CASCADE, related_name='notes',
         verbose_name='Arbitraje'
