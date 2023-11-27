@@ -83,10 +83,13 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             })
 
     def post(self, request, *args, **kwargs):
+        review = self.get_object()
+        
 
         if request.GET['recepcion'] != 'true':
 
-            form = ReviewForm(request.POST)
+            form = ReviewForm(request.POST, instance=review)
+
 
             inline_notes_form = inlineformset_factory(
                 Review,
@@ -97,9 +100,9 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             )(request.POST, instance=self.get_object())
 
             if form.is_valid() and inline_notes_form.is_valid():
-                return self.form_valid(inline_notes_form)
+                return self.form_valid(form, inline_notes_form)
             else:
-                return self.form_invalid(inline_notes_form)
+                return self.inline_form_invalid(inline_notes_form)
         else:
             inline_notes_form = inlineformset_factory(
                 Review,
@@ -110,26 +113,16 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView):
             )(request.POST, instance=self.get_object())
 
             if inline_notes_form.is_valid():
-                return self.form_valid(inline_notes_form)
+                return self.inline_form_valid(inline_notes_form)
             else:
-                return self.form_invalid(inline_notes_form)
+                return self.inline_form_invalid(inline_notes_form)
 
     def form_valid(self, form, inline_notes_form):
         self.object = form.save()
         inline_notes_form.save()
         messages.success(self.request, '¡Arbitraje guardado exitosamente!')
         return redirect('core_dashboard:dashboard')
-
-    def form_valid(self, inline_notes_form):
-        inline_notes_form.save()
-        messages.success(self.request, '¡Arbitraje guardado exitosamente!')
-        return redirect('core_dashboard:dashboard')
-
-    def form_invalid(self, inline_notes_form):
-        return render(self.request, self.template_name, {
-            'review': self.get_object(),
-            'inline_notes_form': inline_notes_form,
-        })
+    
 
     def form_invalid(self, form, inline_notes_form):
         return render(self.request, self.template_name, {

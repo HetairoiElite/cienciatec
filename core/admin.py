@@ -202,8 +202,6 @@ class HomeAdmin(admin.ModelAdmin):
         ('Archivos adjuntos', {
             'fields': (
                 'convocatoria',
-                'acept_template',
-                'reject_template',
             )
         }),
         # ('Periodo de publicación', {'fields': ('publication',)})

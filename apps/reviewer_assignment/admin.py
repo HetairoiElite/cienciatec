@@ -71,6 +71,7 @@ class ReviewInline(jet_admin.CompactInline):
 class AssignmentAdmin(admin.ModelAdmin):
     
     change_form_template = 'admin/reviewer_assignment/change_form.html'
+    change_list_template = 'admin/reviewer_assignment/change_list.html'
     
     # * cargar contexto 
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -121,7 +122,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 
         return super().get_fields(request, obj)
 
-    list_filter = ('status',)
+    list_filter = ('status', 'publication__numero_publicacion')
 
     search_fields = ('article__title',)
 
@@ -172,6 +173,19 @@ class AssignmentAdmin(admin.ModelAdmin):
                         'La asignación del artículo <a>' + obj.article.title + '</a> se ha actualizado correctamente'))
                 
         return super().save_model(request, obj, form, change)
+    
+    def changelist_view(self, request, extra_context=None):
+        from apps.events.models import Publication
+        current = Publication.objects.get_current()
+        if current and not request.GET:
+            from django.http import HttpResponseRedirect
+            from django.urls import reverse
+            url = "%s?publication__numero_publicacion=%s" % (reverse('admin:Asignacion_Arbitros_assignment_changelist'), current.numero_publicacion)
+            print(url)
+            return HttpResponseRedirect(url)
+        
+        return super(AssignmentAdmin, self).changelist_view(request, extra_context=extra_context)
+
 
     def delete_model(self, request, obj):
         messages.success(request,

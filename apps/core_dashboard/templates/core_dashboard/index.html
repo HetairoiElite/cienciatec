@@ -93,16 +93,18 @@
                                  {% elif status == "3" %} Tu artículo ha sido asignado para su arbitraje. En cualquier momento será enviado para su revisión.
                                   {% elif status == "4" %}
                                   Tú artículo está a la espera de tus correcciones.
-                                    {% elif status == "5" %}
-                                    Tú artículo ha sido enviado para la recepción de correciones.
-                                {% elif status == "6" %}
-                                Su propuesta se encuentra en dictamen. Debe esperar a que el artículo sea aceptado o rechazado.
+                                  {% elif status == "5" %}
+                                  Tus correcciones fueron enviadas para su recepción.
+                                    {% elif status == "6" %}
+                                    Tus correcciones están siendo recibidas.
                                 {% elif status == "7" %}
-                                Su artículo ha sido aceptado.
+                                Su propuesta se encuentra en dictamen. Debe esperar a que el artículo sea aceptado o rechazado.
                                 {% elif status == "8" %}
-                                Su artículo ha sido rechazado.
+                                Su artículo ha sido aceptado.
                                 {% elif status == "9" %}
-                                Su artículo ha sido publicado.
+                                Su artículo ha sido rechazado.
+                                {% elif status == "10" %}
+                                Su artículo ha sido publicado pero está a la espera de asignar DOI.
                                  
                                   {% endif %}
                                 {% endwith %}">
@@ -127,12 +129,14 @@
                                 <i class="fi-check" style="color:green;"></i>
 
                                 {% elif status == "6" %}
-                                <i class="fi-flag" style="color:blue;"></i>
+                                <i class="fi-flag" style="color:yellow;"></i>
                                 {% elif status == "7" %}
-                                <i class="fi-check" style="color:green;"></i>
+                                <i class="fi-flag" style="color:blue;"></i>
                                 {% elif status == "8" %}
-                                <i class="fi-x" style="color:red;"></i>
+                                <i class="fi-check" style="color:green;"></i>
                                 {% elif status == "9" %}
+                                <i class="fi-x" style="color:red;"></i>
+                                {% elif status == "10" %}
                                 <i class="fi-check" style="color:green;"></i>
                                 {% endif %}
                                 {% endwith %}
@@ -239,7 +243,11 @@
             {% endfor %}
             {% endif %}
 
-            {% if user.profile.assignments.all.count != 0 %}
+            {% with assignments_by_pub=request.user|get_assignments_by_pub:current_publication %}
+            
+
+            {% if assignments_by_pub.count != 0 %}
+            
             <div class="grid-x grid-padding-x cell align-center ">
                 <div class="callout primary cell">
                     <p>
@@ -420,9 +428,11 @@
                         </td>
 
                     </tr>
+                    
                     {% comment %} </tbody> {% endcomment %}
                 {% endif %}
                 {% endfor %}
+                
                 {% endwith %}
                 </tbody>
             </table>
@@ -436,6 +446,8 @@
                 </div>
             </div>
             {% endif %}
+            {% endwith %}
+
         </div>
     </div>
 </div>

@@ -141,11 +141,12 @@ class ArticleProposal(TimeStampedModel):
         ('3', 'En revisión'),
         ('4', 'Sin corregir'),
         ('5', 'Corregido'),
-        ('6', 'En dictamen'),
-        ('7', 'Aceptado'),
-        ('8', 'Rechazado'),
-        ('9', 'Pendiente'),
-        ('10', 'Publicado')
+        ('6', 'En recepción'),
+        ('7', 'En dictamen'),
+        ('8', 'Aceptado'),
+        ('9', 'Rechazado'),
+        ('10', 'Pendiente'),
+        ('11', 'Publicado')
     )
 
     status = models.CharField(
@@ -230,6 +231,8 @@ class ArticleProposal(TimeStampedModel):
     def send_reception_letter(self):
 
         reception_letter = Home.objects.first().reception_letters
+        
+        current_publication = Home.objects.first().publications.get_current()
 
         # * str basedir
         template_paths = (settings.BASE_DIR /
@@ -271,13 +274,13 @@ class ArticleProposal(TimeStampedModel):
                 'October', 'Octubre').replace(
                 'November', 'Noviembre').replace(
                 'December', 'Diciembre'),
-            'numero_oficio': reception_letter.current_number,
+            'numero_oficio': current_publication.numero_folio,
             'anio': timezone.now().year,
             'autor': self.author.user.first_name + ' ' + self.author.user.last_name,
             'titulo': self.title,
             'email': self.author.user.email,
             'coautores': self.coauthors.all(),
-            'numero': Home.objects.first().publications.get_current().numero_publicacion,
+            'numero': current_publication.numero_publicacion,
             'firma_presidente': firma_presidente,
             'firma_secretary': firma_secretario,
             'PRESIDENT': reception_letter.president,
@@ -336,18 +339,16 @@ class ArticleProposal(TimeStampedModel):
 
         self.save()
 
-        reception_letter.current_number += 1
-        reception_letter.save()
+        current_publication.numero_folio += 1
+        current_publication.save()
 
     def send_arbitration_report(self):
         report_letter = Home.objects.first().report_letters
 
-        # * si el status es 7 (aceptado) se envía la carta de dictamen aprobación
-
-        if self.status == '7':
+        if self.status == '8':
             template_paths = (settings.BASE_DIR /
                               'downloads/DICTAMEN-APROBADO_edit.docx').__str__()
-        elif self.status == '8':
+        elif self.status == '9':
             template_paths = (settings.BASE_DIR /
                               'downloads/DICTAMEN-NO-APROBADO_edit.docx').__str__()
 

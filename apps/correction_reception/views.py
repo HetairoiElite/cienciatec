@@ -138,6 +138,8 @@ class DictamenView(View):
             
             if reported_reviews == 2:
                 review.assignment.status = '7'
+                review.assignment.article.status = '7'
+                review.assignment.article.save()
                 review.assignment.completed = True
                 review.assignment.save()
 

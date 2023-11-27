@@ -180,11 +180,11 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-flag"></i> Asignar</a>'
                                    + '</a>')
-            elif obj.status < '5':
+            elif obj.status <= '6':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
                                    + '</a>')
-            elif obj.status == '6':
+            elif obj.status == '7':
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
                                    '<i class="fi fi-results"></i> Dictaminar</a>'
                                    + '</a>')
@@ -277,12 +277,22 @@ class ArticleProposalAdmin(admin.ModelAdmin):
             # * translate message
 
             messages.add_message(request, messages.SUCCESS,
-                                 format_html(f'La propuesta de artículo <a href="/admin/proposal_reception/articleproposal/{obj.id}">{obj.title}</a> ha sido actualizada correctamente.'))
+                                 format_html(f'La propuesta de artículo <a href="/admin/Recepcion_Propuestas/articleproposal/{obj.id}">{obj.title}</a> ha sido actualizada correctamente.'))
 
         super().save_model(request, obj, form, change)
     # * change_list_context
     
-    
+    def changelist_view(self, request, extra_context=None):
+        from apps.events.models import Publication
+        current = Publication.objects.get_current()
+        print(current)
+        if current and not request.GET:
+            from django.http import HttpResponseRedirect
+            from django.urls import reverse
+            url = "%s?publication__numero_publicacion=%s" % (reverse('admin:Recepcion_Propuestas_articleproposal_changelist'), current.numero_publicacion)
+            print(url)
+            return HttpResponseRedirect(url)
+        return super(ArticleProposalAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
 admin.site.register(ArticleProposal, ArticleProposalAdmin)

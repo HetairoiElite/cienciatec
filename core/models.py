@@ -202,10 +202,6 @@ class ReceptionLetter(TimeStampedModel):
     template = models.FileField(
         verbose_name='Plantilla', upload_to= custom_upload_template_reception_letter, null=True, blank=True)
 
-    # * número de oficio actual
-
-    current_number = models.PositiveIntegerField(
-        verbose_name='Número de oficio actual', default=1)
 
     # * presidente del comité de arbitraje
 
