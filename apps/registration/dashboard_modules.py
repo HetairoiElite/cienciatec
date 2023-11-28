@@ -9,7 +9,7 @@ class NewUsers(DashboardModule):
     def init_with_context(self, context):
         
             
-        new_users = User.objects.filter(is_active=False)
+        new_users = User.objects.filter(is_active=False).filter(profile__type_user=2)
         
         
          
