@@ -48,6 +48,7 @@
 
             {% endfor %}
             {% endif %}
+            {% with articles=user.profile.article_proposal.all %}
 
             {% if user.profile.article_proposal.all.count != 0 %}
 
@@ -66,7 +67,6 @@
                 </div>
             </div>
 
-            {% with articles=user.profile.article_proposal.all %}
 
             <table>
                 <thead>
@@ -101,12 +101,14 @@
                                 Su propuesta se encuentra en dictamen. Debe esperar a que el artículo sea aceptado o rechazado.
                                 {% elif status == "8" %}
                                 Su artículo ha sido aceptado.
+                                
                                 {% elif status == "9" %}
                                 Su artículo ha sido rechazado.
                                 {% elif status == "10" %}
                                 Su artículo ha sido publicado pero está a la espera de asignar DOI.
                                  
                                   {% endif %}
+
                                 {% endwith %}">
 
                                 {% with article.status as status %}
@@ -153,7 +155,7 @@
                             <a href="{{ article.reception_letter.url }}" class="btn btn-link text-primary"
                                 style="text-decoration: none;" target="_blank">
                                 <i class="fi-eye"></i>
-                                Ver</a>
+                                Ver </a>
 
                             {% endif %}
                         </td>
@@ -195,15 +197,17 @@
 
                     {% endif %}
 
-                    {% endfor %}
 
-                    {% endwith %}
+                    {% endfor %}
+                    
+
                 </tbody>
 
 
             </table>
 
             {% else %}
+            
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <p>
                     No ha iniciado ninguna propuesta de artículo para esta publicación{% if current_publication  %}
@@ -212,12 +216,27 @@
                 </p>
             </div>
             {% endif %}
+            {% if articles.count > 0 %}
+            <div class="grid-x grid-paggin-x cell align-center large-8">
+                <div class="cell medium-4 large-3 small-6">
+                    <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Enviar otra
+                        propuesta</a>
+                        
+                </div>
+            </div>
+            
+            {% else %}
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <div class="cell medium-4 large-3 small-6">
                     <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Iniciar
                         propuesta</a>
                 </div>
             </div>
+            
+            {% endif %}
+                    {% endwith %}
+
+           
 
         </div>
 
