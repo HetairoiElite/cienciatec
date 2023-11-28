@@ -1,0 +1,11 @@
+{% block module_content %}
+    <div class="module-content">
+        <ul>
+            {% for child in module.children %}
+                <li>
+                    <strong>{{ child.title }}:</strong><span style="color:blue"> {{ child.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
