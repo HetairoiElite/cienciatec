@@ -52,7 +52,7 @@ class ReceptionLetterAdmin(admin.StackedInline):
 
     fieldsets = (
         (None, {
-            'fields': ('template', 'current_number', 'seal_preview', 'seal')
+            'fields': ('template', 'seal_preview', 'seal')
         }),
         ('Secretario del comite arbitraje', {
             'fields': ('secretary', 'secretary_firm_preview', 'secretary_firm')
