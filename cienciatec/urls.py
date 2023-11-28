@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from jet.dashboard.dashboard import DefaultIndexDashboard
 from jet.dashboard.dashboard_modules import google_analytics
 from apps.proposal_reception.dashboard_modules import RecentArticleProposals
+from apps.registration.dashboard_modules import NewUsers
 
 class CustomIndexDashboard(DefaultIndexDashboard):
     columns = 3
@@ -31,6 +32,8 @@ class CustomIndexDashboard(DefaultIndexDashboard):
         super(CustomIndexDashboard, self).init_with_context(context)
         self.available_children.append(RecentArticleProposals)
         self.children.append(RecentArticleProposals)
+        self.available_children.append(NewUsers)
+        self.children.append(NewUsers)
 
 from apps.final_report_sending.views import FinalReportAdminView
 
