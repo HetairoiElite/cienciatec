@@ -181,9 +181,12 @@ class ArticleProposal(TimeStampedModel):
     def generate_fake_doi(self):
         pass
 
+    
     def generate_template_as_pdf(self):
         from dotenv import load_dotenv
         import os
+        from docx import Document
+        from core.functions import add_line_numbering_to_docx
 
         load_dotenv()
 
@@ -193,61 +196,51 @@ class ArticleProposal(TimeStampedModel):
             from docx2pdf import convert
             import pythoncom
             import shutil
-            
 
             pythoncom.CoInitialize()
 
-            # * delete old template to downloads folder
-
+            # Eliminar el antiguo template en la carpeta de descargas
             try:
                 os.remove(settings.BASE_DIR / 'downloads' / 'template.docx')
             except:
                 pass
 
-            # * copy template to downloads folder
+            # Copiar template a la carpeta de descargas
             shutil.copy(self.template.path, settings.BASE_DIR /
                         'downloads' / 'template.docx')
 
+            # Agregar numeración de líneas al template
+            doc = Document(settings.BASE_DIR / 'downloads' / 'template.docx')
+            add_line_numbering_to_docx(doc)
+            doc.save(settings.BASE_DIR / 'downloads' / 'template.docx')
+
+            # Convertir el template a PDF
             convert(settings.BASE_DIR / 'downloads' / 'template.docx',
                     settings.BASE_DIR / 'downloads' / 'template.pdf')
 
         else:
             import subprocess
             from django.core.files.storage import default_storage
-            
-           
-             
-            
+
             path = self.template.path
             with default_storage.open(path) as f:
                 with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename('template.docx')), 'wb') as d:
                     d.write(f.read())
-                    
-            from docx import Document
-            from docx.oxml.ns import nsdecls
-            from docx.oxml import parse_xml
-            
-            doc = Document(settings.BASE_DIR / 'downloads' / 'template.docx')
-            
-            lineNumbering = parse_xml(r'<w:lnNumType %s w:countBy="1" w:restart="continuous"/>' % nsdecls('w'))
 
-            sectPr = doc.sections[0]._sectPr
-            for child in sectPr:
-                if child.tag == '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}lnNumType':
-                    sectPr.remove(child)
-                    
-            sectPr.append(lineNumbering)
-            
-            doc.save(settings.BASE_DIR / 'downloads' / 'template.docx')
-            
+                # Agregar numeración de líneas al template
+                doc = Document(settings.BASE_DIR / 'downloads' / 'template.docx')
+                add_line_numbering_to_docx(doc)
+                doc.save(settings.BASE_DIR / 'downloads' / 'template.docx')
 
-            output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
-                                              settings.BASE_DIR / 'downloads' / 'template.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
+                # Convertir el template a PDF utilizando LibreOffice
+                output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
+                                                settings.BASE_DIR / 'downloads' / 'template.docx', '--outdir', settings.BASE_DIR / 'downloads'))
 
+        # Guardar el PDF resultante en el modelo
         with open(settings.BASE_DIR / 'downloads' / 'template.pdf', 'rb') as f:
             from django.core.files import File
             self.template_as_pdf.save(f'{self.title}.pdf',
-                                      File(f))
+                                    File(f))
 
         self.save()
 

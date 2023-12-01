@@ -41,9 +41,12 @@ class ArticleCorrection(TimeStampedModel):
     
     # * correction file as pdf
     
+        
     def generate_correction_file_as_pdf(self):
         from dotenv import load_dotenv
         import os
+        from docx import Document
+        from core.functions import add_line_numbering_to_docx
 
         load_dotenv()
 
@@ -55,7 +58,7 @@ class ArticleCorrection(TimeStampedModel):
             import shutil
 
             pythoncom.CoInitialize()
-            
+
             # Eliminar el antiguo correction_file en la carpeta de descargas
             try:
                 os.remove(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
@@ -64,6 +67,11 @@ class ArticleCorrection(TimeStampedModel):
 
             # Copiar correction_file a la carpeta de descargas
             shutil.copy(self.correction_file.path, settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+
+            # Agregar numeración de líneas al correction_file
+            doc = Document(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+            add_line_numbering_to_docx(doc)
+            doc.save(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
 
             # Convertir el correction_file a PDF
             convert(settings.BASE_DIR / 'downloads' / 'correction_file.docx',
@@ -79,15 +87,20 @@ class ArticleCorrection(TimeStampedModel):
                 with open(os.path.join(settings.BASE_DIR, 'downloads', 'correction_file.docx'), 'wb') as d:
                     d.write(f.read())
 
-            # Convertir el correction_file a PDF utilizando LibreOffice
-            output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
-                                            settings.BASE_DIR / 'downloads' / 'correction_file.docx',  '--outdir', settings.BASE_DIR / 'downloads'))
+                # Agregar numeración de líneas al correction_file
+                doc = Document(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+                add_line_numbering_to_docx(doc)
+                doc.save(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+
+                # Convertir el correction_file a PDF utilizando LibreOffice
+                output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
+                                                settings.BASE_DIR / 'downloads' / 'correction_file.docx', '--outdir', settings.BASE_DIR / 'downloads'))
 
         # Guardar el PDF resultante en el modelo
         with open(settings.BASE_DIR / 'downloads' / 'correction_file.pdf', 'rb') as f:
             from django.core.files import File
             self.correction_file_as_pdf.save(f'{self.article.title}-corregido.pdf',
-                                    File(f))
+                                            File(f))
 
         # Guardar el modelo
         self.save()
