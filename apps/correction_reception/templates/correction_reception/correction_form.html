@@ -95,6 +95,21 @@ Recepción de correcciones de la propuesta {{correction}}
                                 Debes marcar todas las observaciones.
                             </span>
                         </div>
+                         
+                        {# comentarios #}
+                        <div class="cell">
+                            <label>
+                                {{form.comments.label}}:
+                                {{form.comments}}
+                            </label>
+                            <div class="help-text">
+                                <p>
+                                    {{form.comments.help_text}}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        
                     </div>
                     <div class="grid-x grid-padding-x grid-margin-x">
                         <div class="cell">
