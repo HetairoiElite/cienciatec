@@ -15,6 +15,17 @@ class CorrectionReceptionForm(forms.ModelForm):
         required=True,
         help_text='Todas las observaciones deben ser seleccionadas'
     )
+    
+    comments = forms.CharField(
+        widget=forms.Textarea(attrs={'required': 'true',
+                                     'rows': '10',
+                                     'placeholder': 'Comentarios',
+                                     'readonly': 'true',
+                                     'style': 'resize:none;'}),
+        label='Comentarios',
+        required=True,
+        help_text='Comentarios de los árbitros que debes tener en cuenta para la corrección.'
+    )
 
     class Meta:
         model = ArticleCorrection
@@ -43,6 +54,14 @@ class CorrectionReceptionForm(forms.ModelForm):
             },
             choices=self.fields['corrections'].choices
         )
+        
+        
+        self.fields['comments'].initial = f'''
+Arbitro 1: 
+        {self.instance.article.assignment.reviews.all()[0].comments}
+Arbitro 2:
+        {self.instance.article.assignment.reviews.all()[1].comments}
+        '''
 
 class ReportForm(forms.Form):
     
