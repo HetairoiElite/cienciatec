@@ -23,6 +23,18 @@ class ReviewForm(forms.ModelForm):
                 })
             )
         }
+        
+        help_texts = {
+            'comments': f'''
+            Los comentarios tienen la
+            finalidad de señalar errores
+            o proporcionar sugerencias al 
+            autor del artículo, los cuales
+            no están necesariamente vinculados
+            a algún número de línea específico.
+
+            '''
+        }
 
     def clean(self):
         cleaned_data = super().clean()
