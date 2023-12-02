@@ -138,15 +138,93 @@ class Article(TimeStampedModel):
     file = models.FileField(verbose_name='Archivo', upload_to='articles/')
     fecha_publicacion = models.DateField(
         verbose_name='Fecha de publicación', null=True, blank=True)
-    doi = models.CharField(verbose_name='DOI', max_length=100, null=True, blank=True)
+    doi = models.CharField(verbose_name='DOI', max_length=100, null=True, blank=True,
+                           help_text='Cada vez que se actualice este campo, se notificará al autor')
     class Meta:
         verbose_name = 'Artículo'
         verbose_name_plural = 'Artículos'
 
     def __str__(self):
-        return self.title
+        return self.article_proposal.title 
 
     def get_absolute_url(self):
-        url = reverse('admin:%s_%s_change' % (
-            self._meta.app_label, self._meta.model_name), args=[self.id])
-        return u'<a href="%s">%s</a>' % (url, self)
+        url = reverse('publications:article_detail', args=[self.id])
+        
+        return url
+     
+    
+    def publicar(self):
+        from dotenv import load_dotenv
+        import os
+        from docx import Document
+        from core.functions import remove_line_numbering_from_docx
+        
+        load_dotenv()
+        
+        # * descargar correction file
+        
+        
+        DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
+
+        if DJANGO_SETTINGS_MODULE == 'cienciatec.settings.local':
+            path = self.article_proposal.correction.correction_file.path
+            from docx import Document
+             
+            document = Document(path)
+            
+            remove_line_numbering_from_docx(document)
+            
+            document.save(path)
+             
+            # * convert docx to pdf
+            from docx2pdf import convert
+            import pythoncom
+            import shutil
+            from django.conf import settings
+
+            pythoncom.CoInitialize()
+
+            # Eliminar el antiguo template en la carpeta de descargas
+            try:
+                os.remove(settings.BASE_DIR + '/downloads/correction_file.pdf')
+            except:
+                pass
+             
+            shutil.copy(self.article_proposal.correction.correction_file.path, settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+            
+            convert(settings.BASE_DIR / 'downloads' / 'correction_file.docx', settings.BASE_DIR / 'downloads' / 'correction_file.pdf')
+        else:
+            import subprocess
+            from django.core.files.storage import default_storage
+            import os
+            
+            path = self.article_proposal.correction.correction_file.path
+            
+            with default_storage.open(path) as f:
+                with open(os.path.join(settings.BASE_DIR, 'downloads', os.path.basename('correction_file.docx')), 'wb') as d:
+                    d.write(f.read())
+                    
+                doc = Document(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+                
+                remove_line_numbering_from_docx(doc)
+                
+                doc.save(settings.BASE_DIR / 'downloads' / 'correction_file.docx')
+                    
+                output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
+                                                  settings.BASE_DIR / 'downloads' / 'correction_file.docx', '--outdir', settings.BASE_DIR / 'downloads'))
+                    
+        with open(settings.BASE_DIR / 'downloads'/ 'correction_file.pdf', 'rb') as f:
+            from django.core.files import File
+            self.file.save(f'{self.article_proposal.title}.pdf', File(f))
+            
+         
+        self.save()
+            
+             
+        
+        
+        
+        self.fecha_publicacion = timezone.now()
+        # * descargar correction file
+         
+        
