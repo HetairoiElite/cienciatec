@@ -70,6 +70,20 @@ Recepción de correcciones de la propuesta {{correction}}
                             </label>
                         </div>
                     </div>
+                    <div class="grid-x grid-padding-x grid-margin-x">
+                        <div class="cell">
+                            <label>
+                                Plantilla con numeración de linea:
+                                <br>
+                                <a href="
+                        {% if article.numbering_line_file %}
+                        {{article.numbering_line_file.url}}{% endif %}" class="btn btn-link text-primary"
+                                    style="text-decoration: none;" target="_blank">
+                                    <i class="fi-download"></i>
+                                    Descargar</a>
+                            </label>
+                        </div>
+                    </div>
 
 
                     <div class="grid-x grid-padding-x grid-margin-x">
@@ -95,7 +109,7 @@ Recepción de correcciones de la propuesta {{correction}}
                                 Debes marcar todas las observaciones.
                             </span>
                         </div>
-                         
+
                         {# comentarios #}
                         <div class="cell">
                             <label>
@@ -108,8 +122,8 @@ Recepción de correcciones de la propuesta {{correction}}
                                 </p>
                             </div>
                         </div>
-                        
-                        
+
+
                     </div>
                     <div class="grid-x grid-padding-x grid-margin-x">
                         <div class="cell">
