@@ -154,12 +154,12 @@
                         </li>
                     </div>
                     {% endif %}
-                    <div class="cell large-11">
+                    {% comment %} <div class="cell large-11">
                         <li><a style="color:white;" href="{% url 'events:calendar' %}">
                                 <i class="fi-calendar"></i>
                                 Calendario</a>
                         </li>
-                    </div>
+                    </div> {% endcomment %}
                     {% if request.user.is_staff %}
                     <div class="cell large-11">
                         <li><a style="color:white;" href="{% url 'admin:index' %}">
