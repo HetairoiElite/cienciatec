@@ -278,12 +278,3 @@ class CheckTitleView(View):
             }
         return JsonResponse(data)
 
-class ArticleView(TemplateView):
-    template_name = 'proposal_reception/article.html'
-
-    def get(self, request, *args, **kwargs):
-        article = ArticleProposal.objects.get(id=self.kwargs['pk'])
-        context = {
-            'article': article
-        }
-        return render(request, self.template_name, context)
