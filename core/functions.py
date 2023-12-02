@@ -9,3 +9,9 @@ def add_line_numbering_to_docx(doc):
         lineNumbering = parse_xml(r'<w:lnNumType %s w:countBy="1" w:restart="continuous"/>' % nsdecls('w'))
         sectPr = section._sectPr
         sectPr.append(lineNumbering)
+        
+def remove_line_numbering_from_docx(doc):
+    # * aplicar numeración de líneas a todas las secciones del documento
+    for section in doc.sections:
+        if section._sectPr.xpath("w:lnNumType"):
+            section._sectPr.remove(section._sectPr.xpath("w:lnNumType")[0])
