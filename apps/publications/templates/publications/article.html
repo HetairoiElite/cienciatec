@@ -1,0 +1,218 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{article.article_proposal.title}}{% endblock title %}
+
+{% block content %}
+
+<article class="grid-container">
+    <div class="grid-x grid-margin-x align-right" id="content">
+        <div class="medium-6 cell">
+            <div class="blog-post" id="postx">
+                <h3 id="title">{{article.article_proposal.title}} <br><small>Fecha de publicación:
+                        {{article.fecha_publicacion}}</small></h3>
+                <div class="sticky" data-sticky data-anchor="postx" data-margin-top="7"
+                    style="background-color:white; padding-top:50px ">
+                    <button id="prev" class="button secondary">
+                        <i class="fi-arrow-left"></i>
+                    </button>
+                    <button id="next" class="button secondary">
+                        <i class="fi-arrow-right"></i>
+                    </button>
+                    &nbsp; &nbsp;
+                    <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
+                </div>
+                <div class="grid-x cell align-center">
+                    <div class="grid-x cell large-4 medium-9 align-center">
+                        <canvas id="the-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="medium-4 cell" data-sticky-container>
+
+            <div class="sticky" data-sticky data-anchor="content" data-margin-top="8">
+
+                <div class="callout secondary">
+                    <h4>Perfiles</h4>
+                    <ul>
+
+                        {% for profile in article.article_proposal.profiles.all %}
+                        <li>{{profile.profile}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+
+                <div class="callout primary">
+                    <h4>Formatos</h4>
+                    <span>
+                    <a href="{{article.file.url}}" class="button">Ver <i class="fi-page-pdf"></i>
+                        PDF</a>
+                    <a href="{{article.file.url}}" class="button" download>
+                        Descargar
+                        <i class="fi-page-pdf"></i>
+                        PDF</a>
+                    
+                    </span>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+
+</article>
+
+
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/1.2.3/motion-ui.min.js"></script>
+{% endblock content %}
+
+
+{% block scripts %}
+
+
+<script src="{% static 'core/pdfjs-3.4.120-dist/build/pdf.js' %}"></script>
+
+<script>
+    url =
+        '{{article.file.url}}'
+
+    {
+        var pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1,
+            canvas = document.getElementById('the-canvas'),
+            ctx = canvas.getContext('2d');
+
+        /**
+         * Get page info from document, resize canvas accordingly, and render page.
+         * @param num Page number.
+         */
+        function renderPage(num) {
+            pageRendering = true;
+            // Using promise to fetch the page
+
+            pdfDoc.getPage(num).then(function (page) {
+
+                // get content 
+
+                var content = page.getTextContent();
+
+                content.then(function (text) {
+                    console.log(text);
+                    items = text.items;
+                    cleanItems = [];
+
+                    console.log(items);
+                    contadorLineas = 1;
+                    for (i = 0; i < items.length; i++) {
+                        if (items[i].str != contadorLineas) {
+                            cleanItems.push(items[i]);
+                        } else {
+                            contadorLineas++;
+
+                        }
+                    }
+
+                    // create a new page with the clean items
+
+                    newPage = new Page(page.pageIndex, page.view, cleanItems, page.rotate);
+
+
+                });
+
+
+
+
+
+                var viewport = page.getViewport({
+                    scale: scale
+                });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+
+                var renderTask = page.render(renderContext);
+
+
+
+                // Wait for rendering to finish
+                renderTask.promise.then(function () {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+
+            // Update page counters
+            document.getElementById('page_num').textContent = num;
+        }
+
+        /**
+         * If another page rendering in progress, waits until the rendering is
+         * finised. Otherwise, executes rendering immediately.
+         */
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        /**
+         * Displays previous page.
+         */
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('prev').addEventListener('click', onPrevPage);
+
+        /**
+         * Displays next page.
+         */
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('next').addEventListener('click', onNextPage);
+
+
+
+        /**
+         * Asynchronously downloads PDF.
+         */
+        pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+            // Initial/first page rendering
+            renderPage(pageNum);
+        });
+    }
+</script>
+
+{% endblock scripts %}
