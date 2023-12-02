@@ -1,6 +1,6 @@
 from jet.dashboard.modules import DashboardModule
 from apps.proposal_reception.models import ArticleProposal
-from apps.events.models import Publication
+from apps.publications.models import Publication
 
 
 class RecentArticleProposals(DashboardModule):

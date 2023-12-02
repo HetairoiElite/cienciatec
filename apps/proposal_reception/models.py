@@ -18,7 +18,7 @@ from docx.shared import Cm
 # * django models utils
 from model_utils.models import TimeStampedModel
 
-from apps.events.events import Event
+from apps.publications.events import Event
 from core.models import Home
 
 from .managers import ArticleProposalManager
@@ -174,8 +174,6 @@ class ArticleProposal(TimeStampedModel):
     numbering_line_file = models.FileField(
         upload_to=custom_upload__to_numbering_line, verbose_name='Plantilla con numeración de líneas', null=True, max_length=255)
 
-    DOI = models.CharField(
-        max_length=100, verbose_name='DOI', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Propuesta de artículo'
@@ -503,3 +501,4 @@ class Coauthor(TimeStampedModel):
 
     def __str__(self):
         return self.nombre + ' ' + self.apellido_paterno + ' ' + self.apellido_materno
+

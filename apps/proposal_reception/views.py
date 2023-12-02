@@ -26,7 +26,7 @@ from .forms import ArticleProposalForm, CoauthorForm, ArticleImageForm, ArticleP
 from .models import ArticleProposal, Coauthor, ArticleImage
 
 # * home
-from apps.events.models import Publication
+from apps.publications.models import Publication
 
 # *¨login required mixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -277,3 +277,13 @@ class CheckTitleView(View):
                 'is_taken': ArticleProposal.objects.filter(title__iexact=title).exists()
             }
         return JsonResponse(data)
+
+class ArticleView(TemplateView):
+    template_name = 'proposal_reception/article.html'
+
+    def get(self, request, *args, **kwargs):
+        article = ArticleProposal.objects.get(id=self.kwargs['pk'])
+        context = {
+            'article': article
+        }
+        return render(request, self.template_name, context)
