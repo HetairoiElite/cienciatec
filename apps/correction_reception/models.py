@@ -22,12 +22,21 @@ def custom_upload__to_correction_as_pdf(instance, filename):
     except:
         return 'corrections/' + filename
 
+def custom_upload__to_numbering_line(instance, filename):
+    try:
+        old_instance = ArticleCorrection.objects.get(pk=instance.pk)
+        old_instance.numbering_line_file.delete()
+        return 'corrections/' + filename
+    except:
+        return 'corrections/' + filename
+    
+
 class ArticleCorrection(TimeStampedModel):
     correction_file = models.FileField(
         upload_to=custom_upload__to_correction, verbose_name='Plantilla corregida', null=True, max_length=255)
     
     correction_file_as_pdf = models.FileField(
-        upload_to=custom_upload__to_correction, verbose_name='Plantilla corregida en PDF', null=True, max_length=255)
+        upload_to=custom_upload__to_correction_as_pdf, verbose_name='Plantilla corregida en PDF', null=True, max_length=255)
 
     article = models.OneToOneField(
         'Recepcion_Propuestas.ArticleProposal', on_delete=models.CASCADE, related_name='correction', verbose_name='Artículo', null=True, blank=True)
