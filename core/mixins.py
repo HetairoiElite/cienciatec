@@ -2,7 +2,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
-from apps.events.models import Publication
+from apps.publications.models import Publication
 
 class OnlyAuthorMixin(LoginRequiredMixin):
     
