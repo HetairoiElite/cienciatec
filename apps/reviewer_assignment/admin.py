@@ -79,6 +79,11 @@ class AssignmentAdmin(admin.ModelAdmin):
         extra_context['propuesta'] = Assignment.objects.get(id=object_id).article
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
+    
+    # * no permitir agregar
+    def has_add_permission(self, request):
+        return False
+    
     inlines = [
         ReviewInline
     ]
@@ -94,9 +99,14 @@ class AssignmentAdmin(admin.ModelAdmin):
 
     def get_profiles(self, obj):
         return format_html('<br>'.join(
-            ['<a href="/admin/Asignacion_Arbitros/profile/' + str(p.id) + '/change/">' + str(p) + '</a>' for p in obj.article.profiles.all()]))
+            ['<a href="/admin/Asignacion_Arbitros/profile/' + str(p.id) + '/change/">' + str(p) + '</a>' for p in obj.article.profiles.all()] 
+            
+              
+            )+ f'<p class="help">Los perfiles pueden ser modificados en el detalle del <a href="/admin/Recepcion_Propuestas/articleproposal/{obj.article.id}/change/">artículo</a> siempre y cuando la propuesta aún no haya sido recibida.</p>')
 
     get_profiles.short_description = 'Perfiles'
+    
+    get_profiles.help_text = 'Perfiles de los autores del artículo'
 
     list_display = ('article', 'get_referees', 'status')
 
