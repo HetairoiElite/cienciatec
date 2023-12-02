@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 # from apps.chat.models import Thread
 
 
-from apps.events.models import Publication
+from apps.publications.models import Publication
 # Create your views here.
 
 class Dashboard(LoginRequiredMixin, TemplateView):

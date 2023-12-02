@@ -283,7 +283,7 @@ class ArticleProposalAdmin(admin.ModelAdmin):
     # * change_list_context
     
     def changelist_view(self, request, extra_context=None):
-        from apps.events.models import Publication
+        from apps.publications.models import Publication
         current = Publication.objects.get_current()
         print(current)
         if current and not request.GET:
