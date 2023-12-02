@@ -72,7 +72,7 @@ LOCAL_APPS = [
     'core',
     'apps.school',
     'apps.core_dashboard',
-    'apps.events',
+    'apps.publications',
     'apps.proposal_reception',
     'apps.reviewer_assignment',
     'apps.article_review',
