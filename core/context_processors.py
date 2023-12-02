@@ -1,7 +1,7 @@
 # * context procesor for home
 
 from .models import Home
-from apps.events.models import Publication
+from apps.publications.models import Publication
 
 
 def home(request):
