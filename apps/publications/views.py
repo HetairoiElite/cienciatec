@@ -1,13 +1,18 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.views.generic import ListView
+from django.views.generic import TemplateView
 # Create your views here.
-from . models import Publication
+from . models import Publication, Article
+from apps.proposal_reception.models import ArticleProposal
 
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .utils import PublicationCalendar
 import calendar
 import datetime
+
+from django.contrib import messages as message
 
 
 class CalendarView(ListView):
@@ -110,3 +115,50 @@ class CalendarView(ListView):
         # print(html_calendar)
 
         return context
+
+class PublicationView(TemplateView):
+    template_name = 'admin/publication_confirm.html'
+
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        article = ArticleProposal.objects.get(id=kwargs['article_id'])
+        context['article'] = article
+        return render(request, self.template_name, context)
+    
+    def post(self, request, *args, **kwargs):
+        from django.utils import timezone
+        article_proposal = ArticleProposal.objects.get(id=kwargs['article_id'])
+        
+        article_proposal.status = '10'
+        
+        
+        
+        
+        article = Article.objects.create(
+            publication=article_proposal.publication,
+            article_proposal=article_proposal,
+            fecha_publicacion=timezone.now()
+        )
+        
+        article.publicar()
+        article_proposal.save()
+        
+        message.success(
+                request, mark_safe(f"""La propuesta de artículo <a href="{reverse("admin:Eventos_article_change", args=[article.id])}">{article.article_proposal.title}</a> ha sido
+                                   <span style="color: green;">
+                                   Publicada
+                                        </span>
+                                   exitosamente."""))
+
+        return redirect('admin:Recepcion_Propuestas_articleproposal_changelist')
+    
+class ArticleView(TemplateView):
+    template_name = 'publications/article.html'
+    
+    def get(self, request, *args, **kwargs):
+        article = Article.objects.get(id=self.kwargs['pk'])
+        context = {
+            'article': article
+        }
+        return render(request, self.template_name, context)
