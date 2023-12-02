@@ -8,11 +8,12 @@ from .utils import PublicationCalendar
 from django.utils.safestring import mark_safe
 from django.contrib import messages
 from django.utils.html import format_html
+from .models import Article
 # Register your models here.
 
 class PublicationAdmin(admin.ModelAdmin):
     list_display = ['numero_publicacion', 'start_date', 'end_date']
-    change_list_template = 'admin/events/change_list.html'
+    change_list_template = 'admin/publications/change_list.html'
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -140,5 +141,31 @@ class PublicationAdmin(admin.ModelAdmin):
                              format_html('La <a href="{}">{}</a> ha sido eliminada correctamente.', reverse('admin:Eventos_publication_change', args=[obj.id]), obj))
         super().delete_model(request, obj)
 
+class ArticleAdmin(admin.ModelAdmin):
+    
+    def get_title(self, obj):
+        return obj.article_proposal.title
+    
+    def has_add_permission(self, request):
+        return False
+    
+    actions = None
+     
+    get_title.short_description = 'Titulo'
+    list_display = [ 'get_title','fecha_publicacion', 'doi']
+    search_fields = ['article_proposal__title']
+    list_filter = ['publication']
+    list_per_page = 10
+    
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj.doi:
+            return ['publication', 'article_proposal', 'fecha_publicacion', 'file', 'doi']
+        else:
+            return ['publication', 'article_proposal', 'fecha_publicacion', 'file']
+
+    
+
 
 admin.site.register(Publication, PublicationAdmin)
+admin.site.register(Article,ArticleAdmin)
