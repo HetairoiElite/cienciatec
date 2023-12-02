@@ -56,7 +56,7 @@ urlpatterns = [
     path('accounts/', include('apps.registration.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 
-    path('eventos/', include('apps.events.urls')),
+    path('publicacion/', include('apps.publications.urls')),
 
 
     path('tablero/', include('apps.core_dashboard.urls')),
