@@ -148,13 +148,12 @@ class ArticleProposalAdmin(admin.ModelAdmin):
     form = ArticleProposalAdminForm
 
     # actions = [send_arbitration_report]
-    actions = [mark_as_received, send_arbitration_report]
+    actions = [mark_as_received, 
+            #    send_arbitration_report
+               ]
 
     def has_add_permission(self, request, obj=None):
-        if not request.user.is_superuser:
-            return False
-
-        return True
+        return False
 
     def has_delete_permission(self, request, obj=None):
         if not request.user.is_superuser:
@@ -180,7 +179,7 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-flag"></i> Asignar</a>'
                                    + '</a>')
-            elif obj.status <= '6':
+            elif int(obj.status) <= 6:
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}">' +
                                    '<i class="fi fi-eye"></i> Ver asignación</a>'
                                    + '</a>')
@@ -188,9 +187,13 @@ class ArticleProposalAdmin(admin.ModelAdmin):
                 return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
                                    '<i class="fi fi-results"></i> Dictaminar</a>'
                                    + '</a>')
-            elif obj.status == '7':
-                return format_html(f'<a href="/admin/Asignacion_Arbitros/assignment/{obj.assignment.id}/change/#/tab/inline_0/">' +
-                                   '<i class="fi fi-results"></i></a>'
+            elif obj.status == '8':
+                return format_html(f'<a href="/admin/publicacion/{obj.id}/">' +
+                                   '<i class="fi fi-results"></i> Publicar</a>'
+                                   + '</a>')
+            elif obj.status == '10':
+                return format_html(f'<a href="/admin/Eventos/article/{obj.article.id}/">' +
+                                   '<i class="fi fi-results"></i> Asignar DOI</a>'
                                    + '</a>')
         else:
 
