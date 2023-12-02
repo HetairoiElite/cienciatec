@@ -83,6 +83,15 @@ def custom_upload_to_rights_transfer_letter(instance, filename):
         return f'letters/{instance.author.user.username}/{filename}'
 
 
+def custom_upload__to_numbering_line(instance, filename):
+    try:
+        old_instance = ArticleProposal.objects.get(pk=instance.pk)
+        old_instance.numbering_line_file.delete()
+        return 'corrections/' + filename
+    except:
+        return 'corrections/' + filename
+
+
 class ArticleProposal(TimeStampedModel):
 
     objects = ArticleProposalManager.as_manager()
@@ -162,9 +171,11 @@ class ArticleProposal(TimeStampedModel):
     rights_transfer_letter = models.FileField(
         verbose_name='Carta de cesión de derechos', upload_to=custom_upload_to_rights_transfer_letter, null=True)
 
+    numbering_line_file = models.FileField(
+        upload_to=custom_upload__to_numbering_line, verbose_name='Plantilla con numeración de líneas', null=True, max_length=255)
+
     DOI = models.CharField(
         max_length=100, verbose_name='DOI', null=True, blank=True)
-    
 
     class Meta:
         verbose_name = 'Propuesta de artículo'
@@ -181,7 +192,6 @@ class ArticleProposal(TimeStampedModel):
     def generate_fake_doi(self):
         pass
 
-    
     def generate_template_as_pdf(self):
         from dotenv import load_dotenv
         import os
@@ -228,26 +238,32 @@ class ArticleProposal(TimeStampedModel):
                     d.write(f.read())
 
                 # Agregar numeración de líneas al template
-                doc = Document(settings.BASE_DIR / 'downloads' / 'template.docx')
+                doc = Document(settings.BASE_DIR /
+                               'downloads' / 'template.docx')
                 add_line_numbering_to_docx(doc)
                 doc.save(settings.BASE_DIR / 'downloads' / 'template.docx')
 
                 # Convertir el template a PDF utilizando LibreOffice
                 output = subprocess.check_output(('libreoffice', '--headless', '--convert-to', 'pdf',
-                                                settings.BASE_DIR / 'downloads' / 'template.docx', '--outdir', settings.BASE_DIR / 'downloads'))
+                                                  settings.BASE_DIR / 'downloads' / 'template.docx', '--outdir', settings.BASE_DIR / 'downloads'))
 
         # Guardar el PDF resultante en el modelo
         with open(settings.BASE_DIR / 'downloads' / 'template.pdf', 'rb') as f:
             from django.core.files import File
             self.template_as_pdf.save(f'{self.title}.pdf',
-                                    File(f))
+                                      File(f))
+
+        with open(settings.BASE_DIR / 'downloads' / 'template.docx', 'rb') as f:
+            from django.core.files import File
+            self.numbering_line_file.save(f'{self.title}.docx',
+                               File(f))
 
         self.save()
 
     def send_reception_letter(self):
 
         reception_letter = Home.objects.first().reception_letters
-        
+
         current_publication = Home.objects.first().publications.get_current()
 
         # * str basedir
