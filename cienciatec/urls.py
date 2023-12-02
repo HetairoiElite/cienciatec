@@ -47,6 +47,7 @@ urlpatterns = [
     #      namespace='final_report_sending')),
 
     path('admin/dictamen-final/', include('apps.final_report_sending.urls')),
+    path('admin/publicacion/', include('apps.publications.urls_admin')),
     path('admin/', admin.site.urls),
 
 
