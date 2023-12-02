@@ -185,7 +185,7 @@ class AssignmentAdmin(admin.ModelAdmin):
         return super().save_model(request, obj, form, change)
     
     def changelist_view(self, request, extra_context=None):
-        from apps.events.models import Publication
+        from apps.publications.models import Publication
         current = Publication.objects.get_current()
         if current and not request.GET:
             from django.http import HttpResponseRedirect
