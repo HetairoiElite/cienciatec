@@ -165,11 +165,12 @@
 
                             {% if article.status == "4" %}
 
-                            <a href="{% url 'correction_reception:correction_form' article.correction.id %}"
-                                style="text-decoration:none;" class="btn btn-link">
-                                <i class="fi-check"></i>
-                                Corregir</a>
-
+                            <div>
+                                <a href="{% url 'correction_reception:correction_form' article.correction.id %}"
+                                    style="text-decoration:none;" class="btn btn-link">
+                                    <i class="fi-check"></i>
+                                    Corregir</a>
+                            </div>
                             {% else %}
 
                             {% endif %}
@@ -199,7 +200,6 @@
 
 
                     {% endfor %}
-                    
 
                 </tbody>
 
@@ -207,7 +207,6 @@
             </table>
 
             {% else %}
-            
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <p>
                     No ha iniciado ninguna propuesta de artículo para esta publicación{% if current_publication  %}
@@ -221,10 +220,8 @@
                 <div class="cell medium-4 large-3 small-6">
                     <a href="{% url 'proposal_reception:article_proposal_form' %}" class="button expanded">Enviar otra
                         propuesta</a>
-                        
                 </div>
             </div>
-            
             {% else %}
             <div class="grid-x grid-paggin-x cell align-center large-8">
                 <div class="cell medium-4 large-3 small-6">
@@ -232,11 +229,11 @@
                         propuesta</a>
                 </div>
             </div>
-            
-            {% endif %}
-                    {% endwith %}
 
-           
+            {% endif %}
+            {% endwith %}
+
+
 
         </div>
 
@@ -266,6 +263,7 @@
             
 
             {% if assignments_by_pub.count != 0 %}
+
             
             <div class="grid-x grid-padding-x cell align-center ">
                 <div class="callout primary cell">
@@ -447,11 +445,11 @@
                         </td>
 
                     </tr>
-                    
+
                     {% comment %} </tbody> {% endcomment %}
                 {% endif %}
                 {% endfor %}
-                
+
                 {% endwith %}
                 </tbody>
             </table>
