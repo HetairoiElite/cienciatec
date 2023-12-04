@@ -58,7 +58,7 @@ class AssignmentForm(forms.ModelForm):
                     count_assignments=Coalesce(Subquery(count_assignments_subquery, output_field=IntegerField()), 0)
                 )
                 
-                all_referees_filtered = all_referees.filter(count_assignments__lt=4).distinct()
+                all_referees_filtered = all_referees.filter(count_assignments__lt=4, user__is_active=True).distinct()
                 
                 self.fields['referees'].queryset = all_referees_filtered
                 

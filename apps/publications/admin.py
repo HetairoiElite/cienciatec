@@ -154,7 +154,7 @@ class ArticleAdmin(admin.ModelAdmin):
     get_title.short_description = 'Titulo'
     list_display = [ 'get_title','fecha_publicacion', 'doi']
     search_fields = ['article_proposal__title']
-    list_filter = ['publication']
+    list_filter = ['publication__numero_publicacion']
     list_per_page = 10
     
     
