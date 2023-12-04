@@ -161,6 +161,17 @@
                         </td>
 
                         <td class="text-center acciones">
+                            {% if article.article %}
+                            <a class="btn btn-link"
+                            href="{% url 'publications:article_detail' article.article.id %}"
+                                style="text-decoration: none;" target="_blank"
+                            >
+                                <i class="fi-info"></i>
+                                Ver Artículo</a>
+                            {% endif %}
+
+                            {% if article.status == "4" %}
+                            {% endif %}
                             {% if article|is_assigned %}
 
                             {% if article.status == "4" %}
@@ -186,7 +197,7 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            {% if article.status > "7" %}
+                            {% if article.status == "8" or article.status == "9" or article.status == "10" or article.status == "11" %}
 
                             <a href="{{ article.dictamen_letter.url }}" class="btn btn-link text-primary"
                                 style="text-decoration: none;" target="_blank">
