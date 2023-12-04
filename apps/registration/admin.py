@@ -39,18 +39,18 @@ class InlineProfile(admin.StackedInline):
             return ('avatar', 'type_user', )
         else:
             return ('avatar', 'type_user', 'profiles')
-        
+
     def get_readonly_fields(self, request, obj=None):
         if obj.profile.user.email:
             return ('type_user',)
         return ()
-
 
     # def get_readonly_fields(self, request, obj=None):
     #     if obj.profile.type_user != '2':
     #         return ('avatar',  )
     #     else:
     #         return ('avatar', 'profiles')
+
 
 class CustomUserAdmin(UserAdmin):
 
@@ -69,12 +69,12 @@ class CustomUserAdmin(UserAdmin):
     get_type_user.short_description = 'Tipo de usuario'
 
     inlines = (InlineProfile,)
-    
+
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
         return super(CustomUserAdmin, self).get_inline_instances(request, obj)
-    
+
     model = User
     list_display = ('username', 'image_tag', 'email', 'first_name',
                     'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
@@ -102,6 +102,35 @@ class CustomUserAdmin(UserAdmin):
     )
 
     readonly_fields = ('last_login', 'date_joined')
+
+    # * notificar a los árbitros que su cuenta ha sido activada
+    def save_model(self, request: HttpRequest, obj: Any, form: Any, change: bool) -> None:
+        if 'is_active' in form.changed_data:
+            if obj.profile.type_user == '2':
+                if obj.is_active:
+                    from django.core.mail import EmailMessage
+                    from django.conf import settings
+                    # * get domain from settings
+                    from django.contrib.sites.shortcuts import get_current_site
+
+
+                    subject = 'Cuenta activada'
+                    message = f'''
+Su cuenta ha sido activada. Ya puede ingresar al sistema.
+
+Usuario: {obj.username}
+
+Acceda al sistema en: {get_current_site(request).domain}/accounts/login/
+
+'''
+                    
+                    
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list = [obj.email, ]
+                    email = EmailMessage(
+                        subject, message, email_from, recipient_list)
+                    email.send()
+        super().save_model(request, obj, form, change)
 
 
 admin.site.unregister(User)
