@@ -159,11 +159,40 @@ class ArticleAdmin(admin.ModelAdmin):
     
     
     def get_readonly_fields(self, request, obj=None):
-        if obj.doi:
-            return ['publication', 'article_proposal', 'fecha_publicacion', 'file', 'doi']
-        else:
-            return ['publication', 'article_proposal', 'fecha_publicacion', 'file']
 
+        return ['publication', 'article_proposal', 'fecha_publicacion', 'file']
+
+    # * cuando se actualiza el doi se debe enviar un correo al autor del articulo
+    def save_model(self, request, obj, form, change):
+        if 'doi' in form.changed_data:
+            if obj.doi:
+                from django.core.mail import EmailMessage
+                from django.conf import settings
+                from django.contrib.sites.shortcuts import get_current_site
+                
+                author = obj.article_proposal.author
+                
+                subject = 'DOI de su articulo'
+                
+                message = f'''
+Estimado/a {author.user.first_name} {author.user.last_name}:
+
+Le informamos que el DOI de su articulo {obj.article_proposal.title} ha sido actualizado a {obj.doi}.
+'''
+
+                email = EmailMessage(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [author.user.email],
+                    reply_to=[settings.EMAIL_HOST_USER],
+                )
+                
+                email.send()
+            
+        super().save_model(request, obj, form, change)
+         
+            
     
 
 
