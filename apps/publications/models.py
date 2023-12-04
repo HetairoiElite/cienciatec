@@ -219,12 +219,17 @@ class Article(TimeStampedModel):
             
             from django.core.mail import EmailMessage
             from django.conf import settings
+            from django.contrib.sites.shortcuts import get_current_site
+            
             
             email = EmailMessage(
                 subject=f'Artículo {self.article_proposal.title} publicado',
-                body=f'''El artículo {self.article_proposal.title} ha sido publicado. Puedes acceder a él en el siguiente enlace: {settings.DOMAIN_NAME + self.get_absolute_url()}
+                body=f'''
+El artículo {self.article_proposal.title} ha sido publicado. 
+
+Puedes acceder a él en el siguiente enlace: {get_current_site(None).domain}{self.get_absolute_url()}
                
-                Posteriormente se te enviará el DOI del artículo.
+El DOI del artículo será notificado en cuanto sea asignado por el personal administrativo.
                 ''',
                 from_email= settings.EMAIL_HOST_USER,
                 to=[self.article_proposal.author.user.email]
