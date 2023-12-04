@@ -189,6 +189,8 @@ Le informamos que el DOI de su articulo {obj.article_proposal.title} ha sido act
                 )
                 
                 email.send()
+                obj.article_proposal.status = '11'
+                obj.article_proposal.save()
             
         super().save_model(request, obj, form, change)
          
