@@ -217,6 +217,21 @@ class Article(TimeStampedModel):
             from django.core.files import File
             self.file.save(f'{self.article_proposal.title}.pdf', File(f))
             
+            from django.core.mail import EmailMessage
+            from django.conf import settings
+            
+            email = EmailMessage(
+                subject=f'Artículo {self.article_proposal.title} publicado',
+                body=f'''El artículo {self.article_proposal.title} ha sido publicado. Puedes acceder a él en el siguiente enlace: {settings.DOMAIN_NAME + self.get_absolute_url()}
+               
+                Posteriormente se te enviará el DOI del artículo.
+                ''',
+                from_email= settings.EMAIL_HOST_USER,
+                to=[self.article_proposal.author.user.email]
+            )
+            
+            email.send()
+            
          
         self.save()
             
