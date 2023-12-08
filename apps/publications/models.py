@@ -153,7 +153,7 @@ class Article(TimeStampedModel):
         return url
      
     
-    def publicar(self):
+    def publicar(self, request):
         from dotenv import load_dotenv
         import os
         from docx import Document
@@ -186,9 +186,11 @@ class Article(TimeStampedModel):
 
             # Eliminar el antiguo template en la carpeta de descargas
             try:
-                os.remove(settings.BASE_DIR + '/downloads/correction_file.pdf')
-            except:
-                pass
+                os.remove(settings.BASE_DIR / 'downloads/correction_file.pdf')
+            except Exception as e:
+                print(e)
+
+            # * descargar word file
              
             shutil.copy(self.article_proposal.correction.correction_file.path, settings.BASE_DIR / 'downloads' / 'correction_file.docx')
             
@@ -227,7 +229,7 @@ class Article(TimeStampedModel):
                 body=f'''
 El artículo {self.article_proposal.title} ha sido publicado. 
 
-Puedes acceder a él en el siguiente enlace: {get_current_site(None).domain}{self.get_absolute_url()}
+Puedes acceder a él en el siguiente enlace: {get_current_site(request).domain}{self.get_absolute_url()}
                
 El DOI del artículo será notificado en cuanto sea asignado por el personal administrativo.
                 ''',
