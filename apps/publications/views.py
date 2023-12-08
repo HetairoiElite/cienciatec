@@ -141,7 +141,7 @@ class PublicationView(TemplateView):
             fecha_publicacion=timezone.now()
         )
         
-        article.publicar()
+        article.publicar(request)
         article_proposal.save()
         
         message.success(
