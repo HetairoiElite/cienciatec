@@ -252,7 +252,13 @@
 
 <!-- Imagen centrada -->
 <div class="container text-center mb-3">
-    <img src="{{home.image.url}}" class="img-fluid" alt="Imagen responsive">
+    <img src="
+    {% if home.image %}
+    {{home.image.url}}
+    {% else %}
+    {% static 'core/img/itssmt.png' %}
+    {% endif %}
+    " class="img-fluid" alt="Imagen responsive">
 </div>
 
 {% if request.path != "/" and not 'accounts' in request.path or 'profile' in request.path %}

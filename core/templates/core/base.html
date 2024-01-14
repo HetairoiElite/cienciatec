@@ -48,7 +48,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} | {{home.title}}</title>
     <link rel="stylesheet" href="{% static 'core/node_modules/foundation-sites/dist/css/foundation.min.css' %}" />
-    <link rel="shortcut icon" href="{{home.favicon.url}}" type="image/x-icon">
+    <link rel="shortcut icon" href="
+    {% if home.favicon %}
+    {{home.favicon.url}}
+    {% else %}
+    {% static 'core/img/favicon.png' %}
+    {% endif %}
+    " type="image/x-icon">
     <link rel="stylesheet" href="{% static 'core/foundation-icons/foundation-icons.css' %}">
 
     <style>
