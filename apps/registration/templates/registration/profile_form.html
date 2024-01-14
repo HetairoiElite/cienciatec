@@ -47,8 +47,13 @@
                     <div class="grid-x grid-container">
                         <div class="cell grid-x medium-12 large-2 align-center">
                             <div class="row align-center">
-                                <img src="{{request.user.profile.avatar.url}}"
-                                    class="rounded-circle column align-center " width="75px" height="75pd">
+                                <img src="
+                                {% if request.user.profile.avatar %}
+                                {{request.user.profile.avatar.url}}
+                                {% else %}
+                                {% static 'core/img/default.jpg' %}
+                                {% endif %}
+                                " class="rounded-circle column align-center " width="75px" height="75pd">
                             </div>
                         </div>
                         <div class="cell grid-x grid-padding-x medium-12 large-10 align-center">
@@ -107,10 +112,19 @@
                             {% endif %}
 
                             <div class="cell medium-12">
-                                <label for="email">Email: <i class="fi-check" style="color: green; width: 50px;"></i>
+                                <label for="email">Email:
+                                    {% if request.user.email %}
+                                    <i class="fi-check" style="color: green; width: 50px;"></i>
+
+                                    {% endif %}
                                 </label>
                                 <input type="email" class="form-control mb-3" value="{{request.user.email}}"
-                                    aria-label="Disabled input example" disabled>
+                                    aria-label="Disabled input example"
+                                    {% if not request.user.is_superuser and not "Administrador" in request.user.profile.profiles %}
+                                    disabled
+                                    {% else %}
+                                    placeholder="Email"
+                                    {% endif %}>
                             </div>
 
                             <div class="cell medium 12">
