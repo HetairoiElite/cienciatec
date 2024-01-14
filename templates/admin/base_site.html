@@ -8,7 +8,14 @@
 
 {% block extrastyle %}
 {% comment %} icon  {% endcomment %}
-<link rel="shortcut icon" href="{{home.favicon.url}}" type="image/x-icon">
+<link rel="shortcut icon" href="
+{% if home.favicon %}
+{{home.favicon.url}}
+{% else %}
+{% static 'core/img/favicon.png' %}
+{% endif %}
+
+" type="image/x-icon">
 
 
 <div id="loading" style="display:none;">
@@ -132,7 +139,13 @@ Bienvenido
 {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
-        <img src="{{home.brand_image.url}}" alt="" width="150px">
+        <img src="
+        {% if home.brand_image %}
+        {{home.brand_image.url}}
+        {% else %}
+        {% static 'core/img/logo1.png' %}
+        {% endif %}
+        " alt="" width="150px">
         {% comment %} {{ site_header|default:_('Django Administration') }} {% endcomment %}
 
     </a>
