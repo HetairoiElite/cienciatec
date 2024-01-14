@@ -1,3 +1,9 @@
+from django.template.defaultfilters import filesizeformat
+from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
+from django.utils.html import format_html, format_html_join
+from django.utils.formats import date_format
+from .models import ReportLetter
 from django.contrib import admin
 from django.utils.html import format_html
 from django import forms
@@ -65,14 +71,15 @@ class ReceptionLetterAdmin(admin.StackedInline):
     readonly_fields = (
         'seal_preview', 'secretary_firm_preview', 'president_firm_preview')
 
+
 # * ReportLetterAdmin
-from .models import ReportLetter
+
+
 class ReportLetterAdmin(admin.StackedInline):
     model = ReportLetter
-    
+
     can_delete = False
-    
-    
+
 
 # * home admin
 
@@ -114,49 +121,69 @@ class HomeAdmin(admin.ModelAdmin):
     # * image preview
 
     def image_previewc(self, obj):
-        return format_html(
-            '<img src="{}" width="200" /><a href="{}" target="_blank">{}</a>'.format(obj.image.url, obj.image.url, obj.image.url))
+        if obj.image:
+            return format_html(
+                '<img src="{}" width="200" /><a href="{}" target="_blank">{}</a>'.format(
+                    obj.image.url, obj.image.url, obj.image.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/itssmt.png" width="200" />')
 
     image_previewc.short_description = 'Imagen principal'
 
     def image_preview(self, obj):
-        return format_html(
-            '<img src="{}" width="200" />'.format(obj.image.url)
-        )
+        if obj.image:
+            return format_html(
+                '<img src="{}" width="200" />'.format(obj.image.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/itssmt.png" width="200" />')
 
     image_preview.short_description = 'Imagen principal'
 
     # * brand image preview
 
     def brand_image_previewc(self, obj):
-        return format_html(
-            '<img src="{}" width="200" /><a href="{}" target="_blank">{}</a>'.format(
-                obj.brand_image.url, obj.brand_image.url, obj.brand_image.url)
-        )
+        if obj.brand_image:
+            return format_html(
+                '<img src="{}" width="200" /><a href="{}" target="_blank">{}</a>'.format(
+                    obj.brand_image.url, obj.brand_image.url, obj.brand_image.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/logo1.png" width="200" />')
 
     brand_image_previewc.short_description = 'Imagen de marca'
 
     def brand_image_preview(self, obj):
-        return format_html(
-            '<img src="{}" width="200" />'.format(obj.brand_image.url)
-        )
+        if obj.brand_image:
+            return format_html(
+                '<img src="{}" width="200" />'.format(obj.brand_image.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/logo1.png" width="200" />')
 
     brand_image_preview.short_description = 'Imagen de marca'
 
     # * favicon preview
 
     def favicon_previewc(self, obj):
-        return format_html(
-            '<img src="{}" width="50" /><a href="{}" target="_blank">{}</a>'.format(
-                obj.favicon.url, obj.favicon.url, obj.favicon.url)
-        )
+        if obj.favicon:
+            return format_html(
+                '<img src="{}" width="50" /><a href="{}" target="_blank">{}</a>'.format(
+                    obj.favicon.url, obj.favicon.url, obj.favicon.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/favicon.png" width="50" />')
 
     favicon_previewc.short_description = 'Favicon'
 
     def favicon_preview(self, obj):
-        return format_html(
-            '<img src="{}" width="50" />'.format(obj.favicon.url)
-        )
+        if obj.favicon:
+            return format_html(
+                '<img src="{}" width="50" />'.format(obj.favicon.url)
+            )
+        else:
+            return format_html('<img src="/static/core/img/favicon.png" width="50" />')
 
     favicon_preview.short_description = 'Favicon'
 
@@ -229,14 +256,8 @@ class HomeAdmin(admin.ModelAdmin):
 admin.site.register(Home, HomeAdmin)
 
 
-from django.contrib import admin
 # from cabinet.admin import FileAdmin
 # from cabinet.models import File
-from django.utils.formats import date_format
-from django.utils.html import format_html, format_html_join
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
-from django.template.defaultfilters import filesizeformat
 
 # Register your models here.
 
@@ -259,16 +280,16 @@ from django.template.defaultfilters import filesizeformat
 #             format_html_join(mark_safe("<br>"), "{}", ((d,)
 #                              for d in details if d)),
 #         )
-        
+
 #     admin_details.short_description = "Detalles"
-    
+
 #     def admin_file_name(self, instance):
 #         return format_html(
 #             "{} <small>({})</small>",
 #             instance.file_name,
 #             filesizeformat(instance.file_size),
 #         )
-        
+
 #     admin_file_name.short_description = "Nombre del archivo"
 
 # # * Unregister the default FileAdmin
