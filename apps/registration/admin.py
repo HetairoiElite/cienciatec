@@ -55,7 +55,7 @@ class InlineProfile(admin.StackedInline):
 class CustomUserAdmin(UserAdmin):
 
     def image_tag(self, obj):
-        return format_html('<img src="{}" width="100" height="100" />'.format(obj.profile.avatar.url))
+        return format_html('<img src="{}" width="100" height="100" />'.format(obj.profile.avatar.url if obj.profile.avatar else '/static/core/img/default.jpg'))
 
     image_tag.short_description = 'Avatar'
 
