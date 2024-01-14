@@ -25,7 +25,7 @@ TYPE_USER = (
 
 class Profile(models.Model):
     avatar = models.ImageField(
-        upload_to=custom_upload_to, blank=True, null=True, default='avatars/default.jpg')
+        upload_to=custom_upload_to, blank=True, null=True)
     type_user = models.CharField(
         max_length=1, choices=TYPE_USER, verbose_name='Tipo de usuario', null=True, blank=True)
     user = models.OneToOneField(
