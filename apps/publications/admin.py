@@ -25,7 +25,9 @@ class PublicationAdmin(admin.ModelAdmin):
         if obj:
             return []
         else:
-            return ['current']
+            return ['current', 'numero_folio']
+        
+    
 
     inlines = [
        
