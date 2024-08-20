@@ -15,3 +15,10 @@ def remove_line_numbering_from_docx(doc):
     for section in doc.sections:
         if section._sectPr.xpath("w:lnNumType"):
             section._sectPr.remove(section._sectPr.xpath("w:lnNumType")[0])
+            
+def eliminar_pie_pagina(doc):
+    for section in doc.sections:
+        footer = section._sectPr
+        for child in list(footer):
+            if child.tag == '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}footerReference':
+                footer.remove(child)
