@@ -195,6 +195,7 @@ class ArticleProposal(TimeStampedModel):
         import os
         from docx import Document
         from core.functions import add_line_numbering_to_docx
+        from core.functions import eliminar_pie_pagina
 
         load_dotenv()
 
@@ -220,6 +221,7 @@ class ArticleProposal(TimeStampedModel):
             # Agregar numeración de líneas al template
             doc = Document(settings.BASE_DIR / 'downloads' / 'template.docx')
             add_line_numbering_to_docx(doc)
+            
             doc.save(settings.BASE_DIR / 'downloads' / 'template.docx')
 
             # Convertir el template a PDF
