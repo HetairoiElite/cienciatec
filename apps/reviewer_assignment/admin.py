@@ -93,7 +93,7 @@ class AssignmentAdmin(admin.ModelAdmin):
     def get_referees(self, obj):
         return format_html('\n'.join(
 
-            ['<a href="/admin/auth/user/' + str(p.id) + '/change/#/tab/inline_0/"><i class="fi-torso"></i> ' +
+            ['<a href="/admin/auth/user/' + str(p.user.id) + '/change/"><i class="fi-torso"></i> ' +
              p.user.get_full_name() + '</a><br>' for p in obj.referees.all()]))
     get_referees.short_description = 'Árbitros'
 
