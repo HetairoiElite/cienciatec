@@ -1,6 +1,16 @@
 {% extends "core/base.html" %}
 {% load static %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+
+{% if status == "success" %}
+Activación de cuenta exitosa
+{% elif status == "error"  %}
+Error en la activación de cuenta
+{% elif status == "warning" %}
+Activación de cuenta expirada
+{% endif %}
+
+{% endblock %}
 
 {% block back %}
 <a href="{% url 'home' %}" class="button clear">
